@@ -921,10 +921,12 @@ public class PcView extends Activity {
             ComputerObject computer = (ComputerObject) pcGridAdapter.getItem(i);
 
             // Check if this is the same computer
-            if (details.uuid.equals(computer.details.uuid)) {
+            // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+            if (details.uuid != null && details.uuid.equals(computer.details.uuid)) {
                 existingEntry = computer;
                 break;
             }
+            // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
         }
 
         if (existingEntry != null) {

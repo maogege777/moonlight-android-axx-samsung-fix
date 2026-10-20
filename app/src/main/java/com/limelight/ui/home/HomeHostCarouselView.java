@@ -176,6 +176,13 @@ public final class HomeHostCarouselView extends RecyclerView
             return;
         }
 
+        // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+        // Applying fresh state now makes any deferred snapshot obsolete. Leaving it around
+        // let an older snapshot overwrite a newer host state when the scroll finally settled.
+        pendingComputers = null;
+        pendingSelectionKey = null;
+        // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
+
         applyComputers(safeComputers, preferredSelectionKey);
     }
 
@@ -242,6 +249,17 @@ public final class HomeHostCarouselView extends RecyclerView
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         configureCardSize(w);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+        // Flush any deferred host update. A scroll-state callback can be missed while the
+        // window is re-created or the carousel is not scrolling, which previously left the
+        // cards showing a stale state until the activity was resumed again.
+        post(this::completeCarouselScrollIfIdle);
+        // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
     }
 
     private void configureCardSize(int w) {

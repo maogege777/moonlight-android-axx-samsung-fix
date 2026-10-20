@@ -128,37 +128,45 @@ public class ComputerManagerService extends Service {
         if (details.state == ComputerDetails.State.ONLINE) {
             ComputerDetails existingComputer = dbManager.getComputerByUUID(details.uuid);
 
-            // Check if it's in the database because it could have been
-            // removed after this was issued
+            // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+            // A successful probe must still reach the UI even when the DB row is missing.
+            // Returning early here left the live state ONLINE but never notified the home
+            // screen, which then stayed on "checking" until polling was restarted.
             if (!newPc && existingComputer == null) {
-                // It's gone
-                releaseLocalDatabaseReference();
-                return false;
-            }
-
-            // If we already have an entry for this computer in the DB, we must
-            // combine the existing data with this new data (which may be partially available
-            // due to detecting the PC via mDNS) without the saved external address. If we
-            // write to the DB without doing this first, we can overwrite our existing data.
-            if (existingComputer != null) {
-                existingComputer.update(details);
-                dbManager.updateComputer(existingComputer);
+                LimeLog.warning("No DB row for " + details.name + "; reporting probe result without persisting");
             }
             else {
                 try {
-                    // If the active address is a site-local address (RFC 1918),
-                    // then use STUN to populate the external address field if
-                    // it's not set already.
-                    if (details.remoteAddress == null) {
-                        InetAddress addr = InetAddress.getByName(details.activeAddress.address);
-                        if (addr.isSiteLocalAddress()) {
-                            populateExternalAddress(details);
-                        }
+                    // If we already have an entry for this computer in the DB, we must
+                    // combine the existing data with this new data (which may be partially available
+                    // due to detecting the PC via mDNS) without the saved external address. If we
+                    // write to the DB without doing this first, we can overwrite our existing data.
+                    if (existingComputer != null) {
+                        existingComputer.update(details);
+                        dbManager.updateComputer(existingComputer);
                     }
-                } catch (UnknownHostException ignored) {}
+                    else {
+                        try {
+                            // If the active address is a site-local address (RFC 1918),
+                            // then use STUN to populate the external address field if
+                            // it's not set already.
+                            if (details.remoteAddress == null) {
+                                InetAddress addr = InetAddress.getByName(details.activeAddress.address);
+                                if (addr.isSiteLocalAddress()) {
+                                    populateExternalAddress(details);
+                                }
+                            }
+                        } catch (UnknownHostException ignored) {}
 
-                dbManager.updateComputer(details);
+                        dbManager.updateComputer(details);
+                    }
+                } catch (RuntimeException e) {
+                    // A persistence failure must not swallow the probe result.
+                    LimeLog.severe("Failed to persist " + details.name + ": " + e);
+                    e.printStackTrace();
+                }
             }
+            // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
         }
 
         // Newly added PCs are reported by addTuple() after merging their saved route policy.
@@ -216,6 +224,13 @@ public class ComputerManagerService extends Service {
                             }
                         } catch (InterruptedException e) {
                             break;
+                        } catch (RuntimeException e) {
+                            // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+                            // An unexpected failure must not kill the polling thread, otherwise the
+                            // host stays on its last state until polling is restarted.
+                            LimeLog.severe("Polling " + tuple.computer.name + " failed: " + e);
+                            e.printStackTrace();
+                            // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
                         } finally {
                             for (Runnable callback : refreshCallbacks) {
                                 callback.run();
@@ -258,12 +273,20 @@ public class ComputerManagerService extends Service {
                     }
                 };
                 for (PollingTuple tuple : pollingTuples) {
-                    if (pollingActive && tuple.thread != null) {
-                        remaining.incrementAndGet();
-                        synchronized (tuple.pollEvent) {
-                            tuple.refreshCallbacks.add(completed);
-                            tuple.pollEvent.notifyAll();
-                        }
+                    if (!pollingActive) {
+                        continue;
+                    }
+                    // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+                    // Revive a dead polling thread, otherwise a manual refresh does nothing.
+                    if (tuple.thread == null) {
+                        tuple.thread = createPollingThread(tuple);
+                        tuple.thread.start();
+                    }
+                    // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
+                    remaining.incrementAndGet();
+                    synchronized (tuple.pollEvent) {
+                        tuple.refreshCallbacks.add(completed);
+                        tuple.pollEvent.notifyAll();
                     }
                 }
                 completed.run();
