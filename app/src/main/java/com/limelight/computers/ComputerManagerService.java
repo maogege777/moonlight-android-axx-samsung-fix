@@ -167,8 +167,13 @@ public class ComputerManagerService extends Service {
             public void run() {
 
                 int offlineCount = 0;
+                long observedNetworkGeneration = tuple.networkChangeGeneration;
                 try {
                     while (!isInterrupted() && pollingActive) {
+                        if (observedNetworkGeneration != tuple.networkChangeGeneration) {
+                            observedNetworkGeneration = tuple.networkChangeGeneration;
+                            offlineCount = 0;
+                        }
                         List<Runnable> refreshCallbacks;
                         synchronized (pollingTuples) {
                             if (tuple.thread != this) {
@@ -182,10 +187,20 @@ public class ComputerManagerService extends Service {
                                 if (isInterrupted()) {
                                     break;
                                 }
-                                if (!runPoll(tuple.computer, false, offlineCount)) {
+                                long pollNetworkGeneration = tuple.networkChangeGeneration;
+                                boolean pollSucceeded = runPoll(tuple.computer, false, offlineCount);
+                                if (!pollSucceeded && pollNetworkGeneration != tuple.networkChangeGeneration) {
+                                    tuple.computer.state = ComputerDetails.State.UNKNOWN;
+                                    if (listener != null) {
+                                        listener.notifyComputerUpdated(tuple.computer);
+                                    }
+                                    offlineCount = 0;
+                                }
+                                else if (!pollSucceeded) {
                                     LimeLog.warning(tuple.computer.name + " is offline (try " + offlineCount + ")");
                                     offlineCount++;
-                                } else {
+                                }
+                                else {
                                     tuple.lastSuccessfulPollMs = SystemClock.elapsedRealtime();
                                     offlineCount = 0;
                                 }
@@ -199,7 +214,8 @@ public class ComputerManagerService extends Service {
                         }
                         try {
                             synchronized (tuple.pollEvent) {
-                                if (tuple.refreshCallbacks.isEmpty()) {
+                                if (tuple.refreshCallbacks.isEmpty() &&
+                                        observedNetworkGeneration == tuple.networkChangeGeneration) {
                                     tuple.pollEvent.wait(SERVERINFO_POLLING_PERIOD_MS);
                                 }
                             }
@@ -722,7 +738,9 @@ public class ComputerManagerService extends Service {
         }
     }
 
-    private void startParallelPollThread(ParallelPollTuple tuple, HashSet<ComputerDetails.AddressTuple> uniqueAddresses) {
+    // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+    private void startParallelPollThread(ParallelPollTuple tuple, HashSet<ComputerDetails.AddressTuple> uniqueAddresses,
+                                        Object completionLock, ParallelPollTuple[] firstSuccess) {
         // Don't bother starting a polling thread for an address that doesn't exist
         // or if the address has already been polled with an earlier tuple
         if (tuple.address == null || !uniqueAddresses.add(tuple.address)) {
@@ -734,13 +752,19 @@ public class ComputerManagerService extends Service {
         tuple.pollingThread = new Thread() {
             @Override
             public void run() {
-                ComputerDetails details = tryPollIp(tuple.existingDetails, tuple.address);
-
-                synchronized (tuple) {
-                    tuple.complete = true; // Done
-                    tuple.returnedDetails = details; // Polling result
-
-                    tuple.notify();
+                ComputerDetails details = null;
+                try {
+                    details = tryPollIp(tuple.existingDetails, tuple.address);
+                }
+                finally {
+                    synchronized (completionLock) {
+                        tuple.complete = true;
+                        tuple.returnedDetails = details;
+                        if (details != null && firstSuccess[0] == null) {
+                            firstSuccess[0] = tuple;
+                        }
+                        completionLock.notifyAll();
+                    }
                 }
             }
         };
@@ -749,91 +773,77 @@ public class ComputerManagerService extends Service {
     }
 
     private ComputerDetails parallelPollPc(ComputerDetails details) throws InterruptedException {
+        ParallelPollTuple activeInfo = new ParallelPollTuple(details.activeAddress, details);
         ParallelPollTuple localInfo = new ParallelPollTuple(details.localAddress, details);
         ParallelPollTuple manualInfo = new ParallelPollTuple(details.manualAddress, details);
         ParallelPollTuple remoteInfo = new ParallelPollTuple(details.remoteAddress, details);
         ParallelPollTuple ipv6Info = new ParallelPollTuple(details.ipv6Address, details);
 
-        // These must be started in order of precedence for the deduplication algorithm
-        // to result in the correct behavior.
+        List<ParallelPollTuple> pollTuples = new LinkedList<>();
+        pollTuples.add(activeInfo);
+        pollTuples.add(localInfo);
+        pollTuples.add(manualInfo);
+        pollTuples.add(remoteInfo);
+        pollTuples.add(ipv6Info);
+
         HashSet<ComputerDetails.AddressTuple> uniqueAddresses = new HashSet<>();
-        startParallelPollThread(localInfo, uniqueAddresses);
-        startParallelPollThread(manualInfo, uniqueAddresses);
-        startParallelPollThread(remoteInfo, uniqueAddresses);
-        startParallelPollThread(ipv6Info, uniqueAddresses);
+        Object completionLock = new Object();
+        ParallelPollTuple[] firstSuccess = new ParallelPollTuple[1];
+        for (ParallelPollTuple tuple : pollTuples) {
+            startParallelPollThread(tuple, uniqueAddresses, completionLock, firstSuccess);
+        }
 
         try {
-            // Check local first
-            synchronized (localInfo) {
-                while (!localInfo.complete) {
-                    localInfo.wait();
+            synchronized (completionLock) {
+                while (firstSuccess[0] == null) {
+                    boolean allComplete = true;
+                    for (ParallelPollTuple tuple : pollTuples) {
+                        if (!tuple.complete) {
+                            allComplete = false;
+                            break;
+                        }
+                    }
+                    if (allComplete) {
+                        return null;
+                    }
+                    completionLock.wait();
                 }
 
-                if (localInfo.returnedDetails != null) {
-                    localInfo.returnedDetails.activeAddress = localInfo.address;
-                    return localInfo.returnedDetails;
-                }
-            }
-
-            // Now manual
-            synchronized (manualInfo) {
-                while (!manualInfo.complete) {
-                    manualInfo.wait();
-                }
-
-                if (manualInfo.returnedDetails != null) {
-                    manualInfo.returnedDetails.activeAddress = manualInfo.address;
-                    return manualInfo.returnedDetails;
-                }
-            }
-
-            // Now remote IPv4
-            synchronized (remoteInfo) {
-                while (!remoteInfo.complete) {
-                    remoteInfo.wait();
-                }
-
-                if (remoteInfo.returnedDetails != null) {
-                    remoteInfo.returnedDetails.activeAddress = remoteInfo.address;
-                    return remoteInfo.returnedDetails;
-                }
-            }
-
-            // Now global IPv6
-            synchronized (ipv6Info) {
-                while (!ipv6Info.complete) {
-                    ipv6Info.wait();
-                }
-
-                if (ipv6Info.returnedDetails != null) {
-                    ipv6Info.returnedDetails.activeAddress = ipv6Info.address;
-                    return ipv6Info.returnedDetails;
-                }
+                ParallelPollTuple winner = firstSuccess[0];
+                winner.returnedDetails.activeAddress = winner.address;
+                return winner.returnedDetails;
             }
         } finally {
             // Stop any further polling if we've found a working address or we've been
             // interrupted by an attempt to stop polling.
-            localInfo.interrupt();
-            manualInfo.interrupt();
-            remoteInfo.interrupt();
-            ipv6Info.interrupt();
+            for (ParallelPollTuple tuple : pollTuples) {
+                tuple.interrupt();
+            }
         }
-
-        return null;
     }
+    // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
 
     private boolean pollComputer(ComputerDetails details) throws InterruptedException {
         // Poll all addresses in parallel to speed up the process
         LimeLog.info("Starting parallel poll for "+details.name+" ("+details.localAddress +", "+details.remoteAddress +", "+details.manualAddress+", "+details.ipv6Address+")");
         ComputerDetails polledDetails;
+        // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
         if (details.preferredAddress != null) {
             polledDetails = tryPollIp(details, details.preferredAddress);
             if (polledDetails != null) {
                 polledDetails.activeAddress = ComputerDetails.copyAddress(details.preferredAddress);
             }
-        } else {
+            else if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+            else {
+                polledDetails = parallelPollPc(details);
+            }
+        }
+        else {
             polledDetails = parallelPollPc(details);
         }
+        // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
         LimeLog.info("Parallel poll for "+details.name+" returned address: "+details.activeAddress);
 
         if (polledDetails != null) {
@@ -844,6 +854,23 @@ public class ComputerManagerService extends Service {
             return false;
         }
     }
+
+    // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] BEGIN
+    private void markComputersForNetworkRecheck() {
+        synchronized (pollingTuples) {
+            for (PollingTuple tuple : pollingTuples) {
+                tuple.computer.state = ComputerDetails.State.UNKNOWN;
+                if (listener != null) {
+                    listener.notifyComputerUpdated(tuple.computer);
+                }
+                synchronized (tuple.pollEvent) {
+                    tuple.networkChangeGeneration++;
+                    tuple.pollEvent.notifyAll();
+                }
+            }
+        }
+    }
+    // EXTENSION DEVELOPMENT [EXT-NETWORK-REACHABILITY] [MODIFIED] END
 
     @Override
     public void onCreate() {
@@ -875,28 +902,21 @@ public class ComputerManagerService extends Service {
             networkCallback = new ConnectivityManager.NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
-                    LimeLog.info("Resetting PC state for new available network");
-                    synchronized (pollingTuples) {
-                        for (PollingTuple tuple : pollingTuples) {
-                            tuple.computer.state = ComputerDetails.State.UNKNOWN;
-                            if (listener != null) {
-                                listener.notifyComputerUpdated(tuple.computer);
-                            }
-                        }
-                    }
+                    LimeLog.info("New default network available; rechecking PC state");
+                    markComputersForNetworkRecheck();
                 }
 
                 @Override
                 public void onLost(Network network) {
-                    LimeLog.info("Offlining PCs due to network loss");
-                    synchronized (pollingTuples) {
-                        for (PollingTuple tuple : pollingTuples) {
-                            tuple.computer.state = ComputerDetails.State.OFFLINE;
-                            if (listener != null) {
-                                listener.notifyComputerUpdated(tuple.computer);
-                            }
-                        }
+                    ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                    Network activeNetwork = connMgr.getActiveNetwork();
+                    if (activeNetwork != null && !activeNetwork.equals(network)) {
+                        LimeLog.info("Ignoring loss of a non-default network while a default network remains");
+                        return;
                     }
+
+                    LimeLog.info("Default network lost; rechecking PC state");
+                    markComputersForNetworkRecheck();
                 }
             };
 
@@ -1081,6 +1101,7 @@ class PollingTuple {
     public volatile Thread thread;
     public final ComputerDetails computer;
     public final Object networkLock;
+    public volatile long networkChangeGeneration;
     public long lastSuccessfulPollMs;
     public final Object pollEvent = new Object();
     public final List<Runnable> refreshCallbacks = new LinkedList<>();
