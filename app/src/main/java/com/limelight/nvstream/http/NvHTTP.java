@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -55,6 +56,7 @@ import com.limelight.nvstream.http.PairingManager.PairState;
 import com.limelight.nvstream.jni.MoonBridge;
 import com.limelight.utils.RazerUtils;
 
+import okhttp3.Call;
 import okhttp3.ConnectionPool;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -90,6 +92,23 @@ public class NvHTTP {
     private X509Certificate serverCert;
 
     private String clientName;
+
+    // Tracks the request currently in flight so a stopped or superseded probe can abandon it
+    // immediately instead of waiting for the full connect/read timeout to expire.
+    private final AtomicReference<Call> activeCall = new AtomicReference<>();
+    private volatile boolean cancelled;
+
+    public void cancel() {
+        cancelled = true;
+        Call call = activeCall.getAndSet(null);
+        if (call != null) {
+            call.cancel();
+        }
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
@@ -448,7 +467,24 @@ public class NvHTTP {
     private ResponseBody openHttpConnection(OkHttpClient client, HttpUrl baseUrl, String path, String query) throws IOException {
         HttpUrl completeUrl = getCompleteUrl(baseUrl, path, query);
         Request request = new Request.Builder().url(completeUrl).get().build();
-        Response response = performAndroidTlsHack(client).newCall(request).execute();
+
+        if (cancelled) {
+            throw new java.net.SocketException("Probe cancelled");
+        }
+
+        Call call = performAndroidTlsHack(client).newCall(request);
+        activeCall.set(call);
+        if (cancelled) {
+            call.cancel();
+        }
+
+        Response response;
+        try {
+            response = call.execute();
+        }
+        finally {
+            activeCall.compareAndSet(call, null);
+        }
 
         ResponseBody body = response.body();
         
