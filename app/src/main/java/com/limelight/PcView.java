@@ -970,18 +970,23 @@ public class PcView extends Activity {
         for (int index = 0; index < pcGridAdapter.getCount(); index++) {
             computers.add((ComputerObject) pcGridAdapter.getItem(index));
         }
+        // EXTENSION DEVELOPMENT [EXT-HOST-SORT-ORDER] [MODIFIED] BEGIN
+        // Hosts are sorted by name only, regardless of their online/offline state.
+        // The state-priority rule (online -> unknown -> offline, then by name) is kept
+        // commented out below together with getHostSortRank() so it can be restored quickly.
         Collections.sort(computers, (left, right) -> {
-            int stateComparison = Integer.compare(
-                    getHostSortRank(left), getHostSortRank(right));
-            if (stateComparison != 0) {
-                return stateComparison;
-            }
+            // int stateComparison = Integer.compare(
+            //         getHostSortRank(left), getHostSortRank(right));
+            // if (stateComparison != 0) {
+            //     return stateComparison;
+            // }
             String leftName = left == null || left.details == null || left.details.name == null
                     ? "" : left.details.name;
             String rightName = right == null || right.details == null || right.details.name == null
                     ? "" : right.details.name;
             return leftName.compareToIgnoreCase(rightName);
         });
+        // EXTENSION DEVELOPMENT [EXT-HOST-SORT-ORDER] [MODIFIED] END
         if (!computers.isEmpty() && !hostSelectionExplicit) {
             selectedHostKey = computers.get(0).details.uuid;
         }
@@ -990,13 +995,18 @@ public class PcView extends Activity {
         configureHomeLayout();
     }
 
-    private static int getHostSortRank(ComputerObject computer) {
-        if (computer == null || computer.details == null
-                || computer.details.state == ComputerDetails.State.UNKNOWN) {
-            return 1;
-        }
-        return computer.details.state == ComputerDetails.State.ONLINE ? 0 : 2;
-    }
+    // EXTENSION DEVELOPMENT [EXT-HOST-SORT-ORDER] [DISABLED] BEGIN
+    // Unused while hosts are sorted by name only. Kept commented out so the state-priority
+    // sorting in syncHomeHosts() can be re-enabled by uncommenting this method and the
+    // stateComparison block there.
+    // private static int getHostSortRank(ComputerObject computer) {
+    //     if (computer == null || computer.details == null
+    //             || computer.details.state == ComputerDetails.State.UNKNOWN) {
+    //         return 1;
+    //     }
+    //     return computer.details.state == ComputerDetails.State.ONLINE ? 0 : 2;
+    // }
+    // EXTENSION DEVELOPMENT [EXT-HOST-SORT-ORDER] [DISABLED] END
 
     private void launchAddHost() {
         startActivity(new Intent(PcView.this, AddComputerManually.class));
