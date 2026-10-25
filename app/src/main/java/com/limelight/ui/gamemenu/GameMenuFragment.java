@@ -682,6 +682,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
     //   短按  → 保持原有「显示/隐藏」行为，按钮绿色高亮同步（行为零改动）
     //   长按  → 200ms 后在按钮正下方（空间不足则正上方）弹出方案列表，就近点选
     //   选中  → 写 pref（gamepad_axi_list / keyboard_axi_list）→ 刷新角标 → 热重载布局
+    //           → 关闭全部菜单窗口，回到串流画面
     // 与二级面板「虚拟手柄与虚拟按键」里的 RadioGroup 共用同一份 pref，两处始终一致。
 
     /**
@@ -915,7 +916,10 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
 
         Toast.makeText(ctx, (isGamePad ? "虚拟手柄" : "虚拟按键")
                 + "已切换到方案" + (index + 1), Toast.LENGTH_SHORT).show();
+        // 先收掉方案浮层，再关闭整条菜单窗口链（含本主菜单），直接回到串流画面。
+        // 与「操作」面板发送快捷键后的行为一致，复用 BaseGameMenuFragmentDialog.dismissAllDialogs()。
         dismissSchemePopup();
+        dismissAllDialogs();
     }
 
     /** 让两个角标始终显示当前生效的方案序号，并跟随手柄/按键的启用状态换底色。 */
