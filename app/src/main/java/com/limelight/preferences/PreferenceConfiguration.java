@@ -151,6 +151,13 @@ public class PreferenceConfiguration {
     //屏幕按键/虚拟手柄：仅在按下瞬间震动，拖放与滑过其他按键不再重复震动
     public static final String CHECKBOX_VIBRATE_ON_PRESS_ONLY = "checkbox_vibrate_keyboard_on_press_only";
 
+    //屏幕按键/虚拟手柄：按下震动时长（毫秒）
+    public static final String EDIT_VIBRATE_PRESS_MS = "edit_vibrate_press_ms";
+
+    //按下震动时长允许范围（低于 8ms 多数马达感知不到，高于 100ms 会明显拖长）
+    public static final int MIN_VIBRATE_PRESS_MS = 8;
+    public static final int MAX_VIBRATE_PRESS_MS = 100;
+
     //自动摇杆
     private static final String CHECKBOX_CHECKBOX_ENABLE_ANALOG_STICK_NEW="checkbox_enable_analog_stick_new";
 
@@ -184,6 +191,7 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_UNLOCK_FPS = false;
     private static final boolean DEFAULT_VIBRATE_OSC = true;
     private static final boolean DEFAULT_VIBRATE_ON_PRESS_ONLY = true;
+    private static final int DEFAULT_VIBRATE_PRESS_MS = 10;
     private static final boolean DEFAULT_VIBRATE_FALLBACK = false;
     private static final int DEFAULT_VIBRATE_FALLBACK_STRENGTH = 100;
     private static final boolean DEFAULT_FLIP_FACE_BUTTONS = false;
@@ -310,6 +318,9 @@ public class PreferenceConfiguration {
 
     //仅按下瞬间震动：开启后拖放、滑过其他按键、摇杆画圈都不再触发震动
     public boolean enableKeyboardVibrateOnPressOnly;
+
+    //按下震动时长（毫秒），8~100
+    public int vibratePressMs;
 
     public boolean enableKeyboardSquare;
 
@@ -985,6 +996,8 @@ public class PreferenceConfiguration {
 
         config.enableKeyboardVibrate=prefs.getBoolean(CHECKBOX_ENABLE_KEYBOARD_VIBRATE,false);
         config.enableKeyboardVibrateOnPressOnly=prefs.getBoolean(CHECKBOX_VIBRATE_ON_PRESS_ONLY,DEFAULT_VIBRATE_ON_PRESS_ONLY);
+        config.vibratePressMs=Math.max(MIN_VIBRATE_PRESS_MS,Math.min(MAX_VIBRATE_PRESS_MS,
+                prefs.getInt(EDIT_VIBRATE_PRESS_MS,DEFAULT_VIBRATE_PRESS_MS)));
         //兼容joycon手柄
         config.enableJoyConFix=prefs.getBoolean("checkbox_enable_joyconfix",false);
         //全键盘透明度

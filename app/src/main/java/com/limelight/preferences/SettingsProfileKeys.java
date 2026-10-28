@@ -88,6 +88,7 @@ final class SettingsProfileKeys {
         "checkbox_vibrate_fallback",
         "checkbox_vibrate_keyboard",
         "checkbox_vibrate_keyboard_on_press_only",
+        "edit_vibrate_press_ms",
         "checkbox_vibrate_osc",
         "ds5TriggerEnd",
         "ds5TriggerFrequency",

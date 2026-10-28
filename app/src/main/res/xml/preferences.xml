@@ -644,6 +644,12 @@
             android:defaultValue="true" />
 
         <Preference
+            android:key="edit_vibrate_press_ms"
+            android:dependency="checkbox_vibrate_keyboard"
+            android:title="@string/title_vibrate_press_ms"
+            android:summary="@string/summary_vibrate_press_ms" />
+
+        <Preference
             android:key="import_keyboard_file"
             android:title="导入虚拟按键配置"
             android:summary="选择一个配置文件，覆盖默认选择的布局方案。(仅横屏模式)"

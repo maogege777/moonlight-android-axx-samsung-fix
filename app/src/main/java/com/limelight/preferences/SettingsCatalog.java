@@ -60,7 +60,7 @@ final class SettingsCatalog {
                 "checkbox_audio_haptics_keep_controller_rumble")),
         new Group("虚拟按键", "屏幕按键与完整键盘",
             new Section("屏幕按键", "checkbox_enable_keyboard", "keyboard_axi_list", "checkbox_vibrate_keyboard",
-                "checkbox_vibrate_keyboard_on_press_only"),
+                "checkbox_vibrate_keyboard_on_press_only", "edit_vibrate_press_ms"),
             new Section("完整键盘", "seekbar_keyboard_axi_opacity", "seekbar_keyboard_axi_height",
                 "checkbox_enable_keyboard_axi_combination"),
             new Section("按键配置", "import_keyboard_file", "export_keyboard_file")),

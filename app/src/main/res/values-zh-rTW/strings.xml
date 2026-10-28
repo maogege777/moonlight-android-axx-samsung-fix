@@ -150,6 +150,8 @@
     <string name="summary_checkbox_vibrate_osc_gamepad"> 開啟後，遊戲內的震動會改用手機馬達輸出（僅使用虛擬手把時生效） </string>
     <string name="title_checkbox_vibrate_on_press_only"> 僅按下震動 </string>
     <string name="summary_checkbox_vibrate_on_press_only"> 按下瞬間只震動一次，拖動和滑過其他按鍵不再持續震動 </string>
+    <string name="title_vibrate_press_ms"> 震感強度 </string>
+    <string name="summary_vibrate_press_ms"> 按下時手機馬達的震動時長（8~100ms） </string>
     <string name="title_only_l3r3">僅顯示 L3 和 R3</string>
     <string name="summary_only_l3r3">隱藏除 L3 和 R3 外的所有虛擬按鈕</string>
     <string name="title_reset_osc">重設已儲存的螢幕控制按鈕版面配置</string>

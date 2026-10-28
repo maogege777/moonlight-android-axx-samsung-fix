@@ -43,6 +43,7 @@ import com.limelight.StreamLogFilesActivity;
 import com.limelight.binding.input.virtual_controller.keyboard.KeyBoardControllerConfigurationLoader;
 import com.limelight.binding.video.MediaCodecHelper;
 import com.limelight.ui.AppDialog;
+import com.limelight.ui.gamemenu.GameVibrationStrengthFragment;
 import com.limelight.utils.PairingBackupManager;
 import com.limelight.log.StreamLogStore;
 import com.limelight.utils.Dialog;
@@ -486,6 +487,7 @@ public class StreamSettings extends Activity {
         public void onResume() {
             super.onResume();
             updateStreamLogSummary();
+            updateVibratePressSummary(findPreference(PreferenceConfiguration.EDIT_VIBRATE_PRESS_MS));
             // Keep the Preference lifecycle for dependencies and activity results. Only the
             // independent settings sheet is visible; never open native preference dialogs.
             new Handler().post(() -> {
@@ -493,6 +495,38 @@ public class StreamSettings extends Activity {
                     ((StreamSettings) getActivity()).showSettingsPanel();
                 }
             });
+        }
+
+        private void updateVibratePressSummary(Preference preference) {
+            Activity activity = getActivity();
+            if (activity == null || preference == null) {
+                return;
+            }
+            int ms = PreferenceConfiguration.readPreferences(activity).vibratePressMs;
+            preference.setSummary("按下时手机马达的震动时长（8~100ms），当前 " + ms + "ms");
+        }
+
+        private void showVibratePressDialog(Preference preference) {
+            Activity activity = getActivity();
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
+            GameVibrationStrengthFragment fragment = new GameVibrationStrengthFragment();
+            fragment.setWidth(UiHelper.dpToPx(activity, 364));
+            fragment.setValue(PreferenceConfiguration.readPreferences(activity).vibratePressMs);
+            fragment.setOnClick(ms -> {
+                PreferenceManager.getDefaultSharedPreferences(activity)
+                        .edit()
+                        .putInt(PreferenceConfiguration.EDIT_VIBRATE_PRESS_MS, ms)
+                        .apply();
+                updateVibratePressSummary(preference);
+                SettingsPanelDialog panel = (SettingsPanelDialog) getFragmentManager()
+                        .findFragmentByTag(SettingsPanelDialog.TAG);
+                if (panel != null) {
+                    panel.refresh();
+                }
+            });
+            fragment.show(getFragmentManager());
         }
 
         private void updateStreamLogSummary() {
@@ -566,6 +600,15 @@ public class StreamSettings extends Activity {
                     return true;
                 });
                 updateStreamLogSummary();
+            }
+
+            Preference vibratePress = findPreference(PreferenceConfiguration.EDIT_VIBRATE_PRESS_MS);
+            if (vibratePress != null) {
+                updateVibratePressSummary(vibratePress);
+                vibratePress.setOnPreferenceClickListener(preference -> {
+                    showVibratePressDialog(preference);
+                    return true;
+                });
             }
 
             if (!MediaCodecHelper.isXiaomiXringO1Device()) {

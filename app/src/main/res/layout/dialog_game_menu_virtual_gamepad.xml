@@ -621,6 +621,29 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_vibration_strength"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/ic_game_menu_btn_selector"
+                    android:drawableLeft="@drawable/ic_axi_vibrate"
+                    android:drawableRight="@drawable/ic_axi_arrow"
+                    android:drawablePadding="6dp"
+                    android:gravity="left|center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="震感强度\n15ms"
+                    android:textSize="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/ll_ds_touchpad_row"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"

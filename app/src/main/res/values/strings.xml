@@ -293,6 +293,8 @@
     <string name="summary_checkbox_vibrate_osc_gamepad">In-game rumble is played through the phone\'s vibration motor (only while using the on-screen gamepad)</string>
     <string name="title_checkbox_vibrate_on_press_only">Vibrate on press only</string>
     <string name="summary_checkbox_vibrate_on_press_only">Vibrate once when a button is pressed. Dragging and sliding across other buttons will not vibrate again.</string>
+    <string name="title_vibrate_press_ms">Vibration strength</string>
+    <string name="summary_vibrate_press_ms">Haptic duration for on-screen buttons and the virtual gamepad (8-100 ms)</string>
     <string name="title_only_l3r3">Only show L3 and R3</string>
     <string name="summary_only_l3r3">Hide all virtual buttons except L3 and R3</string>
     <string name="title_show_guide_button">Show Guide Button</string>

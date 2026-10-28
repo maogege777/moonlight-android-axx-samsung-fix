@@ -43,6 +43,8 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
 
     private Button btn_vibration_on_press;
 
+    private Button btn_vibration_strength;
+
     private LinearLayout ll_ds_touchpad_row;
 
     private Button btn_vibration_gamepad;
@@ -93,6 +95,7 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
 
         btn_vibration=v.findViewById(R.id.btn_vibration);
         btn_vibration_on_press=v.findViewById(R.id.btn_vibration_on_press);
+        btn_vibration_strength=v.findViewById(R.id.btn_vibration_strength);
         ll_ds_touchpad_row=v.findViewById(R.id.ll_ds_touchpad_row);
         btn_vibration_gamepad=v.findViewById(R.id.btn_vibration_gamepad);
         btn_ds_touchpad=v.findViewById(R.id.btn_ds_touchpad);
@@ -124,6 +127,7 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         ibtn_back.setOnClickListener(this);
         btn_vibration.setOnClickListener(this);
         btn_vibration_on_press.setOnClickListener(this);
+        btn_vibration_strength.setOnClickListener(this);
         btn_vibration_gamepad.setOnClickListener(this);
         btn_ds_touchpad.setOnClickListener(this);
         v.findViewById(R.id.btn_right).setOnClickListener(this);
@@ -388,6 +392,9 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         ll_ds_touchpad_row.setVisibility(dsTouchpadSupported ? View.VISIBLE : View.GONE);
         btn_ds_touchpad.setBackgroundResource(dsTouchpadVisible ?
                 R.drawable.ic_game_menu_btn_green_selector : R.drawable.ic_game_menu_btn_selector);
+
+        //两行显示：标题 + 当前时长，右侧箭头提示可进入
+        btn_vibration_strength.setText("震感强度\n" + prefConfig.vibratePressMs + "ms");
     }
 
     private void initViewHeight(){
@@ -430,6 +437,21 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
                     .edit()
                     .putBoolean(PreferenceConfiguration.CHECKBOX_ENABLE_KEYBOARD_VIBRATE,prefConfig.enableKeyboardVibrate)
                     .commit();
+            return;
+        }
+        if(v.getId()==R.id.btn_vibration_strength){
+            GameVibrationStrengthFragment fragment=new GameVibrationStrengthFragment();
+            fragment.setWidth(UiHelper.dpToPx(getActivity(),364));
+            fragment.setValue(prefConfig.vibratePressMs);
+            fragment.setOnClick(ms -> {
+                prefConfig.vibratePressMs=ms;
+                initViewData();
+                PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .edit()
+                        .putInt(PreferenceConfiguration.EDIT_VIBRATE_PRESS_MS,ms)
+                        .commit();
+            });
+            fragment.show(getFragmentManager());
             return;
         }
         if(v.getId()==R.id.btn_vibration_on_press){
