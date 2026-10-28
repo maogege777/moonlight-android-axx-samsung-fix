@@ -125,9 +125,10 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             btn_screen_move.setBackgroundResource(game.getScreenMoveZoom()?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
         }
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
-        attachSchemeLongPress(btn_game_pad, SCHEME_KIND_GAMEPAD);
-        attachSchemeLongPress(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
-        attachSchemeLongPress(btn_mouse, SCHEME_KIND_MOUSE);
+        // 单击弹出布局方案菜单；长按切换显示/隐藏
+        attachToggleLongPress(btn_game_pad, SCHEME_KIND_GAMEPAD);
+        attachToggleLongPress(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
+        // 鼠标与触控：单击、长按都直接弹完整菜单，无需自定义长按监听
         refreshSchemeBadges();
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] END
         v.findViewById(R.id.btn_unlink).setOnClickListener(this);
@@ -316,19 +317,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             return;
         }
         if(v.getId()==R.id.btn_game_pad){
-            // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [MODIFIED] BEGIN
-            // 长按已弹出方案浮层时，松手补发的这次 click 直接丢弃，不再切换显隐
+            // 长按已切换开关时，松手补发的这次 click 直接丢弃，不再弹菜单
             if(schemeLongPressFired){
                 schemeLongPressFired=false;
                 return;
             }
-            // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [MODIFIED] END
-            if(game!=null){
-                game.showHideVirtualController();
-                btn_game_pad.setBackgroundResource(game.prefConfig.onscreenController?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
-                // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW]
-                refreshSchemeBadges();
-            }
+            // 单击：弹出虚拟手柄布局方案菜单
+            showSchemePopup(btn_game_pad, SCHEME_KIND_GAMEPAD);
             return;
         }
 
@@ -341,18 +336,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         }
 
         if(v.getId()==R.id.btn_v_keyboard){
-            // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [MODIFIED] BEGIN
+            // 长按已切换开关时，松手补发的这次 click 直接丢弃，不再弹菜单
             if(schemeLongPressFired){
                 schemeLongPressFired=false;
                 return;
             }
-            // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [MODIFIED] END
-            if(game!=null){
-                game.showHideKeyboardController();
-                btn_v_keyboard.setBackgroundResource(game.prefConfig.enableKeyboard?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
-                // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW]
-                refreshSchemeBadges();
-            }
+            // 单击：弹出虚拟按键布局方案菜单
+            showSchemePopup(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
             return;
         }
 
@@ -408,7 +398,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                 return;
             }
             // 单击与长按统一弹出模式菜单；不再进入旧的列表面板
-            showMouseMenu(btn_mouse, false);
+            showMouseMenu(btn_mouse);
             return;
         }
 
@@ -673,6 +663,91 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
      * 用 OnTouchListener + Handler 而不是 setOnLongClickListener，是因为原生长按固定 500ms，
      * 且这里需要在长按后吞掉补发的 click；返回 false 保证短按仍走原有 OnClickListener。
      */
+    /**
+     * 长按切换虚拟手柄 / 虚拟按键的显示状态。
+     * 与方案浮层共用同一套触摸骨架：超过阈值触发 toggle，并吞掉松手后补发的 click。
+     */
+    private void attachToggleLongPress(final Button btn, final int kind) {
+        if (btn == null) {
+            return;
+        }
+        btn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        schemeLongPressFired = false;
+                        scheduleToggleLongPress(kind);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (event.getX() < 0 || event.getY() < 0
+                                || event.getX() > v.getWidth() || event.getY() > v.getHeight()) {
+                            cancelSchemeLongPress();
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        cancelSchemeLongPress();
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void scheduleToggleLongPress(final int kind) {
+        schemeLongPressRunnable = new Runnable() {
+            @Override
+            public void run() {
+                schemeLongPressFired = true;
+                if (!isAdded()) {
+                    return;
+                }
+                if (kind == SCHEME_KIND_GAMEPAD) {
+                    toggleVirtualGamepad();
+                } else if (kind == SCHEME_KIND_KEYBOARD) {
+                    toggleVirtualKeyboard();
+                }
+                // click 在 UP 时立即补发；稍后清标记，避免长按后手指移出按钮导致下次点击被误吞
+                schemePressHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        schemeLongPressFired = false;
+                    }
+                }, 400);
+            }
+        };
+        schemePressHandler.postDelayed(schemeLongPressRunnable, SCHEME_LONG_PRESS_DELAY_MS);
+    }
+
+    private void toggleVirtualGamepad() {
+        if (game == null) {
+            return;
+        }
+        game.showHideVirtualController();
+        final boolean on = game.prefConfig.onscreenController;
+        btn_game_pad.setBackgroundResource(on
+                ? R.drawable.ic_game_menu_btn_green_selector : R.drawable.ic_game_menu_btn_selector);
+        refreshSchemeBadges();
+        Toast.makeText(getActivity(), on ? "虚拟手柄已开启" : "虚拟手柄已关闭",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private void toggleVirtualKeyboard() {
+        if (game == null) {
+            return;
+        }
+        game.showHideKeyboardController();
+        final boolean on = game.prefConfig.enableKeyboard;
+        btn_v_keyboard.setBackgroundResource(on
+                ? R.drawable.ic_game_menu_btn_green_selector : R.drawable.ic_game_menu_btn_selector);
+        refreshSchemeBadges();
+        Toast.makeText(getActivity(), on ? "虚拟按键已开启" : "虚拟按键已关闭",
+                Toast.LENGTH_SHORT).show();
+    }
+
     private void attachSchemeLongPress(final Button btn, final int kind) {
         if (btn == null) {
             return;
@@ -747,10 +822,6 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         }
         dismissSchemePopup();
 
-        if (kind == SCHEME_KIND_MOUSE) {
-            showMouseMenu(anchor, true);
-            return;
-        }
         final boolean isGamePad = kind == SCHEME_KIND_GAMEPAD;
 
         final String[] names = getResources().getStringArray(
@@ -836,7 +907,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
      * 鼠标模式长按菜单：8 个模式，当前项高亮，点击即切换。
      * 与虚拟手柄/按键的方案弹窗共用同一套 PopupWindow 与行样式。
      */
-    private void showMouseMenu(final View anchor, final boolean quick) {
+    private void showMouseMenu(final View anchor) {
         final Context ctx = getActivity();
         if (ctx == null || anchor == null) {
             return;
@@ -852,36 +923,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         root.setPadding(dpToPx(8), dpToPx(6), dpToPx(8), dpToPx(6));
 
         TextView header = new TextView(ctx);
-        header.setText(quick ? "鼠标模式" : "鼠标与触控");
+        header.setText("鼠标与触控");
         header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         header.setTextColor(0xFF9C9CA0);
         header.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(6));
         root.addView(header);
 
-        if (quick) {
-            if (current > 3) {
-                TextView hint = new TextView(ctx);
-                hint.setText("当前：" + names[current] + "（变体，基础为「"
-                        + names[baseModeOf(current)] + "」）");
-                hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
-                hint.setTextColor(0xFFE0A33A);
-                hint.setPadding(dpToPx(6), dpToPx(2), dpToPx(6), dpToPx(6));
-                root.addView(hint);
-            }
-            // 长按只给 4 个基础模式；当前处于变体时把对应基础项标成空心圆
-            for (int i = 0; i < Math.min(4, names.length); i++) {
-                final int index = i;
-                final boolean hollow = i != current && i == baseModeOf(current);
-                root.addView(createSchemeRow(ctx, i + 1, names[i], i == current, hollow,
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                applyMouseMode(index);
-                            }
-                        }));
-            }
-        } else {
-            root.addView(createGroupLabel(ctx, "触控模式"));
+        root.addView(createGroupLabel(ctx, "触控模式"));
             for (int i = 0; i < Math.min(4, names.length); i++) {
                 final int index = i;
                 root.addView(createSchemeRow(ctx, i + 1, names[i], i == current, false,
@@ -930,16 +978,15 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                             applyHidePcCursor();
                         }
                     }));
-        }
 
-        // 8 项比方案列表长，外套 ScrollView 并限制最大高度，避免小屏横屏溢出
+        // 菜单项较多，外套 ScrollView 并限制最大高度，避免小屏横屏溢出
         ScrollView scrollView = new ScrollView(ctx);
         scrollView.setVerticalScrollBarEnabled(false);
         scrollView.addView(root, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // 完整菜单文案更长，宽度比快速菜单宽一些
-        final int popupWidth = dpToPx(quick ? 200 : 250);
+        final int popupWidth = dpToPx(250);
         final int containerW = getResources().getDisplayMetrics().widthPixels;
         final int containerH = getResources().getDisplayMetrics().heightPixels;
         final int margin = dpToPx(8);
