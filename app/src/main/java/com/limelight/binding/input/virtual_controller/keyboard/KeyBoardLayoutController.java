@@ -238,6 +238,7 @@ public class KeyBoardLayoutController {
         }
 
         CheckBox btn_combination=keyboardView.findViewById(R.id.btn_combination);
+        attachTopBarHaptic(btn_combination);
         btn_combination.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -253,10 +254,15 @@ public class KeyBoardLayoutController {
         }
 
         keyboardView.findViewById(R.id.iv_down).setOnClickListener(v -> hide());
+        attachTopBarHaptic(keyboardView.findViewById(R.id.iv_down));
 
         keyboardView.findViewById(R.id.iv_game_menu).setOnClickListener(v -> Game.instance.showGameMenu());
+        attachTopBarHaptic(keyboardView.findViewById(R.id.iv_game_menu));
 
         rg_keyboard=keyboardView.findViewById(R.id.rg_keyboard);
+        // 模式切换按钮按下即震（重复点同一个也有反馈，所以挂在触摸层而非状态变化）
+        attachTopBarHaptic(keyboardView.findViewById(R.id.rbt_keyboard_1));
+        attachTopBarHaptic(keyboardView.findViewById(R.id.rbt_keyboard_2));
         rg_keyboard.check(R.id.rbt_keyboard_1);
 
         rg_keyboard.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -311,6 +317,7 @@ public class KeyBoardLayoutController {
                 Game.instance.toggleKeyboard();
             }
         });
+        attachTopBarHaptic(keyboardView.findViewById(R.id.btn_soft_phone));
 
         keyboardView.findViewById(R.id.mouse_up).setOnTouchListener(new View.OnTouchListener() {
             private Runnable repeater = new Runnable() {
@@ -474,6 +481,23 @@ public class KeyBoardLayoutController {
                 Math.min(PreferenceConfiguration.MAX_VIBRATE_PRESS_MS, prefConfig.vibratePressMs));
     }
 
+    /**
+     * 顶栏按钮（模式切换 / 组合键模式 / 手机软键盘 / 收起 / 菜单）的点击反馈。
+     * 这些 View 不是键盘按键，没有走 ACTION_DOWN 的震动入口，单独补一次。
+     * 用 OnTouchListener 而不是 setOnClickListener：前者不覆盖原有 click 监听。
+     */
+    private void attachTopBarHaptic(View view) {
+        if (view == null) {
+            return;
+        }
+        view.setOnTouchListener((v, event) -> {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                performPressHaptic();
+            }
+            return false;
+        });
+    }
+
     // ---------------------------------------------------------------- 顶栏组合键条
 
     /**
@@ -511,6 +535,12 @@ public class KeyBoardLayoutController {
         lp.rightMargin = dp(5);
         chip.setLayoutParams(lp);
         chip.setOnClickListener(v -> sendCombo(bean));
+        chip.setOnTouchListener((v, event) -> {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                performPressHaptic();
+            }
+            return false;
+        });
         chip.setOnLongClickListener(v -> {
             showComboMenu(bean);
             return true;
@@ -527,6 +557,12 @@ public class KeyBoardLayoutController {
         add.setBackground(comboBackground(0xFF3A3A3C, 0xFF3A3A3C));
         add.setLayoutParams(new LinearLayout.LayoutParams(dp(28), dp(24)));
         add.setOnClickListener(v -> openComboEditor(null));
+        add.setOnTouchListener((v, event) -> {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                performPressHaptic();
+            }
+            return false;
+        });
         return add;
     }
 
