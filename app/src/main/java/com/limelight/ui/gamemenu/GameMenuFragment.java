@@ -212,12 +212,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             }
             return;
         }
-        if (v.getId() == R.id.btn_display_4) {
-            if (conn != null) {
-                sendKeys(new short[]{KeyboardTranslator.VK_LCONTROL, KeyboardTranslator.VK_LMENU, KeyboardTranslator.VK_LSHIFT, KeyboardTranslator.VK_F4});
-            }
-            return;
-        }
+        // 显示器4 已移除（该位置改放画面缩放），不再有对应按钮分支。
 
         //操作（侧边栏入口；原主菜单「更多」与其重复，已移除）
         if(v.getId()==R.id.btn_soft_function){
