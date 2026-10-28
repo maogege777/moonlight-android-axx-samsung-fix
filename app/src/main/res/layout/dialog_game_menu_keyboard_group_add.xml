@@ -121,11 +121,13 @@
                   图标按钮由 GameKeyboardUpdateFragment 按 QuickKeyStore.iconLibrary() 动态填充。
                   整行高度固定 42dp，避免挤压下方的虚拟键盘区域。 -->
             <LinearLayout
+                android:id="@+id/ll_icon_picker"
                 android:layout_width="match_parent"
                 android:layout_height="42dp"
                 android:layout_marginTop="5dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -153,6 +155,14 @@
 
             </LinearLayout>
             <!-- EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="保存后长按组合键气泡按钮可以进行编辑和删除"
+                android:textColor="#E0A33A"
+                android:textSize="9dp" />
 
         </LinearLayout>
 

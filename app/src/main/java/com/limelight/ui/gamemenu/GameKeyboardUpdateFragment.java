@@ -306,6 +306,16 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
     /** 图标选择器：横向滚动的 vector 图标库，选中项高亮；不选择则保存时留空（回落默认图标）。 */
     private void buildIconPicker(View root) {
         iconPickerContainer = root.findViewById(R.id.lv_icon_picker);
+        // 全键盘组合键条不需要图标：keyFrom==1（自定义快捷键）时整块隐藏，
+        // 避免挤压键盘区域，也避免用户误以为必须选图标。
+        View iconRow = root.findViewById(R.id.ll_icon_picker);
+        if (iconRow != null && keyFrom == 1) {
+            iconRow.setVisibility(View.GONE);
+            return;
+        }
+        if (iconPickerContainer == null) {
+            return;
+        }
         if (iconPickerContainer == null) {
             return;
         }

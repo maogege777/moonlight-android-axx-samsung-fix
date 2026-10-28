@@ -856,6 +856,10 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                     }));
         }
 
+        // 底部橙色提示：告知长按按钮可快速开关（与自定义快捷键面板的提示同色）
+        root.addView(createHintLabel(ctx,
+                isGamePad ? "长按「虚拟手柄」按钮可以快速开关" : "长按「虚拟按键」按钮可以快速开关"));
+
         final int popupWidth = dpToPx(168);
         final PopupWindow popup = new PopupWindow(root, popupWidth,
                 ViewGroup.LayoutParams.WRAP_CONTENT, true);
@@ -1080,6 +1084,16 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
         tv.setTextColor(0xFF8E8E93);
         tv.setPadding(dpToPx(6), dpToPx(8), dpToPx(6), dpToPx(4));
+        return tv;
+    }
+
+    /** 底部橙色提示行：与自定义快捷键面板的提示同色，用于说明长按快捷操作。 */
+    private View createHintLabel(Context ctx, String label) {
+        TextView tv = new TextView(ctx);
+        tv.setText(label);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+        tv.setTextColor(0xFFE0A33A);
+        tv.setPadding(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(8));
         return tv;
     }
 

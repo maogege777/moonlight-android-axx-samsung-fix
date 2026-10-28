@@ -485,6 +485,7 @@ public class KeyBoardLayoutController {
             return;
         }
         llCombo.removeAllViews();
+        llCombo.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
         List<GameMenuQuickBean> items = QuickKeyStore.loadCustom(context);
         for (GameMenuQuickBean bean : items) {
             if (QuickKeyStore.isSeedItem(bean)) {
@@ -504,7 +505,7 @@ public class KeyBoardLayoutController {
         chip.setSingleLine(true);
         chip.setEllipsize(TextUtils.TruncateAt.END);
         chip.setPadding(dp(8), 0, dp(8), 0);
-        chip.setBackground(comboBackground(0xFF333336, 0xFF45454A));
+        chip.setBackground(comboBackground(0xFF3A3A3C, 0xFF3A3A3C));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, dp(24));
         lp.rightMargin = dp(5);
@@ -521,9 +522,9 @@ public class KeyBoardLayoutController {
         TextView add = new TextView(context);
         add.setText("+");
         add.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        add.setTextColor(0xFFA8E063);
+        add.setTextColor(0xFFF2F2F7);
         add.setGravity(Gravity.CENTER);
-        add.setBackground(comboBackground(0xFF2F5D1A, 0xFF63BF2C));
+        add.setBackground(comboBackground(0xFF3A3A3C, 0xFF3A3A3C));
         add.setLayoutParams(new LinearLayout.LayoutParams(dp(28), dp(24)));
         add.setOnClickListener(v -> openComboEditor(null));
         return add;
@@ -537,16 +538,16 @@ public class KeyBoardLayoutController {
         return bg;
     }
 
-    /** 胶囊显示组合键文本（desc 优先，其次名称，最后键码）。 */
+    /** 胶囊显示用户输入的名称；名称留空时回落到组合键文本（desc），再退到键码。 */
     private String comboLabel(GameMenuQuickBean bean) {
         if (bean == null) {
             return "";
         }
-        if (!TextUtils.isEmpty(bean.getDesc())) {
-            return bean.getDesc();
-        }
         if (!TextUtils.isEmpty(bean.getName())) {
             return bean.getName();
+        }
+        if (!TextUtils.isEmpty(bean.getDesc())) {
+            return bean.getDesc();
         }
         return bean.getCodes() == null ? "" : bean.getCodes();
     }

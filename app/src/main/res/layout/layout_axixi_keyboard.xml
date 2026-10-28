@@ -78,14 +78,16 @@
             android:layout_height="27dp"
             android:layout_toRightOf="@+id/btn_soft_phone"
             android:layout_toLeftOf="@+id/iv_game_menu"
+            android:layout_marginLeft="8dp"
             android:layout_marginRight="5dp"
+            android:fillViewport="true"
             android:scrollbars="none">
 
             <LinearLayout
                 android:id="@+id/ll_combo"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical"
+                android:gravity="end|center_vertical"
                 android:orientation="horizontal" />
         </HorizontalScrollView>
 
