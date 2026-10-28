@@ -148,6 +148,9 @@ public class PreferenceConfiguration {
     //屏幕特殊按键 震动
     public static final String CHECKBOX_ENABLE_KEYBOARD_VIBRATE = "checkbox_vibrate_keyboard";
 
+    //屏幕按键/虚拟手柄：仅在按下瞬间震动，拖放与滑过其他按键不再重复震动
+    public static final String CHECKBOX_VIBRATE_ON_PRESS_ONLY = "checkbox_vibrate_keyboard_on_press_only";
+
     //自动摇杆
     private static final String CHECKBOX_CHECKBOX_ENABLE_ANALOG_STICK_NEW="checkbox_enable_analog_stick_new";
 
@@ -180,6 +183,7 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_MOUSE_NAV_BUTTONS = false;
     private static final boolean DEFAULT_UNLOCK_FPS = false;
     private static final boolean DEFAULT_VIBRATE_OSC = true;
+    private static final boolean DEFAULT_VIBRATE_ON_PRESS_ONLY = true;
     private static final boolean DEFAULT_VIBRATE_FALLBACK = false;
     private static final int DEFAULT_VIBRATE_FALLBACK_STRENGTH = 100;
     private static final boolean DEFAULT_FLIP_FACE_BUTTONS = false;
@@ -303,6 +307,9 @@ public class PreferenceConfiguration {
     public boolean enableDeviceRumble;
 
     public boolean enableKeyboardVibrate;
+
+    //仅按下瞬间震动：开启后拖放、滑过其他按键、摇杆画圈都不再触发震动
+    public boolean enableKeyboardVibrateOnPressOnly;
 
     public boolean enableKeyboardSquare;
 
@@ -977,6 +984,7 @@ public class PreferenceConfiguration {
         config.enableKeyboard = prefs.getBoolean(CHECKBOX_ENABLE_KEYBOARD,false);
 
         config.enableKeyboardVibrate=prefs.getBoolean(CHECKBOX_ENABLE_KEYBOARD_VIBRATE,false);
+        config.enableKeyboardVibrateOnPressOnly=prefs.getBoolean(CHECKBOX_VIBRATE_ON_PRESS_ONLY,DEFAULT_VIBRATE_ON_PRESS_ONLY);
         //兼容joycon手柄
         config.enableJoyConFix=prefs.getBoolean("checkbox_enable_joyconfix",false);
         //全键盘透明度

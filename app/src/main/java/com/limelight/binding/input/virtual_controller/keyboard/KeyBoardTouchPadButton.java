@@ -271,6 +271,7 @@ public class KeyBoardTouchPadButton extends keyBoardVirtualControllerElement {
         int action = event.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
+                virtualController.notifyPressHapticOnDown();
                 xFactor = 1280 / (double) getWidth();
                 yFactor = 720 / (double) getHeight();
                 lastTouchX = (int) event.getX();
@@ -312,6 +313,7 @@ public class KeyBoardTouchPadButton extends keyBoardVirtualControllerElement {
             }
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
+                virtualController.resetPressHapticGesture();
                 setPressed(false);
                 if (event.getEventTime() - originalTouchTime <= 200) {
                     onClickCallback();

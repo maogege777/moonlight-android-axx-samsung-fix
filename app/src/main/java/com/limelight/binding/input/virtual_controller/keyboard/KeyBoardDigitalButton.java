@@ -250,6 +250,7 @@ public class KeyBoardDigitalButton extends keyBoardVirtualControllerElement {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
+                virtualController.notifyPressHapticOnDown();
                 movingButton = null;
                 setPressed(true);
                 onClickCallback();
@@ -267,6 +268,7 @@ public class KeyBoardDigitalButton extends keyBoardVirtualControllerElement {
             }
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
+                virtualController.resetPressHapticGesture();
                 if(enableSwitchDown&&switchDown){
                     return true;
                 }

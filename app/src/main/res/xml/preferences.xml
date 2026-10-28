@@ -335,8 +335,8 @@
         <CheckBoxPreference
             android:key="checkbox_vibrate_osc"
             android:dependency="checkbox_show_onscreen_controls"
-            android:title="@string/title_checkbox_vibrate_osc"
-            android:summary="@string/summary_checkbox_vibrate_osc"
+            android:title="@string/title_checkbox_vibrate_osc_gamepad"
+            android:summary="@string/summary_checkbox_vibrate_osc_gamepad"
             android:defaultValue="true" />
 <!--        <CheckBoxPreference-->
 <!--            android:defaultValue="false"-->
@@ -635,6 +635,13 @@
             android:title="@string/title_checkbox_vibrate_osc"
             android:summary="点按屏幕按键时，会触发手机马达震动，此选项也可用于虚拟手柄按钮。"
             android:defaultValue="false" />
+
+        <CheckBoxPreference
+            android:key="checkbox_vibrate_keyboard_on_press_only"
+            android:dependency="checkbox_vibrate_keyboard"
+            android:title="@string/title_checkbox_vibrate_on_press_only"
+            android:summary="@string/summary_checkbox_vibrate_on_press_only"
+            android:defaultValue="true" />
 
         <Preference
             android:key="import_keyboard_file"

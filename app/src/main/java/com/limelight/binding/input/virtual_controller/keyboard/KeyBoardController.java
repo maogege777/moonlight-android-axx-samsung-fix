@@ -102,6 +102,9 @@ public class KeyBoardController {
     private View buttonConfigure = null;
 
     private Vibrator vibrator;
+
+    // 本次触摸手势是否已经触发过按下震动（仅“仅按下震动”模式使用）
+    private boolean pressHapticFired;
     private List<keyBoardVirtualControllerElement> elements = new ArrayList<>();
 
     private PreferenceConfiguration prefConfig;
@@ -740,7 +743,14 @@ public class KeyBoardController {
                     (short) keyEvent.getKeyCode());
         }
         if (prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()&&keyEvent.getSource()!=2) {
-            vibrator.vibrate(10);
+            if (prefConfig.enableKeyboardVibrateOnPressOnly) {
+                // 仅按下震动：抬起不再震动，同一次按下只震一次
+                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                    notifyPressHapticOnDown();
+                }
+            } else {
+                vibrator.vibrate(10);
+            }
         }
     }
 
@@ -753,7 +763,13 @@ public class KeyBoardController {
 
     public void sendAssembleKey(String codes,int action){
         if (prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
-            vibrator.vibrate(10);
+            if (prefConfig.enableKeyboardVibrateOnPressOnly) {
+                if (action == KeyEvent.ACTION_DOWN) {
+                    notifyPressHapticOnDown();
+                }
+            } else {
+                vibrator.vibrate(10);
+            }
         }
         String[] keys=codes.split(",");
         //阿西西快捷键
@@ -825,12 +841,46 @@ public class KeyBoardController {
         }
     }
 
+    /**
+     * 按下瞬间的触感反馈。
+     *
+     * <p>旧逻辑把震动挂在 {@link #sendControllerInputContext()} 上，按住按键拖动或摇杆画圈时
+     * 每个 ACTION_MOVE 都会触发一次 vibrate(10)，体感就是持续震动。开启
+     * enableKeyboardVibrateOnPressOnly 后改由元素在 ACTION_DOWN 调用本方法，同一手势只震一次，
+     * 移动、滑过其他按键都不再触发。</p>
+     */
+    public void notifyPressHapticOnDown() {
+        // 新手势开始，重置去重标记
+        pressHapticFired = false;
+        notifyPressHaptic();
+    }
+
+    public void notifyPressHaptic() {
+        if (vibrator == null || !vibrator.hasVibrator() || !prefConfig.enableKeyboardVibrate) {
+            return;
+        }
+        if (prefConfig.enableKeyboardVibrateOnPressOnly) {
+            if (pressHapticFired) {
+                return;
+            }
+            pressHapticFired = true;
+        }
+        vibrator.vibrate(10);
+    }
+
+    public void resetPressHapticGesture() {
+        pressHapticFired = false;
+    }
+
     public void sendControllerInputContext() {
         // Cancel retransmissions of prior gamepad inputs
         handler.removeCallbacks(delayedRetransmitRunnable);
 
         sendControllerInputContextInternal();
-        if (prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
+        // 仅按下震动模式下，震动由元素在 ACTION_DOWN 时触发；
+        // 状态上报（按住按键拖动、摇杆画圈）不再触发，避免持续震动。
+        if (!prefConfig.enableKeyboardVibrateOnPressOnly
+                && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
             //摇杆不震动
             if(inputContext.inputMap!=0||inputContext.leftTrigger!=0x00||inputContext.rightTrigger!=0x00) {
                 vibrator.vibrate(10);

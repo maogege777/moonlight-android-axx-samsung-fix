@@ -87,6 +87,7 @@ final class SettingsProfileKeys {
         "checkbox_usb_driver",
         "checkbox_vibrate_fallback",
         "checkbox_vibrate_keyboard",
+        "checkbox_vibrate_keyboard_on_press_only",
         "checkbox_vibrate_osc",
         "ds5TriggerEnd",
         "ds5TriggerFrequency",

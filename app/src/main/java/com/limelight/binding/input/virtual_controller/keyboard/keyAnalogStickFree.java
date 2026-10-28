@@ -173,6 +173,7 @@ public class keyAnalogStickFree extends keyBoardVirtualControllerElement {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
                 if (!bIsFingerOnScreen) {
+                    virtualController.notifyPressHapticOnDown();
                     touchID = event.getPointerId(actionIndex);
                     touchStartX = event.getX(actionIndex);
                     touchStartY = event.getY(actionIndex);
@@ -202,6 +203,7 @@ public class keyAnalogStickFree extends keyBoardVirtualControllerElement {
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_CANCEL:
                 if (event.getPointerId(actionIndex) == touchID) {
+                    virtualController.resetPressHapticGesture();
                     bIsFingerOnScreen = false;
                     setPressed(false);
                     stick_state = STICK_STATE.NO_MOVEMENT;

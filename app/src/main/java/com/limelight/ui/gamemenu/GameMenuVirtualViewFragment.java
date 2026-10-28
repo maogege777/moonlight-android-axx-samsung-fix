@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -39,6 +40,10 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
     private String title;
 
     private Button btn_vibration;
+
+    private Button btn_vibration_on_press;
+
+    private LinearLayout ll_ds_touchpad_row;
 
     private Button btn_vibration_gamepad;
 
@@ -87,6 +92,8 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         tx_title=v.findViewById(R.id.tx_title);
 
         btn_vibration=v.findViewById(R.id.btn_vibration);
+        btn_vibration_on_press=v.findViewById(R.id.btn_vibration_on_press);
+        ll_ds_touchpad_row=v.findViewById(R.id.ll_ds_touchpad_row);
         btn_vibration_gamepad=v.findViewById(R.id.btn_vibration_gamepad);
         btn_ds_touchpad=v.findViewById(R.id.btn_ds_touchpad);
         sb_adjust_keyboard_all=v.findViewById(R.id.sb_adjust_keyboard_all);
@@ -116,6 +123,7 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
 
         ibtn_back.setOnClickListener(this);
         btn_vibration.setOnClickListener(this);
+        btn_vibration_on_press.setOnClickListener(this);
         btn_vibration_gamepad.setOnClickListener(this);
         btn_ds_touchpad.setOnClickListener(this);
         v.findViewById(R.id.btn_right).setOnClickListener(this);
@@ -365,8 +373,19 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
 
     private void initViewData(){
         btn_vibration.setBackgroundResource(prefConfig.enableKeyboardVibrate?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
+
+        //“仅按下震动”是“按键震动”的子选项：主开关关闭时置灰，避免误以为它单独生效
+        btn_vibration_on_press.setEnabled(prefConfig.enableKeyboardVibrate);
+        btn_vibration_on_press.setAlpha(prefConfig.enableKeyboardVibrate ? 1f : 0.4f);
+        btn_vibration_on_press.setBackgroundResource(
+                prefConfig.enableKeyboardVibrate && prefConfig.enableKeyboardVibrateOnPressOnly
+                        ? R.drawable.ic_game_menu_btn_green_selector
+                        : R.drawable.ic_game_menu_btn_selector);
+
         btn_vibration_gamepad.setBackgroundResource(prefConfig.vibrateOsc?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
-        btn_ds_touchpad.setVisibility(dsTouchpadSupported ? View.VISIBLE : View.INVISIBLE);
+
+        //DS 触控板单独一行（与上面每格同为 1/3 宽），不支持时整行 GONE，不再留空白
+        ll_ds_touchpad_row.setVisibility(dsTouchpadSupported ? View.VISIBLE : View.GONE);
         btn_ds_touchpad.setBackgroundResource(dsTouchpadVisible ?
                 R.drawable.ic_game_menu_btn_green_selector : R.drawable.ic_game_menu_btn_selector);
     }
@@ -410,6 +429,19 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
             PreferenceManager.getDefaultSharedPreferences(getActivity())
                     .edit()
                     .putBoolean(PreferenceConfiguration.CHECKBOX_ENABLE_KEYBOARD_VIBRATE,prefConfig.enableKeyboardVibrate)
+                    .commit();
+            return;
+        }
+        if(v.getId()==R.id.btn_vibration_on_press){
+            if(!prefConfig.enableKeyboardVibrate){
+                Toast.makeText(getActivity(), "请先开启按键震动", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            prefConfig.enableKeyboardVibrateOnPressOnly=!prefConfig.enableKeyboardVibrateOnPressOnly;
+            initViewData();
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .edit()
+                    .putBoolean(PreferenceConfiguration.CHECKBOX_VIBRATE_ON_PRESS_ONLY,prefConfig.enableKeyboardVibrateOnPressOnly)
                     .commit();
             return;
         }

@@ -142,6 +142,9 @@ public class KeyboardDigitalPadButton extends keyBoardVirtualControllerElement{
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE: {
+                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                    virtualController.notifyPressHapticOnDown();
+                }
                 direction = 0;
 
                 if (event.getX() < getPercent(getWidth(), 33)) {
@@ -163,6 +166,7 @@ public class KeyboardDigitalPadButton extends keyBoardVirtualControllerElement{
             }
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
+                virtualController.resetPressHapticGesture();
                 direction = 0;
                 newDirectionCallback(direction);
                 invalidate();

@@ -348,6 +348,7 @@ public class KeyAnalogStick extends keyBoardVirtualControllerElement {
         switch (event.getActionMasked()) {
             // down event (touch event)
             case MotionEvent.ACTION_DOWN: {
+                virtualController.notifyPressHapticOnDown();
                 // set to dead zoned, will be corrected in update position if necessary
                 stick_state = STICK_STATE.MOVED_IN_DEAD_ZONE;
                 // check for double click
@@ -368,6 +369,7 @@ public class KeyAnalogStick extends keyBoardVirtualControllerElement {
             // up event (revoke touch)
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
+                virtualController.resetPressHapticGesture();
                 setPressed(false);
                 break;
             }
