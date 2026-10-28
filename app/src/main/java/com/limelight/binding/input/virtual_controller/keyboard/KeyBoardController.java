@@ -742,15 +742,13 @@ public class KeyBoardController {
             Game.instance.keyboardEvent(keyEvent.getAction() == KeyEvent.ACTION_DOWN,
                     (short) keyEvent.getKeyCode());
         }
-        if (prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()&&keyEvent.getSource()!=2) {
-            if (prefConfig.enableKeyboardVibrateOnPressOnly) {
-                // 仅按下震动：抬起不再震动，同一次按下只震一次
-                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                    notifyPressHapticOnDown();
-                }
-            } else {
-                vibrator.vibrate(10);
-            }
+        // “仅按下震动”模式下由触摸元素在 ACTION_DOWN 统一触发震动。
+        // 这里若再震一次，会发现一次按下震两下；且十字键滑动换向时
+        // onDirectionChange 会重新生成 ACTION_DOWN，导致拖动又持续震。
+        if (!prefConfig.enableKeyboardVibrateOnPressOnly
+                && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()
+                && keyEvent.getSource() != 2) {
+            vibrator.vibrate(10);
         }
     }
 
@@ -762,14 +760,10 @@ public class KeyBoardController {
     }
 
     public void sendAssembleKey(String codes,int action){
-        if (prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
-            if (prefConfig.enableKeyboardVibrateOnPressOnly) {
-                if (action == KeyEvent.ACTION_DOWN) {
-                    notifyPressHapticOnDown();
-                }
-            } else {
-                vibrator.vibrate(10);
-            }
+        // 同上：元素按下时已经震过，这里不再重复触发（仅旧模式保留原行为）
+        if (!prefConfig.enableKeyboardVibrateOnPressOnly
+                && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
+            vibrator.vibrate(10);
         }
         String[] keys=codes.split(",");
         //阿西西快捷键
