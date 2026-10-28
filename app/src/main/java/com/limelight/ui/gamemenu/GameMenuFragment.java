@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +87,10 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
     private static final int SCHEME_KIND_MOUSE = 2;
     /** 鼠标模式在 SharedPreferences 中的键（与 Game 启动读取保持一致） */
     private static final String MOUSE_MODEL_PREF = "mouse_model_list_axi";
+    /** 电脑端光标是否隐藏：本地记录，仅用于菜单开关回显（真实状态在 PC 端） */
+    private static final String HIDE_PC_CURSOR_PREF = "checkbox_hide_pc_cursor";
+    /** 绝对坐标模式 pref 键（PreferenceConfiguration 中该常量为 private，这里用同名字面量） */
+    private static final String ABSOLUTE_MOUSE_MODE_PREF = "checkbox_absolute_mouse_mode";
     /** 长按阈值：原生 onLongClick 固定 500ms，按需求提前到 200ms */
     private static final int SCHEME_LONG_PRESS_DELAY_MS = 200;
     private final Handler schemePressHandler = new Handler(Looper.getMainLooper());
@@ -403,7 +408,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                 return;
             }
             // 单击与长按统一弹出模式菜单；不再进入旧的列表面板
-            showMouseModePopup(btn_mouse);
+            showMouseMenu(btn_mouse, false);
             return;
         }
 
@@ -743,7 +748,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         dismissSchemePopup();
 
         if (kind == SCHEME_KIND_MOUSE) {
-            showMouseModePopup(anchor);
+            showMouseMenu(anchor, true);
             return;
         }
         final boolean isGamePad = kind == SCHEME_KIND_GAMEPAD;
@@ -831,7 +836,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
      * 鼠标模式长按菜单：8 个模式，当前项高亮，点击即切换。
      * 与虚拟手柄/按键的方案弹窗共用同一套 PopupWindow 与行样式。
      */
-    private void showMouseModePopup(final View anchor) {
+    private void showMouseMenu(final View anchor, final boolean quick) {
         final Context ctx = getActivity();
         if (ctx == null || anchor == null) {
             return;
@@ -847,19 +852,82 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         root.setPadding(dpToPx(8), dpToPx(6), dpToPx(8), dpToPx(6));
 
         TextView header = new TextView(ctx);
-        header.setText("鼠标模式");
+        header.setText(quick ? "鼠标模式" : "鼠标与触控");
         header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         header.setTextColor(0xFF9C9CA0);
         header.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(6));
         root.addView(header);
 
-        for (int i = 0; i < names.length; i++) {
-            final int index = i;
-            root.addView(createSchemeRow(ctx, i + 1, names[i], i == current,
+        if (quick) {
+            if (current > 3) {
+                TextView hint = new TextView(ctx);
+                hint.setText("当前：" + names[current] + "（变体，基础为「"
+                        + names[baseModeOf(current)] + "」）");
+                hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+                hint.setTextColor(0xFFE0A33A);
+                hint.setPadding(dpToPx(6), dpToPx(2), dpToPx(6), dpToPx(6));
+                root.addView(hint);
+            }
+            // 长按只给 4 个基础模式；当前处于变体时把对应基础项标成空心圆
+            for (int i = 0; i < Math.min(4, names.length); i++) {
+                final int index = i;
+                final boolean hollow = i != current && i == baseModeOf(current);
+                root.addView(createSchemeRow(ctx, i + 1, names[i], i == current, hollow,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                applyMouseMode(index);
+                            }
+                        }));
+            }
+        } else {
+            root.addView(createGroupLabel(ctx, "触控模式"));
+            for (int i = 0; i < Math.min(4, names.length); i++) {
+                final int index = i;
+                root.addView(createSchemeRow(ctx, i + 1, names[i], i == current, false,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                applyMouseMode(index);
+                            }
+                        }));
+            }
+
+            root.addView(createGroupLabel(ctx, "模式变体"));
+            for (int i = 4; i < Math.min(8, names.length); i++) {
+                final int index = i;
+                root.addView(createSchemeRow(ctx, i + 1, names[i], i == current, false,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                applyMouseMode(index);
+                            }
+                        }));
+            }
+
+            root.addView(createGroupLabel(ctx, "附加选项"));
+            final boolean hasMouse = hasPhysicalMouse();
+            root.addView(createSwitchRow(ctx, 9, "本地鼠标模式（需外接物理鼠标）",
+                    game != null && game.isCursorVisible(), hasMouse,
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            applyMouseMode(index);
+                            applyMouseLocalMode();
+                        }
+                    }));
+            root.addView(createSwitchRow(ctx, 10, "远程桌面的鼠标模式",
+                    game != null && game.prefConfig.absoluteMouseMode, true,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            applyRemoteDesktopMouseMode();
+                        }
+                    }));
+            root.addView(createSwitchRow(ctx, 11, "隐藏电脑端鼠标光标", isPcCursorHidden(), true,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            applyHidePcCursor();
                         }
                     }));
         }
@@ -870,7 +938,8 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         scrollView.addView(root, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        final int popupWidth = dpToPx(200);
+        // 完整菜单文案更长，宽度比快速菜单宽一些
+        final int popupWidth = dpToPx(quick ? 200 : 250);
         final int containerW = getResources().getDisplayMetrics().widthPixels;
         final int containerH = getResources().getDisplayMetrics().heightPixels;
         final int margin = dpToPx(8);
@@ -948,9 +1017,158 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         }
     }
 
+    /** 5~8 对应的基础模式：5→普通鼠标(1)，6/7/8→触控板(2)。 */
+    private int baseModeOf(int mode) {
+        if (mode == 4) {
+            return 1;
+        }
+        if (mode >= 5 && mode <= 7) {
+            return 2;
+        }
+        return mode;
+    }
+
+    private View createGroupLabel(Context ctx, String label) {
+        TextView tv = new TextView(ctx);
+        tv.setText(label);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+        tv.setTextColor(0xFF8E8E93);
+        tv.setPadding(dpToPx(6), dpToPx(8), dpToPx(6), dpToPx(4));
+        return tv;
+    }
+
+    /** 附加选项行：左侧编号 + 名称 + 右侧开/关状态；不可用时置灰且不响应点击。 */
+    private View createSwitchRow(Context ctx, int number, String label, boolean checked,
+                                 boolean enabled, View.OnClickListener listener) {
+        LinearLayout row = new LinearLayout(ctx);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dpToPx(6), dpToPx(9), dpToPx(6), dpToPx(9));
+        if (enabled) {
+            row.setOnClickListener(listener);
+        } else {
+            row.setAlpha(0.38f);
+        }
+
+        TextView chip = new TextView(ctx);
+        chip.setText(String.valueOf(number));
+        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        chip.setTypeface(Typeface.DEFAULT_BOLD);
+        chip.setGravity(Gravity.CENTER);
+        chip.setTextColor(0xFFFFFFFF);
+        GradientDrawable chipBg = new GradientDrawable();
+        chipBg.setCornerRadius(dpToPx(3));
+        chipBg.setColor(checked ? 0xFF79B033 : 0xFF3C3C40);
+        chip.setBackground(chipBg);
+        LinearLayout.LayoutParams chipLp =
+                new LinearLayout.LayoutParams(dpToPx(16), dpToPx(16));
+        chipLp.rightMargin = dpToPx(8);
+        row.addView(chip, chipLp);
+
+        TextView text = new TextView(ctx);
+        text.setText(label);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        text.setTextColor(checked ? 0xFF96D341 : 0xFFE6E6E6);
+        row.addView(text, new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+        TextView state = new TextView(ctx);
+        state.setText(checked ? "开" : "关");
+        state.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        state.setTextColor(checked ? 0xFF96D341 : 0xFF9A9A9F);
+        row.addView(state);
+        return row;
+    }
+
+    /** 外接鼠标检测：SOURCE_MOUSE 覆盖 USB / 蓝牙鼠标。 */
+    private boolean hasPhysicalMouse() {
+        final int[] ids = InputDevice.getDeviceIds();
+        for (int id : ids) {
+            final InputDevice device = InputDevice.getDevice(id);
+            if (device == null) {
+                continue;
+            }
+            final int sources = device.getSources();
+            if ((sources & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 附加选项 9：本地鼠标模式（抓取鼠标并显示本地光标）。 */
+    private void applyMouseLocalMode() {
+        final Context ctx = getActivity();
+        if (ctx == null) {
+            return;
+        }
+        if (game != null) {
+            game.switchMouseLocalCursor();
+        }
+        refreshSchemeBadges();
+        dismissSchemePopup();
+        dismissAllDialogs();
+        if (game != null) {
+            Toast.makeText(ctx, "本地鼠标模式已" + (game.isCursorVisible() ? "开启" : "关闭"),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /** 附加选项 10：远程桌面的鼠标模式（绝对坐标）。 */
+    private void applyRemoteDesktopMouseMode() {
+        final Context ctx = getActivity();
+        if (ctx == null || game == null) {
+            dismissSchemePopup();
+            dismissAllDialogs();
+            return;
+        }
+        game.prefConfig.absoluteMouseMode = !game.prefConfig.absoluteMouseMode;
+        PreferenceManager.getDefaultSharedPreferences(ctx)
+                .edit()
+                .putBoolean(ABSOLUTE_MOUSE_MODE_PREF, game.prefConfig.absoluteMouseMode)
+                .apply();
+        dismissSchemePopup();
+        dismissAllDialogs();
+        Toast.makeText(ctx, "远程桌面的鼠标模式已"
+                + (game.prefConfig.absoluteMouseMode ? "开启" : "关闭"), Toast.LENGTH_SHORT).show();
+    }
+
+    /** 附加选项 11：隐藏/显示电脑端光标（发送 Ctrl+Alt+Shift+N，本地记录状态用于回显）。 */
+    private void applyHidePcCursor() {
+        final Context ctx = getActivity();
+        if (ctx == null) {
+            return;
+        }
+        final boolean hidden = !isPcCursorHidden();
+        PreferenceManager.getDefaultSharedPreferences(ctx)
+                .edit()
+                .putBoolean(HIDE_PC_CURSOR_PREF, hidden)
+                .apply();
+        if (conn != null) {
+            sendKeys(new short[]{KeyboardTranslator.VK_LCONTROL, KeyboardTranslator.VK_LMENU,
+                    KeyboardTranslator.VK_LSHIFT, KeyboardTranslator.VK_N});
+        }
+        dismissSchemePopup();
+        dismissAllDialogs();
+        Toast.makeText(ctx, "电脑端光标已" + (hidden ? "隐藏" : "显示"),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean isPcCursorHidden() {
+        final Context ctx = getActivity();
+        return ctx != null && PreferenceManager.getDefaultSharedPreferences(ctx)
+                .getBoolean(HIDE_PC_CURSOR_PREF, false);
+    }
+
     /** 单行方案：左侧数字小方块 + 名称，当前方案额外显示对勾并高亮。 */
     private View createSchemeRow(Context ctx, int number, String label, boolean selected,
                                  View.OnClickListener listener) {
+        return createSchemeRow(ctx, number, label, selected, false, listener);
+    }
+
+    /** @param hollow 当前处于变体时，把对应基础模式行标成空心圆（不与对勾抢位置） */
+    private View createSchemeRow(Context ctx, int number, String label, boolean selected,
+                                 boolean hollow, View.OnClickListener listener) {
         LinearLayout row = new LinearLayout(ctx);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
@@ -995,6 +1213,12 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             check.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
             check.setTextColor(0xFF96D341);
             row.addView(check);
+        } else if (hollow) {
+            TextView dot = new TextView(ctx);
+            dot.setText("○");
+            dot.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            dot.setTextColor(0x99E0A33A);
+            row.addView(dot);
         }
         return row;
     }
@@ -1056,6 +1280,8 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             badge_mouse.setBadgeText(mouseShort[Math.min(mouseIndex, mouseShort.length - 1)]);
             // “禁用鼠标/触控”时角标置灰，和手柄/按键的启用态保持一致
             badge_mouse.setActive(mouseIndex != 3);
+            // 5~8 用琥珀描边空心，和 1~4 的深底绿字区分
+            badge_mouse.setVariant(mouseIndex >= 4 && mouseIndex <= 7);
         }
     }
 

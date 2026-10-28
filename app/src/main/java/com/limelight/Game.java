@@ -5065,6 +5065,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private boolean disableMouseModel;
 
     //本地鼠标光标切换
+    public boolean isCursorVisible() {
+        return cursorVisible;
+    }
+
     public void switchMouseLocalCursor(){
         if (!grabbedInput) {
             inputCaptureProvider.enableCapture();

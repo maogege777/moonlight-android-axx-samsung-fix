@@ -37,13 +37,18 @@ public class SchemeBadgeView extends View {
     private static final int COLOR_BG_IDLE = 0xE6171719;
     /** 启用时的实心底色（深绿，与亮绿按钮形成层次而不糊成一片） */
     private static final int COLOR_BG_ACTIVE = 0xE6143A02;
+    /** 鼠标变体模式（5~8）的琥珀色 */
+    private static final int COLOR_VARIANT = 0xFFE0A33A;
 
     private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
 
     private String text = "1";
     private boolean active = true;
+    /** 鼠标 5~8：透明底 + 琥珀描边 + 琥珀空心字 */
+    private boolean variant = false;
 
     public SchemeBadgeView(Context context) {
         this(context, null);
@@ -65,6 +70,10 @@ public class SchemeBadgeView extends View {
         textPaint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD));
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setColor(Color.WHITE);
+
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(dp(1f));
+        borderPaint.setColor(COLOR_VARIANT);
 
         setClickable(false);
         setFocusable(false);
@@ -99,6 +108,14 @@ public class SchemeBadgeView extends View {
         }
     }
 
+    /** 鼠标 5~8 的变体样式：透明底 + 琥珀描边 + 琥珀空心字。 */
+    public void setVariant(boolean variant) {
+        if (this.variant != variant) {
+            this.variant = variant;
+            invalidate();
+        }
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -110,8 +127,18 @@ public class SchemeBadgeView extends View {
         }
 
         final float radius = dp(CORNER_RADIUS_DP);
-        rect.set(0, 0, w, h);
-        canvas.drawRoundRect(rect, radius, radius, fillPaint);
+        if (variant) {
+            // 空心样式：不铺底色，只画琥珀圆角边框 + 琥珀描边文字
+            final float stroke = dp(1f);
+            borderPaint.setStrokeWidth(stroke);
+            rect.set(stroke / 2f, stroke / 2f, w - stroke / 2f, h - stroke / 2f);
+            canvas.drawRoundRect(rect, radius, radius, borderPaint);
+            textPaint.setColor(COLOR_VARIANT);
+        } else {
+            rect.set(0, 0, w, h);
+            canvas.drawRoundRect(rect, radius, radius, fillPaint);
+            textPaint.setColor(Color.WHITE);
+        }
 
         final boolean multiChar = text != null && text.length() > 1;
         final float textSize = h * (multiChar ? MULTI_TEXT_SIZE_RATIO : TEXT_SIZE_RATIO);
