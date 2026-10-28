@@ -10,16 +10,16 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW]
- *
  * 虚拟手柄 / 虚拟按键 按钮右上角的「布局方案」角标。
- * 视觉：实心圆角矩形底 + 空心（描边）数字，数字 1~5 对应方案 1~5。
  *
- * 用自绘而不是 TextView，是因为空心数字需要 Paint.Style.STROKE，TextView 无法直接表达；
- * 自绘也能保证 15dp 小尺寸下的居中与描边粗细。
+ * <p>视觉：实心圆角矩形底 + 实心数字，数字 1~5 对应方案 1~5；
+ * 鼠标模式 5~8 用琥珀实心底 + 深色字区分。</p>
  *
- * 触摸说明：本控件不可点击、不可获得焦点，落在它范围内的触摸会继续下发给下层的 Button，
- * 因此角标不会在按钮右上角形成点击死角。
+ * <p>自绘保证 15dp 小尺寸下的居中与清晰度；文字一律使用填充（FILL）而非描边，
+ * 避免小字号描边产生的发虚/重影。</p>
+ *
+ * <p>触摸说明：本控件不可点击、不可获得焦点，落在它范围内的触摸会继续下发给下层的 Button，
+ * 因此角标不会在按钮右上角形成点击死角。</p>
  */
 public class SchemeBadgeView extends View {
 
@@ -27,27 +27,25 @@ public class SchemeBadgeView extends View {
     private static final float CORNER_RADIUS_DP = 3f;
     /** 字号相对控件高度的比例 */
     private static final float TEXT_SIZE_RATIO = 0.76f;
-    /** 描边宽度相对字号的比例 */
-    private static final float STROKE_RATIO = 0.09f;
-    /** 两个字符（鼠标模式简称）时的字号 / 描边比例，避免撑出胶囊 */
+    /** 两个字符（鼠标模式简称）时的字号比例，避免撑出胶囊 */
     private static final float MULTI_TEXT_SIZE_RATIO = 0.58f;
-    private static final float MULTI_STROKE_RATIO = 0.07f;
 
     /** 未启用时的实心底色（近黑，压在深灰按钮上也清晰） */
     private static final int COLOR_BG_IDLE = 0xE6171719;
     /** 启用时的实心底色（深绿，与亮绿按钮形成层次而不糊成一片） */
     private static final int COLOR_BG_ACTIVE = 0xE6143A02;
-    /** 鼠标变体模式（5~8）的琥珀色 */
+    /** 鼠标变体模式（5~8）的琥珀底色 */
     private static final int COLOR_VARIANT = 0xFFE0A33A;
+    /** 琥珀底上的深色字 */
+    private static final int COLOR_VARIANT_TEXT = 0xFF241A08;
 
     private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
 
     private String text = "1";
     private boolean active = true;
-    /** 鼠标 5~8：透明底 + 琥珀描边 + 琥珀空心字 */
+    /** 鼠标 5~8：琥珀实心底 + 深色实心字 */
     private boolean variant = false;
 
     public SchemeBadgeView(Context context) {
@@ -66,14 +64,10 @@ public class SchemeBadgeView extends View {
     private void init() {
         fillPaint.setStyle(Paint.Style.FILL);
 
-        textPaint.setStyle(Paint.Style.STROKE);
+        textPaint.setStyle(Paint.Style.FILL);
         textPaint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD));
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setColor(Color.WHITE);
-
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(dp(1f));
-        borderPaint.setColor(COLOR_VARIANT);
 
         setClickable(false);
         setFocusable(false);
@@ -82,7 +76,7 @@ public class SchemeBadgeView extends View {
     }
 
     private void applyColors() {
-        fillPaint.setColor(active ? COLOR_BG_ACTIVE : COLOR_BG_IDLE);
+        fillPaint.setColor(variant ? COLOR_VARIANT : (active ? COLOR_BG_ACTIVE : COLOR_BG_IDLE));
     }
 
     /** 设置显示的数字（1~5），对应方案序号。 */
@@ -108,10 +102,11 @@ public class SchemeBadgeView extends View {
         }
     }
 
-    /** 鼠标 5~8 的变体样式：透明底 + 琥珀描边 + 琥珀空心字。 */
+    /** 鼠标 5~8 的变体样式：琥珀实心底 + 深色实心字。 */
     public void setVariant(boolean variant) {
         if (this.variant != variant) {
             this.variant = variant;
+            applyColors();
             invalidate();
         }
     }
@@ -127,24 +122,13 @@ public class SchemeBadgeView extends View {
         }
 
         final float radius = dp(CORNER_RADIUS_DP);
-        if (variant) {
-            // 空心样式：不铺底色，只画琥珀圆角边框 + 琥珀描边文字
-            final float stroke = dp(1f);
-            borderPaint.setStrokeWidth(stroke);
-            rect.set(stroke / 2f, stroke / 2f, w - stroke / 2f, h - stroke / 2f);
-            canvas.drawRoundRect(rect, radius, radius, borderPaint);
-            textPaint.setColor(COLOR_VARIANT);
-        } else {
-            rect.set(0, 0, w, h);
-            canvas.drawRoundRect(rect, radius, radius, fillPaint);
-            textPaint.setColor(Color.WHITE);
-        }
+        rect.set(0, 0, w, h);
+        canvas.drawRoundRect(rect, radius, radius, fillPaint);
+        // 实心纯色文字：小尺寸下描边字容易发虚、看起来像重影
+        textPaint.setColor(variant ? COLOR_VARIANT_TEXT : Color.WHITE);
 
         final boolean multiChar = text != null && text.length() > 1;
-        final float textSize = h * (multiChar ? MULTI_TEXT_SIZE_RATIO : TEXT_SIZE_RATIO);
-        textPaint.setTextSize(textSize);
-        textPaint.setStrokeWidth(Math.max(dp(0.7f),
-                textSize * (multiChar ? MULTI_STROKE_RATIO : STROKE_RATIO)));
+        textPaint.setTextSize(h * (multiChar ? MULTI_TEXT_SIZE_RATIO : TEXT_SIZE_RATIO));
 
         // 以控件高度垂直居中（补偿字体 ascent/descent 造成的上下不对称）
         final Paint.FontMetrics fm = textPaint.getFontMetrics();
