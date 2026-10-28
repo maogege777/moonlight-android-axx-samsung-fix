@@ -633,7 +633,7 @@
         <CheckBoxPreference
             android:key="checkbox_vibrate_keyboard"
             android:title="@string/title_checkbox_vibrate_osc"
-            android:summary="点按屏幕按键时，会触发手机马达震动，此选项也可用于虚拟手柄按钮。"
+            android:summary="点按屏幕按键（含全键盘）时，会触发手机马达震动，此选项也可用于虚拟手柄按钮。"
             android:defaultValue="false" />
 
         <CheckBoxPreference

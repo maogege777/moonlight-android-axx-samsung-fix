@@ -40,6 +40,9 @@ public class KeyBoardLayoutController {
     private RadioGroup rg_keyboard;
     private PreferenceConfiguration prefConfig;
 
+    // 本次触摸手势是否已触发按下震动（与 KeyBoardController 的规则一致）
+    private boolean pressHapticFired;
+
     public KeyBoardLayoutController(final ControllerHandler controllerHandler, FrameLayout layout, final Context context,PreferenceConfiguration prefConfig) {
         this.controllerHandler = controllerHandler;
         this.frame_layout = layout;
@@ -66,6 +69,8 @@ public class KeyBoardLayoutController {
                         if(TextUtils.equals("hide",tag)){
                             return true;
                         }
+                        //隐藏键之外，所有按键（含修饰键、鼠标键）按下都震动一次
+                        notifyPressHapticOnDown();
                         if(!TextUtils.isEmpty(tag)&&tag.startsWith("mouse_")){
                             int code=1;
                             switch (tag){
@@ -120,6 +125,7 @@ public class KeyBoardLayoutController {
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
                         // 处理释放事件
+                        resetPressHapticGesture();
                         String tag2=(String) v.getTag();
                         if(TextUtils.equals("hide",tag2)){
 //                            hide();
@@ -405,8 +411,44 @@ public class KeyBoardLayoutController {
             Game.instance.keyboardEvent(keyEvent.getAction() == KeyEvent.ACTION_DOWN,
                     (short) keyEvent.getKeyCode());
         }
-//        if (prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
-//            vibrator.vibrate(10);
-//        }
+    }
+
+    /**
+     * 全键盘的按下震动：与虚拟按键、虚拟手柄共用同一组设置
+     * （按键震动开关 / 仅按下震动 / 震感强度），规则保持一致。
+     */
+    private void notifyPressHapticOnDown() {
+        if (!canVibrate()) {
+            return;
+        }
+        //新手势，重置组合键模式的去重标记
+        pressHapticFired = false;
+        performPressHaptic();
+    }
+
+    private void performPressHaptic() {
+        if (!canVibrate()) {
+            return;
+        }
+        if (prefConfig.enableKeyboardVibrateOnPressOnly) {
+            if (pressHapticFired) {
+                return;
+            }
+            pressHapticFired = true;
+        }
+        vibrator.vibrate(getPressHapticMs());
+    }
+
+    private void resetPressHapticGesture() {
+        pressHapticFired = false;
+    }
+
+    private boolean canVibrate() {
+        return vibrator != null && vibrator.hasVibrator() && prefConfig.enableKeyboardVibrate;
+    }
+
+    private int getPressHapticMs() {
+        return Math.max(PreferenceConfiguration.MIN_VIBRATE_PRESS_MS,
+                Math.min(PreferenceConfiguration.MAX_VIBRATE_PRESS_MS, prefConfig.vibratePressMs));
     }
 }
