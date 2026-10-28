@@ -29,6 +29,9 @@ public class SchemeBadgeView extends View {
     private static final float TEXT_SIZE_RATIO = 0.76f;
     /** 描边宽度相对字号的比例 */
     private static final float STROKE_RATIO = 0.09f;
+    /** 两个字符（鼠标模式简称）时的字号 / 描边比例，避免撑出胶囊 */
+    private static final float MULTI_TEXT_SIZE_RATIO = 0.58f;
+    private static final float MULTI_STROKE_RATIO = 0.07f;
 
     /** 未启用时的实心底色（近黑，压在深灰按钮上也清晰） */
     private static final int COLOR_BG_IDLE = 0xE6171719;
@@ -75,9 +78,14 @@ public class SchemeBadgeView extends View {
 
     /** 设置显示的数字（1~5），对应方案序号。 */
     public void setSchemeNumber(int number) {
-        String value = String.valueOf(number);
-        if (!value.equals(text)) {
-            text = value;
+        setBadgeText(String.valueOf(number));
+    }
+
+    /** 设置角标文字：布局方案用数字，鼠标模式用两个字简称。 */
+    public void setBadgeText(String value) {
+        String text = value == null ? "" : value;
+        if (!text.equals(this.text)) {
+            this.text = text;
             invalidate();
         }
     }
@@ -105,9 +113,11 @@ public class SchemeBadgeView extends View {
         rect.set(0, 0, w, h);
         canvas.drawRoundRect(rect, radius, radius, fillPaint);
 
-        final float textSize = h * TEXT_SIZE_RATIO;
+        final boolean multiChar = text != null && text.length() > 1;
+        final float textSize = h * (multiChar ? MULTI_TEXT_SIZE_RATIO : TEXT_SIZE_RATIO);
         textPaint.setTextSize(textSize);
-        textPaint.setStrokeWidth(Math.max(dp(0.7f), textSize * STROKE_RATIO));
+        textPaint.setStrokeWidth(Math.max(dp(0.7f),
+                textSize * (multiChar ? MULTI_STROKE_RATIO : STROKE_RATIO)));
 
         // 以控件高度垂直居中（补偿字体 ascent/descent 造成的上下不对称）
         final Paint.FontMetrics fm = textPaint.getFontMetrics();

@@ -271,6 +271,17 @@
         <!-- EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] END -->
     </string-array>
 
+    <string-array name="mouse_model_short_names_axi">
+        <item>多点</item>
+        <item>普通</item>
+        <item>触板</item>
+        <item>禁用</item>
+        <item>互换</item>
+        <item>仅移</item>
+        <item>点移</item>
+        <item>手势</item>
+    </string-array>
+
     <string-array name="mouse_model_values_axi" translatable="false">
         <item>0</item>
         <item>1</item>

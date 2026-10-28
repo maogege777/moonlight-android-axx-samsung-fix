@@ -280,6 +280,34 @@
             </FrameLayout>
             <!-- EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [MODIFIED] END -->
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/ic_game_menu_btn_selector"
+                    android:drawablePadding="4dp"
+                    android:drawableTop="@drawable/ic_axi_touch"
+                    android:gravity="center"
+                    android:padding="4dp"
+                    android:id="@+id/btn_mouse"
+                    android:text="鼠标与触控"
+                    android:textSize="11dp" />
+
+                <!-- 两个字的模式简称，比虚拟手柄的 15dp 圆形角标略宽 -->
+                <com.limelight.ui.gamemenu.SchemeBadgeView
+                    android:id="@+id/badge_mouse"
+                    android:layout_width="24dp"
+                    android:layout_height="15dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginEnd="3dp"
+                    android:layout_marginTop="3dp" />
+            </FrameLayout>
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -294,20 +322,7 @@
                 android:id="@+id/btn_keyboard"
                 android:textSize="11dp" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/ic_game_menu_btn_selector"
-                android:drawablePadding="4dp"
-                android:drawableTop="@drawable/ic_axi_zoom"
-                android:gravity="center"
-                android:padding="4dp"
-                android:id="@+id/btn_screen_move"
-                android:text="画面缩放"
-                android:textSize="11dp" />
-
-        </LinearLayout>
+            </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -367,11 +382,11 @@
                 android:layout_weight="1"
                 android:background="@drawable/ic_game_menu_btn_selector"
                 android:drawablePadding="4dp"
-                android:drawableTop="@drawable/ic_axi_switch_screen"
+                android:drawableTop="@drawable/ic_axi_zoom"
                 android:gravity="center"
                 android:padding="4dp"
-                android:id="@+id/btn_display_4"
-                android:text="显示器4"
+                android:id="@+id/btn_screen_move"
+                android:text="画面缩放"
                 android:textSize="11dp" />
             <!-- EXTENSION DEVELOPMENT [EXT-GAME-MENU-RESTRUCTURE] [MODIFIED] END -->
 
@@ -392,18 +407,7 @@
             android:layout_margin="5dp"
             android:orientation="vertical">
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_game_menu_btn_selector"
-                android:drawableLeft="@drawable/ic_axi_touch"
-                android:drawablePadding="4dp"
-                android:id="@+id/bt_touch_list"
-                android:drawableRight="@drawable/ic_axi_arrow"
-                android:gravity="left|center_vertical"
-                android:padding="10dp"
-                android:text="鼠标与触控"
-                android:textSize="11dp" />
+            <!-- 鼠标与触控已上移到主菜单第 2 行按钮区（btn_mouse），此处不再重复入口 -->
 
             <!-- EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] BEGIN -->
             <!-- 「快捷键」入口已移除：其功能整体融入侧边栏「操作」面板的「自定义快捷键」分组。 -->

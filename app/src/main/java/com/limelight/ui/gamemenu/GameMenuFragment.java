@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,10 +72,20 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
 
     private Button btn_screen_move;
 
+    private Button btn_mouse;
+
     // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
     // 虚拟手柄 / 虚拟按键 的「长按切换布局方案」相关状态。
     private SchemeBadgeView badge_game_pad;
     private SchemeBadgeView badge_v_keyboard;
+    private SchemeBadgeView badge_mouse;
+
+    /** 长按菜单类型：虚拟手柄 / 虚拟按键 / 鼠标模式 */
+    private static final int SCHEME_KIND_GAMEPAD = 0;
+    private static final int SCHEME_KIND_KEYBOARD = 1;
+    private static final int SCHEME_KIND_MOUSE = 2;
+    /** 鼠标模式在 SharedPreferences 中的键（与 Game 启动读取保持一致） */
+    private static final String MOUSE_MODEL_PREF = "mouse_model_list_axi";
     /** 长按阈值：原生 onLongClick 固定 500ms，按需求提前到 200ms */
     private static final int SCHEME_LONG_PRESS_DELAY_MS = 200;
     private final Handler schemePressHandler = new Handler(Looper.getMainLooper());
@@ -96,9 +107,11 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         btn_game_pad=v.findViewById(R.id.btn_game_pad);
         btn_v_keyboard=v.findViewById(R.id.btn_v_keyboard);
         btn_screen_move=v.findViewById(R.id.btn_screen_move);
+        btn_mouse=v.findViewById(R.id.btn_mouse);
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
         badge_game_pad=v.findViewById(R.id.badge_game_pad);
         badge_v_keyboard=v.findViewById(R.id.badge_v_keyboard);
+        badge_mouse=v.findViewById(R.id.badge_mouse);
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] END
         if(game!=null){
             btn_performance.setBackgroundResource(game.prefConfig.enablePerfOverlay?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
@@ -107,8 +120,9 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             btn_screen_move.setBackgroundResource(game.getScreenMoveZoom()?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
         }
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
-        attachSchemeLongPress(btn_game_pad, true);
-        attachSchemeLongPress(btn_v_keyboard, false);
+        attachSchemeLongPress(btn_game_pad, SCHEME_KIND_GAMEPAD);
+        attachSchemeLongPress(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
+        attachSchemeLongPress(btn_mouse, SCHEME_KIND_MOUSE);
         refreshSchemeBadges();
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] END
         v.findViewById(R.id.btn_unlink).setOnClickListener(this);
@@ -123,7 +137,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] BEGIN
         // 「快捷键」入口已移除（bt_quick_list），功能融入「操作」面板的「自定义快捷键」分组。
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
-        v.findViewById(R.id.bt_touch_list).setOnClickListener(this);
+        v.findViewById(R.id.btn_mouse).setOnClickListener(this);
         v.findViewById(R.id.btn_soft_keyboard).setOnClickListener(this);
         v.findViewById(R.id.btn_desktop).setOnClickListener(this);
         v.findViewById(R.id.btn_window).setOnClickListener(this);
@@ -135,7 +149,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         v.findViewById(R.id.btn_display_1).setOnClickListener(this);
         v.findViewById(R.id.btn_display_2).setOnClickListener(this);
         v.findViewById(R.id.btn_display_3).setOnClickListener(this);
-        v.findViewById(R.id.btn_display_4).setOnClickListener(this);
+        // 显示器4 已移除，该位置改放画面缩放；画面缩放的监听见 btn_screen_move。
         // EXTENSION DEVELOPMENT [EXT-GAME-MENU-RESTRUCTURE] [MODIFIED] END
         v.findViewById(R.id.bt_virtual_view).setOnClickListener(this);
         v.findViewById(R.id.bt_display).setOnClickListener(this);
@@ -387,7 +401,12 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         // 原「快捷键」入口（bt_quick_list）已移除：内置项与用户自定义项整体移入
         // GameFunctionFragment 的「自定义快捷键」分组，「禁用默认的特殊按键指令」开关继续生效。
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
-        if(v.getId()==R.id.bt_touch_list){
+        if(v.getId()==R.id.btn_mouse){
+            // 长按已经弹出模式菜单时，吞掉松手后补发的点击，避免又打开列表面板
+            if(schemeLongPressFired){
+                schemeLongPressFired=false;
+                return;
+            }
             // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] BEGIN
             // Keep actions appended after the mouse modes stable when extensions add modes.
             final int mouseModeCount = getResources()
@@ -422,7 +441,14 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                         return;
                     }
                     // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] END
+                    if(index>=0&&index<mouseModeCount){
+                        PreferenceManager.getDefaultSharedPreferences(getActivity())
+                                .edit()
+                                .putString(MOUSE_MODEL_PREF,String.valueOf(index))
+                                .commit();
+                    }
                     game.switchMouseModel(index);
+                    refreshSchemeBadges();
                 }
             });
             fragment.show(getFragmentManager());
@@ -690,7 +716,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
      * 用 OnTouchListener + Handler 而不是 setOnLongClickListener，是因为原生长按固定 500ms，
      * 且这里需要在长按后吞掉补发的 click；返回 false 保证短按仍走原有 OnClickListener。
      */
-    private void attachSchemeLongPress(final Button btn, final boolean isGamePad) {
+    private void attachSchemeLongPress(final Button btn, final int kind) {
         if (btn == null) {
             return;
         }
@@ -701,7 +727,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                     case MotionEvent.ACTION_DOWN:
                         cancelSchemeLongPress();
                         schemeLongPressFired = false;
-                        scheduleSchemeLongPress(v, isGamePad);
+                        scheduleSchemeLongPress(v, kind);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         // 手指滑出按钮范围视为放弃长按，避免误弹
@@ -722,13 +748,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         });
     }
 
-    private void scheduleSchemeLongPress(final View anchor, final boolean isGamePad) {
+    private void scheduleSchemeLongPress(final View anchor, final int kind) {
         schemeLongPressRunnable = new Runnable() {
             @Override
             public void run() {
                 schemeLongPressFired = true;
                 if (isAdded() && anchor != null) {
-                    showSchemePopup(anchor, isGamePad);
+                    showSchemePopup(anchor, kind);
                 }
             }
         };
@@ -757,12 +783,18 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
      * 在 anchor 就近弹出方案列表：优先按钮正下方，底部空间不足时翻到正上方，
      * 水平方向以按钮中心对齐并夹在屏幕安全边距内。
      */
-    private void showSchemePopup(final View anchor, final boolean isGamePad) {
+    private void showSchemePopup(final View anchor, final int kind) {
         final Context ctx = getActivity();
         if (ctx == null || anchor == null) {
             return;
         }
         dismissSchemePopup();
+
+        if (kind == SCHEME_KIND_MOUSE) {
+            showMouseModePopup(anchor);
+            return;
+        }
+        final boolean isGamePad = kind == SCHEME_KIND_GAMEPAD;
 
         final String[] names = getResources().getStringArray(
                 isGamePad ? R.array.gamepad_axi_names : R.array.keyboard_axi_names);
@@ -841,6 +873,125 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
 
         schemePopup = popup;
         popup.showAsDropDown(anchor, xoff, yoff);
+    }
+
+    /**
+     * 鼠标模式长按菜单：8 个模式，当前项高亮，点击即切换。
+     * 与虚拟手柄/按键的方案弹窗共用同一套 PopupWindow 与行样式。
+     */
+    private void showMouseModePopup(final View anchor) {
+        final Context ctx = getActivity();
+        if (ctx == null || anchor == null) {
+            return;
+        }
+        dismissSchemePopup();
+
+        final String[] names = getResources().getStringArray(R.array.mouse_model_names_axi);
+        final int current = getCurrentMouseModeIndex();
+
+        LinearLayout root = new LinearLayout(ctx);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundResource(R.drawable.bg_osc_scheme_popup);
+        root.setPadding(dpToPx(8), dpToPx(6), dpToPx(8), dpToPx(6));
+
+        TextView header = new TextView(ctx);
+        header.setText("鼠标模式");
+        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        header.setTextColor(0xFF9C9CA0);
+        header.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(6));
+        root.addView(header);
+
+        for (int i = 0; i < names.length; i++) {
+            final int index = i;
+            root.addView(createSchemeRow(ctx, i + 1, names[i], i == current,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            applyMouseMode(index);
+                        }
+                    }));
+        }
+
+        // 8 项比方案列表长，外套 ScrollView 并限制最大高度，避免小屏横屏溢出
+        ScrollView scrollView = new ScrollView(ctx);
+        scrollView.setVerticalScrollBarEnabled(false);
+        scrollView.addView(root, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        final int popupWidth = dpToPx(200);
+        final int containerW = getResources().getDisplayMetrics().widthPixels;
+        final int containerH = getResources().getDisplayMetrics().heightPixels;
+        final int margin = dpToPx(8);
+        final int maxHeight = (int) (containerH * 0.62f);
+
+        root.measure(View.MeasureSpec.makeMeasureSpec(popupWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        final int popupHeight = Math.min(root.getMeasuredHeight(), maxHeight);
+
+        final PopupWindow popup = new PopupWindow(scrollView, popupWidth, popupHeight, true);
+        popup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popup.setOutsideTouchable(true);
+        popup.setFocusable(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            popup.setElevation(dpToPx(8));
+        }
+
+        final int[] loc = new int[2];
+        anchor.getLocationOnScreen(loc);
+        int xoff = (anchor.getWidth() - popupWidth) / 2;
+        final int left = loc[0] + xoff;
+        if (left < margin) {
+            xoff += margin - left;
+        } else if (left + popupWidth > containerW - margin) {
+            xoff -= (left + popupWidth) - (containerW - margin);
+        }
+
+        final int gap = dpToPx(6);
+        final int spaceBelow = containerH - (loc[1] + anchor.getHeight());
+        final int yoff;
+        if (spaceBelow >= popupHeight + gap + margin) {
+            yoff = gap;
+        } else {
+            yoff = -(anchor.getHeight() + popupHeight + gap);
+        }
+
+        schemePopup = popup;
+        popup.showAsDropDown(anchor, xoff, yoff);
+    }
+
+    /** 写入 pref 并立即应用鼠标模式，角标同步刷新。 */
+    private void applyMouseMode(int index) {
+        final Context ctx = getActivity();
+        if (ctx == null || game == null || index < 0
+                || index >= getResources().getStringArray(R.array.mouse_model_names_axi).length) {
+            return;
+        }
+        PreferenceManager.getDefaultSharedPreferences(ctx)
+                .edit()
+                .putString(MOUSE_MODEL_PREF, String.valueOf(index))
+                .commit();
+        game.switchMouseModel(index);
+        refreshSchemeBadges();
+        dismissSchemePopup();
+        Toast.makeText(ctx, "已切换到"
+                        + getResources().getStringArray(R.array.mouse_model_names_axi)[index],
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private int getCurrentMouseModeIndex() {
+        final Context ctx = getActivity();
+        if (ctx == null) {
+            return 0;
+        }
+        final String value = PreferenceManager.getDefaultSharedPreferences(ctx)
+                .getString(MOUSE_MODEL_PREF, "0");
+        try {
+            final int index = Integer.parseInt(value);
+            final int count = getResources().getStringArray(R.array.mouse_model_names_axi).length;
+            return index >= 0 && index < count ? index : 0;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     /** 单行方案：左侧数字小方块 + 名称，当前方案额外显示对勾并高亮。 */
@@ -943,6 +1094,15 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
 
         badge_game_pad.setActive(game == null || game.prefConfig.onscreenController);
         badge_v_keyboard.setActive(game == null || game.prefConfig.enableKeyboard);
+
+        if (badge_mouse != null) {
+            final String[] mouseShort = getResources()
+                    .getStringArray(R.array.mouse_model_short_names_axi);
+            final int mouseIndex = getCurrentMouseModeIndex();
+            badge_mouse.setBadgeText(mouseShort[Math.min(mouseIndex, mouseShort.length - 1)]);
+            // “禁用鼠标/触控”时角标置灰，和手柄/按键的启用态保持一致
+            badge_mouse.setActive(mouseIndex != 3);
+        }
     }
 
     private static int indexOfValue(String[] values, String value) {
