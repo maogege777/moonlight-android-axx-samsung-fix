@@ -402,51 +402,8 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                 schemeLongPressFired=false;
                 return;
             }
-            // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] BEGIN
-            // Keep actions appended after the mouse modes stable when extensions add modes.
-            final int mouseModeCount = getResources()
-                    .getStringArray(R.array.mouse_model_names_axi).length;
-            // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] END
-            GameListMouseFragment fragment=new GameListMouseFragment();
-            fragment.setWidth(UiHelper.dpToPx(getActivity(),364));
-            fragment.setTitle("鼠标与触控");
-            fragment.setOnClick(new GameListMouseFragment.onClick() {
-                @Override
-                public void click(String title, int index) {
-                    // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] BEGIN
-                    if(!TextUtils.isEmpty(title)&&index!=mouseModeCount + 1){
-                        Toast.makeText(getActivity(),title,Toast.LENGTH_SHORT).show();
-                    }
-                    if(game==null||index<0){
-                        return;
-                    }
-                    if(index==mouseModeCount){
-                        game.switchMouseLocalCursor();
-                        return;
-                    }
-                    if(index==mouseModeCount + 1){
-                        game.prefConfig.absoluteMouseMode=!game.prefConfig.absoluteMouseMode;
-                        Toast.makeText(getActivity(),"远程桌面鼠标模式"+(game.prefConfig.absoluteMouseMode?"已启用！":"已禁用！"),Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    if(index==mouseModeCount + 2){
-                        if(conn!=null){
-                            sendKeys(new short[]{KeyboardTranslator.VK_LCONTROL,KeyboardTranslator.VK_LMENU, KeyboardTranslator.VK_LSHIFT, KeyboardTranslator.VK_N});
-                        }
-                        return;
-                    }
-                    // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] END
-                    if(index>=0&&index<mouseModeCount){
-                        PreferenceManager.getDefaultSharedPreferences(getActivity())
-                                .edit()
-                                .putString(MOUSE_MODEL_PREF,String.valueOf(index))
-                                .commit();
-                    }
-                    game.switchMouseModel(index);
-                    refreshSchemeBadges();
-                }
-            });
-            fragment.show(getFragmentManager());
+            // 单击与长按统一弹出模式菜单；不再进入旧的列表面板
+            showMouseModePopup(btn_mouse);
             return;
         }
 
@@ -968,6 +925,8 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         game.switchMouseModel(index);
         refreshSchemeBadges();
         dismissSchemePopup();
+        // 与虚拟手柄方案切换一致：直接收起全部菜单，回到串流画面
+        dismissAllDialogs();
         Toast.makeText(ctx, "已切换到"
                         + getResources().getStringArray(R.array.mouse_model_names_axi)[index],
                 Toast.LENGTH_SHORT).show();
