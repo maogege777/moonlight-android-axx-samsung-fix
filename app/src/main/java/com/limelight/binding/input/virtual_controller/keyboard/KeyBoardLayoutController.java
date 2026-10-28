@@ -4,10 +4,14 @@
 
 package com.limelight.binding.input.virtual_controller.keyboard;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -17,14 +21,20 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.limelight.Game;
 import com.limelight.LimeLog;
 import com.limelight.R;
 import com.limelight.binding.input.ControllerHandler;
 import com.limelight.preferences.PreferenceConfiguration;
+import com.limelight.ui.gamemenu.GameKeyboardUpdateFragment;
+import com.limelight.ui.gamemenu.QuickKeyStore;
+import com.limelight.ui.gamemenu.bean.GameMenuQuickBean;
 import com.limelight.ui.gamemenu.TouchPadView;
 
 import java.util.ArrayList;
@@ -38,6 +48,10 @@ public class KeyBoardLayoutController {
     private Vibrator vibrator;
     private LinearLayout keyboardView;
     private RadioGroup rg_keyboard;
+
+    /** 顶栏右侧的组合键条：自定义快捷键，横向滚动 + 末尾添加按钮 */
+    private HorizontalScrollView hsvCombo;
+    private LinearLayout llCombo;
     private PreferenceConfiguration prefConfig;
 
     // 本次触摸手势是否已触发按下震动（与 KeyBoardController 的规则一致）
@@ -59,6 +73,14 @@ public class KeyBoardLayoutController {
     private boolean isCombination=false;
 
     private void initKeyboard(){
+        //整块拦截触摸：键盘范围内的空白、行间距不再漏给下层串流画面。
+        //ViewGroup 派发顺序是子 View 先拿事件，所以按键按钮的点击不受影响。
+        keyboardView.setOnTouchListener((v, event) -> true);
+
+        hsvCombo = keyboardView.findViewById(R.id.hsv_combo);
+        llCombo = keyboardView.findViewById(R.id.ll_combo);
+        rebuildComboBar();
+
         View.OnTouchListener touchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -450,5 +472,167 @@ public class KeyBoardLayoutController {
     private int getPressHapticMs() {
         return Math.max(PreferenceConfiguration.MIN_VIBRATE_PRESS_MS,
                 Math.min(PreferenceConfiguration.MAX_VIBRATE_PRESS_MS, prefConfig.vibratePressMs));
+    }
+
+    // ---------------------------------------------------------------- 顶栏组合键条
+
+    /**
+     * 重建顶栏右侧的组合键条：读自定义快捷键（跳过默认组），末尾固定一个「+」。
+     * 与「操作」面板、设置页的导入导出共用 QuickKeyStore，因此自动被导出/导入覆盖。
+     */
+    private void rebuildComboBar() {
+        if (llCombo == null) {
+            return;
+        }
+        llCombo.removeAllViews();
+        List<GameMenuQuickBean> items = QuickKeyStore.loadCustom(context);
+        for (GameMenuQuickBean bean : items) {
+            if (QuickKeyStore.isSeedItem(bean)) {
+                continue;
+            }
+            llCombo.addView(createComboChip(bean));
+        }
+        llCombo.addView(createComboAddButton());
+    }
+
+    private View createComboChip(final GameMenuQuickBean bean) {
+        TextView chip = new TextView(context);
+        chip.setText(comboLabel(bean));
+        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+        chip.setTextColor(0xFFE6E6E6);
+        chip.setGravity(Gravity.CENTER);
+        chip.setSingleLine(true);
+        chip.setEllipsize(TextUtils.TruncateAt.END);
+        chip.setPadding(dp(8), 0, dp(8), 0);
+        chip.setBackground(comboBackground(0xFF333336, 0xFF45454A));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, dp(24));
+        lp.rightMargin = dp(5);
+        chip.setLayoutParams(lp);
+        chip.setOnClickListener(v -> sendCombo(bean));
+        chip.setOnLongClickListener(v -> {
+            showComboMenu(bean);
+            return true;
+        });
+        return chip;
+    }
+
+    private View createComboAddButton() {
+        TextView add = new TextView(context);
+        add.setText("+");
+        add.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        add.setTextColor(0xFFA8E063);
+        add.setGravity(Gravity.CENTER);
+        add.setBackground(comboBackground(0xFF2F5D1A, 0xFF63BF2C));
+        add.setLayoutParams(new LinearLayout.LayoutParams(dp(28), dp(24)));
+        add.setOnClickListener(v -> openComboEditor(null));
+        return add;
+    }
+
+    private GradientDrawable comboBackground(int fill, int stroke) {
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp(12));
+        bg.setColor(fill);
+        bg.setStroke(dp(1), stroke);
+        return bg;
+    }
+
+    /** 胶囊显示组合键文本（desc 优先，其次名称，最后键码）。 */
+    private String comboLabel(GameMenuQuickBean bean) {
+        if (bean == null) {
+            return "";
+        }
+        if (!TextUtils.isEmpty(bean.getDesc())) {
+            return bean.getDesc();
+        }
+        if (!TextUtils.isEmpty(bean.getName())) {
+            return bean.getName();
+        }
+        return bean.getCodes() == null ? "" : bean.getCodes();
+    }
+
+    /** 发送组合键：依次按下所有键，25ms 后逆序抬起（与「操作」面板一致）。 */
+    private void sendCombo(GameMenuQuickBean bean) {
+        if (bean == null || Game.instance == null) {
+            return;
+        }
+        final String codes = bean.getCodes();
+        if (TextUtils.isEmpty(codes)) {
+            Toast.makeText(context, "该组合键没有可发送的按键", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final String[] keys = codes.split(",");
+        for (String key : keys) {
+            try {
+                Game.instance.keyboardEvent(true, Short.parseShort(key.trim()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        new Handler().postDelayed(() -> {
+            for (int i = keys.length - 1; i >= 0; i--) {
+                try {
+                    Game.instance.keyboardEvent(false, Short.parseShort(keys[i].trim()));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }, 25);
+    }
+
+    /** 长按胶囊：编辑 / 删除。 */
+    private void showComboMenu(final GameMenuQuickBean bean) {
+        if (bean == null || !(context instanceof Activity)) {
+            return;
+        }
+        new AlertDialog.Builder(context)
+                .setTitle(comboLabel(bean))
+                .setItems(new String[]{"编辑", "删除"}, (dialog, which) -> {
+                    if (which == 0) {
+                        openComboEditor(bean);
+                    } else {
+                        confirmDeleteCombo(bean);
+                    }
+                })
+                .show();
+    }
+
+    private void confirmDeleteCombo(final GameMenuQuickBean bean) {
+        new AlertDialog.Builder(context)
+                .setTitle("删除组合键")
+                .setMessage("确定删除「" + comboLabel(bean) + "」？")
+                .setPositiveButton("删除", (dialog, which) -> {
+                    QuickKeyStore.removeCustom(context, bean);
+                    rebuildComboBar();
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    /** 打开现有编辑器：新增或编辑自定义组合键，保存后刷新组合键条。 */
+    private void openComboEditor(GameMenuQuickBean existing) {
+        if (!(context instanceof Activity)) {
+            return;
+        }
+        final Activity activity = (Activity) context;
+        GameKeyboardUpdateFragment fragment = new GameKeyboardUpdateFragment();
+        int width = activity.getResources().getDisplayMetrics().widthPixels;
+        if (activity.getResources().getDisplayMetrics().heightPixels > width) {
+            width = (activity.getResources().getDisplayMetrics().heightPixels * 2) / 3;
+        }
+        fragment.setWidth(width);
+        fragment.setDimAmount(0.8f);
+        fragment.setTitle(existing == null ? "添加组合键" : "编辑组合键");
+        fragment.setKeyFrom(1);
+        fragment.setExisting(existing);
+        fragment.setOnClick(bean -> {
+            if (bean != null) {
+                QuickKeyStore.saveCustom(context, bean);
+                rebuildComboBar();
+            }
+        });
+        fragment.show(activity.getFragmentManager());
+    }
+
+    private int dp(int value) {
+        return (int) (value * context.getResources().getDisplayMetrics().density + 0.5f);
     }
 }

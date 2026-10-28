@@ -392,12 +392,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         // GameFunctionFragment 的「自定义快捷键」分组，「禁用默认的特殊按键指令」开关继续生效。
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
         if(v.getId()==R.id.btn_mouse){
-            // 长按已经弹出模式菜单时，吞掉松手后补发的点击，避免又打开列表面板
-            if(schemeLongPressFired){
-                schemeLongPressFired=false;
-                return;
-            }
-            // 单击与长按统一弹出模式菜单；不再进入旧的列表面板
+            // 鼠标与触控不区分长按：任何点击都弹完整菜单
             showMouseMenu(btn_mouse);
             return;
         }
@@ -688,6 +683,17 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
                         cancelSchemeLongPress();
+                        if (schemeLongPressFired) {
+                            // click 在 UP 后立即补发并消费该标记；若没有 click（手指滑出按钮），
+                            // 这里兜底清除，避免影响下一次点击。不能从长按触发时计时，
+                            // 否则按住超过 600ms 会把标记提前清掉，松手仍会弹菜单。
+                            schemePressHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    schemeLongPressFired = false;
+                                }
+                            }, 300);
+                        }
                         break;
                     default:
                         break;
@@ -710,13 +716,6 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                 } else if (kind == SCHEME_KIND_KEYBOARD) {
                     toggleVirtualKeyboard();
                 }
-                // click 在 UP 时立即补发；稍后清标记，避免长按后手指移出按钮导致下次点击被误吞
-                schemePressHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        schemeLongPressFired = false;
-                    }
-                }, 400);
             }
         };
         schemePressHandler.postDelayed(schemeLongPressRunnable, SCHEME_LONG_PRESS_DELAY_MS);
