@@ -472,6 +472,23 @@ public class KeyBoardLayoutController {
         pressHapticFired = false;
     }
 
+    /**
+     * 独立的一次点击反馈（顶栏按钮、组合键胶囊）。
+     *
+     * <p>不能复用 {@link #performPressHaptic()}：那个方法带「一次手势只震一次」的去重标记，
+     * 而该标记只由键盘按键的 ACTION_UP 重置。顶栏按钮和胶囊没有对应的抬手重置，
+     * 第一次点击把标记置 true 后就再也清不掉，导致后续点击被去重挡掉
+     * （表现为「必须先点一下键盘按键才有震动」）。</p>
+     *
+     * <p>这些 View 每次 ACTION_DOWN 本身就是一次独立点击，直接震即可。</p>
+     */
+    private void vibrateTap() {
+        if (!canVibrate()) {
+            return;
+        }
+        vibrator.vibrate(getPressHapticMs());
+    }
+
     private boolean canVibrate() {
         return vibrator != null && vibrator.hasVibrator() && prefConfig.enableKeyboardVibrate;
     }
@@ -492,7 +509,7 @@ public class KeyBoardLayoutController {
         }
         view.setOnTouchListener((v, event) -> {
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                performPressHaptic();
+                vibrateTap();
             }
             return false;
         });
@@ -537,7 +554,7 @@ public class KeyBoardLayoutController {
         chip.setOnClickListener(v -> sendCombo(bean));
         chip.setOnTouchListener((v, event) -> {
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                performPressHaptic();
+                vibrateTap();
             }
             return false;
         });
@@ -559,7 +576,7 @@ public class KeyBoardLayoutController {
         add.setOnClickListener(v -> openComboEditor(null));
         add.setOnTouchListener((v, event) -> {
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                performPressHaptic();
+                vibrateTap();
             }
             return false;
         });
