@@ -35,6 +35,23 @@ public class TouchPadView extends View {
     private String labelText;
     private Paint labelPaint;
 
+    /** 手指接触时的反馈（震动），由控制器注入，复用键盘的震动设置。 */
+    public interface OnHapticListener {
+        void onHaptic();
+    }
+
+    private OnHapticListener hapticListener;
+
+    public void setOnHapticListener(OnHapticListener listener) {
+        this.hapticListener = listener;
+    }
+
+    private void haptic() {
+        if (hapticListener != null) {
+            hapticListener.onHaptic();
+        }
+    }
+
     public TouchPadViewLister viewLister;
 
     public void setViewLister(TouchPadViewLister viewLister) {
@@ -144,10 +161,12 @@ public class TouchPadView extends View {
                 isMoving = false;
                 multiTouched = false;
                 twoFingerMoved = false;
+                haptic();
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
                 multiTouched = true;
+                haptic();
                 lastX = averageX(event);
                 lastY = averageY(event);
                 isMoving = false;

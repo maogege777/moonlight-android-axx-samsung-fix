@@ -260,9 +260,9 @@ public class KeyBoardLayoutController {
             }
         });
 
-        // 大触摸板 1:1；mini 触摸板面积只有其 1/21，位移放大 5 倍
+        // 两块触摸板都按 1:1 位移，和数字键盘手感一致
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch), 1f);
-        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_mini), 5f);
+        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_mini), 1f);
 
         keyboardView.findViewById(R.id.btn_soft_phone).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,6 +289,7 @@ public class KeyBoardLayoutController {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        vibrateTap();
                         keyboardView.findViewById(R.id.mouse_up).post(repeater);
                         return true;
                     case MotionEvent.ACTION_UP:
@@ -313,6 +314,7 @@ public class KeyBoardLayoutController {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        vibrateTap();
                         keyboardView.findViewById(R.id.mouse_down).post(repeater);
                         return true;
                     case MotionEvent.ACTION_UP:
@@ -386,6 +388,7 @@ public class KeyBoardLayoutController {
             return;
         }
         pad.setLabel("触摸板");
+        pad.setOnHapticListener(this::vibrateTap);
         pad.setViewLister(new TouchPadView.TouchPadViewLister() {
             @Override
             public void sendMouseMove(float dx, float dy) {
