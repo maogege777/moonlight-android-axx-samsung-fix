@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     简化键盘：全键盘去掉 F1-F12 那一行，Esc 并入数字行，Del / Ins 接替右侧 Alt / Ctrl。
-    左侧固定 96dp 是鼠标三键（中/左/右），右侧是触摸板；位置由 spacer 与触摸板的 weight 控制。
+    左侧固定 64dp 是鼠标三键（中/左/右），右侧剩余宽度全部是触摸板（虚线描边，与数字键盘一致）。
+    除数字行（15 个键）外，各行权重合计都是 1440，1u 键像素宽度一致。
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -9,17 +10,10 @@
     android:orientation="horizontal"
     android:padding="3dp">
 
-    <!-- 定位用空白：靠左 0 / 居中 1 / 靠右 1 -->
-    <View
-        android:id="@+id/v_simple_spacer"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
-
     <!-- 左侧鼠标三键 -->
     <LinearLayout
         android:id="@+id/ll_simple_mouse"
-        android:layout_width="96dp"
+        android:layout_width="64dp"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
@@ -32,7 +26,7 @@
             android:tag="mouse_2"
             android:text="中键"
             android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:textSize="11sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -43,7 +37,7 @@
             android:tag="mouse_1"
             android:text="左键"
             android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:textSize="11sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -54,7 +48,7 @@
             android:tag="mouse_3"
             android:text="右键"
             android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:textSize="11sp" />
     </LinearLayout>
 
     <!-- 键块 -->
@@ -715,7 +709,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="160">
+                android:layout_weight="170">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -927,7 +921,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="160">
+                android:layout_weight="170">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -951,7 +945,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="160">
+                android:layout_weight="200">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1157,7 +1151,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="103">
+                android:layout_weight="120">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1174,7 +1168,7 @@
                 android:id="@+id/fv_keyboard_touch_simple_mini"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="103"
+                android:layout_weight="120"
                 android:background="@drawable/bg_ax_touchpad" />
         </LinearLayout>
 
@@ -1188,7 +1182,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="105">
+                android:layout_weight="100">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1204,7 +1198,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="105">
+                android:layout_weight="100">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1220,7 +1214,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="105">
+                android:layout_weight="100">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1236,7 +1230,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="351">
+                android:layout_weight="440">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1363,12 +1357,12 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 右侧空白 = 触摸板 -->
+    <!-- 右侧多余宽度全部给触摸板 -->
     <com.limelight.ui.gamemenu.TouchPadView
         android:id="@+id/fv_keyboard_touch_simple_r"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@drawable/bg_ax_touchpad_flat" />
+        android:background="@drawable/bg_ax_touchpad" />
 
 </LinearLayout>

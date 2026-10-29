@@ -68,26 +68,13 @@
             android:text="组合键模式"
             android:textSize="10dp" />
 
-        <TextView
-            android:id="@+id/btn_typing_align"
-            android:layout_width="78dp"
-            android:layout_height="27dp"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/btn_combination"
-            android:background="@drawable/ic_game_menu_btn_selector"
-            android:gravity="center"
-            android:text="位置 · 居中"
-            android:textColor="@android:color/white"
-            android:textSize="10dp"
-            android:visibility="gone" />
-
         <HorizontalScrollView
             android:id="@+id/hsv_combo"
             android:layout_width="match_parent"
             android:layout_height="27dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="5dp"
-            android:layout_toRightOf="@+id/btn_typing_align"
+            android:layout_toRightOf="@+id/btn_combination"
             android:layout_toLeftOf="@+id/iv_game_menu"
             android:fillViewport="true"
             android:scrollbars="none">

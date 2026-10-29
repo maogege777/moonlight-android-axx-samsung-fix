@@ -53,7 +53,6 @@ public class KeyBoardLayoutController {
     private LinearLayout keyboardView;
     private RadioGroup rg_keyboard;
     private TextView tvMode;
-    private TextView btnTypingAlign;
 
     /** 顶栏右侧的组合键条：自定义快捷键，横向滚动 + 末尾添加按钮 */
     private HorizontalScrollView hsvCombo;
@@ -244,23 +243,11 @@ public class KeyBoardLayoutController {
 
         rg_keyboard = keyboardView.findViewById(R.id.rg_keyboard);
         tvMode = keyboardView.findViewById(R.id.btn_keyboard_mode);
-        btnTypingAlign = keyboardView.findViewById(R.id.btn_typing_align);
 
         // 顶栏「布局 ▾」：每点一次在 简化 -> 全键盘 -> 数字 之间循环
         tvMode.setOnClickListener(v -> cycleMode());
         attachTopBarHaptic(tvMode);
-
-        // 简化键盘专用的位置气泡：左 -> 中 -> 右 循环，写回偏好
-        btnTypingAlign.setOnClickListener(v -> {
-            prefConfig.keyboard_typing_align = (prefConfig.keyboard_typing_align + 1) % 3;
-            PreferenceManager.getDefaultSharedPreferences(context).edit()
-                    .putInt(PREF_KEYBOARD_TYPING_ALIGN, prefConfig.keyboard_typing_align).apply();
-            updateTypingAlignText();
-            applyTypingAlign();
-        });
-        attachTopBarHaptic(btnTypingAlign);
-
-        rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(checkedId));
+rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(checkedId));
         rg_keyboard.check(R.id.rbt_keyboard_3);
         // 两块触摸板都按 1:1 位移，和数字键盘手感一致
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch), 1f);
@@ -415,9 +402,7 @@ public class KeyBoardLayoutController {
             }
         });
     }
-    // ---------------------------------------------------------------- 键盘模式 / 简化键盘位置
-
-    private static final String PREF_KEYBOARD_TYPING_ALIGN = "keyboard_typing_align";
+    // ---------------------------------------------------------------- 键盘模式
 
     /** 顶栏「布局 ▾」：点一下就在 简化 -> 全键盘 -> 数字 之间循环，不弹菜单。 */
     private void cycleMode() {
@@ -450,17 +435,11 @@ public class KeyBoardLayoutController {
         // 三种模式共用同一块深色底板：顶栏、触摸板、键块连成一体，不再分区块
         keyboardView.setBackgroundColor(0xFF212121);
 
-        // 位置气泡只在简化键盘下才有意义
-        btnTypingAlign.setVisibility(isSimple ? View.VISIBLE : View.GONE);
 
         if (tvMode != null) {
             tvMode.setText("布局 · " + modeName(checkedId) + " ▾");
         }
 
-        if (isSimple) {
-            updateTypingAlignText();
-            applyTypingAlign();
-        }
     }
 
     private String modeName(int checkedId) {
@@ -473,42 +452,6 @@ public class KeyBoardLayoutController {
         return "电脑全键盘";
     }
 
-    private void updateTypingAlignText() {
-        if (btnTypingAlign == null) {
-            return;
-        }
-        String[] names = {"靠左", "居中", "靠右"};
-        int a = Math.max(0, Math.min(2, prefConfig.keyboard_typing_align));
-        btnTypingAlign.setText("位置 · " + names[a]);
-    }
-
-    /**
-     * 简化键盘的位置：两侧空白由两块触摸板的 weight 分配。
-     * 靠左 = 左 0 右 1，居中 = 1/1，靠右 = 1/0，键盘挪到哪触摸板就自动变大变小。
-     */
-    private void applyTypingAlign() {
-        View simple = keyboardView.findViewById(R.id.lv_keyboard_simple);
-        if (simple == null) {
-            return;
-        }
-        int align = Math.max(0, Math.min(2, prefConfig.keyboard_typing_align));
-        // 靠左：spacer 0 / 触摸板 1；居中：1 / 1；靠右：1 / 0
-        setPadWeight(simple.findViewById(R.id.v_simple_spacer), align == 0 ? 0f : 1f);
-        setPadWeight(simple.findViewById(R.id.fv_keyboard_touch_simple_r), align == 2 ? 0f : 1f);
-    }
-
-    private void setPadWeight(View v, float weight) {
-        if (v == null) {
-            return;
-        }
-        ViewGroup.LayoutParams lp = v.getLayoutParams();
-        if (lp instanceof LinearLayout.LayoutParams) {
-            LinearLayout.LayoutParams llp = (LinearLayout.LayoutParams) lp;
-            llp.width = 0;
-            llp.weight = weight;
-            v.setLayoutParams(llp);
-        }
-    }
     private void resetView(){
         keyList.clear();
 //        isCombination=false;
@@ -569,9 +512,9 @@ public class KeyBoardLayoutController {
 
         keyboardView.findViewById(R.id.lv_keyboard_simple).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, shortH));
 
-        // 简化键盘键块宽度：按设计放大到 780dp（原来的 1.5 倍），窄屏时最多占屏宽 - 48dp，保证两侧触摸板还在
+        // 简化键盘键块宽度：780dp，窄屏时最多占屏宽 - 112dp（左侧 64dp 鼠标列 + 边距）
         int simpleWidth = Math.min(dip2px(context, 780),
-                context.getResources().getDisplayMetrics().widthPixels - dip2px(context, 150));
+                context.getResources().getDisplayMetrics().widthPixels - dip2px(context, 112));
         View simpleKeys = keyboardView.findViewById(R.id.ll_simple_keys);
         if (simpleKeys != null) {
             simpleKeys.setLayoutParams(new LinearLayout.LayoutParams(simpleWidth, ViewGroup.LayoutParams.MATCH_PARENT));

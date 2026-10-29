@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="150"
+            android:layout_weight="96"
             android:layout_marginRight="5dp"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="131"
@@ -38,7 +38,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="132"
@@ -49,7 +49,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="133"
@@ -60,7 +60,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="134"
@@ -71,7 +71,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="135"
@@ -82,7 +82,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="136"
@@ -93,7 +93,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="137"
@@ -104,7 +104,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="138"
@@ -115,7 +115,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="139"
@@ -126,7 +126,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="140"
@@ -137,7 +137,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="141"
@@ -148,7 +148,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="142"
@@ -159,7 +159,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:layout_marginLeft="5dp"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
@@ -171,7 +171,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
+            android:layout_weight="96"
             android:background="@drawable/bg_ax_key_fkey"
             android:gravity="center"
             android:tag="112"
@@ -751,7 +751,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="160"
+            android:layout_weight="170"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="115"
@@ -913,7 +913,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="160"
+            android:layout_weight="170"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="66"
@@ -931,7 +931,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="160"
+            android:layout_weight="200"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="59"
@@ -1097,7 +1097,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="103"
+            android:layout_weight="120"
             android:background="@drawable/bg_ax_key_alpha"
             android:gravity="center"
             android:tag="19"
@@ -1109,7 +1109,7 @@
             android:id="@+id/fv_keyboard_touch_mini"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="103"
+            android:layout_weight="120"
             android:background="@drawable/bg_ax_touchpad" />
     </LinearLayout>
 
@@ -1122,7 +1122,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="105"
+            android:layout_weight="100"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="113"
@@ -1133,7 +1133,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="105"
+            android:layout_weight="100"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="117"
@@ -1144,7 +1144,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="105"
+            android:layout_weight="100"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="57"
@@ -1155,7 +1155,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="351"
+            android:layout_weight="440"
             android:background="@drawable/bg_ax_key_space"
             android:gravity="center"
             android:tag="62"
