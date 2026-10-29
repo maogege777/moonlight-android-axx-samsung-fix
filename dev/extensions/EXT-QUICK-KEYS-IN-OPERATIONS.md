@@ -231,18 +231,38 @@ and in code comments:
 - The confirm dialog for deleting an entry reads 删除全键盘快捷键, and the editor hint is now
   "保存后长按气泡可以编辑和删除" (the 组合键条 wording no longer appears).
 
-### 2. Simplified keyboard: one tall Enter instead of two
+### 2. Simplified keyboard: the two Enters are now one connected key
 
-`item_layout_axixi_keyboard_simple.xml` used to have two Enter keys - row 3's (weight 150) and the
-one added in `7ddcf14a` at the end of row 4 (weight 100) - which looked like two separate,
-differently sized keys stacked at the right edge.
+`item_layout_axixi_keyboard_simple.xml` used to draw two separate Enter keys - row 3's
+(weight 150) and the one added in `7ddcf14a` at the end of row 4 (weight 100). They looked like
+two stacked keys of different widths, with a visible seam.
 
-Rows 3 and 4 are now wrapped in one horizontal container (`weight=2` inside `ll_simple_keys`, so
-the row heights are unchanged); the left part is a vertical container holding both rows
-(`weight=1` each), and a single Enter occupies the right column (`weight=150`, `match_parent`
-height), so it visually spans both rows. `KeyBoardLayoutController.bindKeys` walks the tree
-recursively, so the extra nesting needs no binding change; the digitpad already used the same
-"跨行回车" pattern. Row 4's remaining keys are ~3.7% narrower because the left column is now
-1440-150 instead of 1440-100, and both rows end flush at the Enter's left edge.
+**Do not merge them into one shared column.** An earlier attempt wrapped rows 3+4 in a horizontal
+container with a single tall Enter on the right (`weight=150`, `match_parent` height). That forced
+the left column of both rows to 1290, which scaled row 4's keys by 1290/1340 and moved the `↑` off
+the `↓` column in row 5 (they stopped being aligned and stopped being the same width). The arrow
+cluster is what constrains the geometry:
+
+- row 4 (without Enter) sums to 1340, `↑` occupies 1240..1340;
+- row 5 sums to 1440, its last three keys are `← ↓ →` at 1140..1240 / 1240..1340 / 1340..1440.
+
+So `↑` only stays above `↓` while row 4's Enter is exactly 100 units wide, and row 3's Enter must
+stay 150 units - i.e. the original weights are the only ones that work.
+
+The keys are therefore kept as two views (both `tag="66"`, so both fire Enter as before), and only
+their backgrounds change so they read as one L-shaped key:
+
+- `bg_ax_key_enter_top.xml` - 2dp inset left/right/top, no bottom inset, only the top corners
+  rounded (5dp), bottom corners square;
+- `bg_ax_key_enter_bottom.xml` - 2dp inset left/right/bottom, no top inset, only the bottom
+  corners rounded, top corners square;
+- the label 回车 lives on the wide top half only.
+
+Result: a seamless stepped key - wide on row 3, narrow on row 4, right edges flush at the far
+right, and the step's inner corner is square. A true ISO shape (narrow top, wide bottom) is
+geometrically impossible here: the wide bottom half would have to sit at 1290..1440 and would
+cover the `↑` column, which conflicts with the "↑ aligned with ↓" requirement; getting ISO would
+mean shifting the whole arrow cluster one unit to the left in both rows.
+
 
 
