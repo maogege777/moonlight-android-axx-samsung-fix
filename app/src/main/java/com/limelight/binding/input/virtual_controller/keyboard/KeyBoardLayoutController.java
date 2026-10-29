@@ -266,7 +266,6 @@ public class KeyBoardLayoutController {
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch), 1f);
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_mini), 1f);
 
-        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_l), 1f);
 
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_r), 1f);
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_mini), 1f);
@@ -493,7 +492,8 @@ public class KeyBoardLayoutController {
             return;
         }
         int align = Math.max(0, Math.min(2, prefConfig.keyboard_typing_align));
-        setPadWeight(simple.findViewById(R.id.fv_keyboard_touch_simple_l), align == 0 ? 0f : 1f);
+        // 靠左：spacer 0 / 触摸板 1；居中：1 / 1；靠右：1 / 0
+        setPadWeight(simple.findViewById(R.id.v_simple_spacer), align == 0 ? 0f : 1f);
         setPadWeight(simple.findViewById(R.id.fv_keyboard_touch_simple_r), align == 2 ? 0f : 1f);
     }
 
@@ -560,15 +560,18 @@ public class KeyBoardLayoutController {
 //        params.leftMargin = 20 + buttonSize;
 //        params.topMargin = 15;
 
-        LinearLayout.LayoutParams params1=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dip2px(context,height));
+        // 全键盘保持原高度；简化键盘与数字键盘各矮一个 F 行（约 33dp）
+        int fullH = dip2px(context, height);
+        int shortH = Math.max(dip2px(context, 110), fullH - dip2px(context, 33));
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, fullH);
         keyboardView.findViewById(R.id.lv_keyboard).setLayoutParams(params1);
-        keyboardView.findViewById(R.id.lv_keyboard_digitpad).setLayoutParams(params1);
+        keyboardView.findViewById(R.id.lv_keyboard_digitpad).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, shortH));
 
-        keyboardView.findViewById(R.id.lv_keyboard_simple).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip2px(context, height)));
+        keyboardView.findViewById(R.id.lv_keyboard_simple).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, shortH));
 
         // 简化键盘键块宽度：按设计放大到 780dp（原来的 1.5 倍），窄屏时最多占屏宽 - 48dp，保证两侧触摸板还在
         int simpleWidth = Math.min(dip2px(context, 780),
-                context.getResources().getDisplayMetrics().widthPixels - dip2px(context, 48));
+                context.getResources().getDisplayMetrics().widthPixels - dip2px(context, 150));
         View simpleKeys = keyboardView.findViewById(R.id.ll_simple_keys);
         if (simpleKeys != null) {
             simpleKeys.setLayoutParams(new LinearLayout.LayoutParams(simpleWidth, ViewGroup.LayoutParams.MATCH_PARENT));

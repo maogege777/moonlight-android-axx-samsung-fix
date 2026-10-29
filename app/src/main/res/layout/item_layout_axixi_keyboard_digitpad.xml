@@ -70,9 +70,9 @@
         android:id="@+id/lv_digitpad"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginLeft="26dp"
-        android:layout_marginRight="26dp"
-        android:layout_weight="280"
+        android:layout_marginLeft="44dp"
+        android:layout_marginRight="44dp"
+        android:layout_weight="255"
         android:orientation="vertical">
 
         <!-- 行1：NumLk ÷ × ⌫ -->

@@ -1,28 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    简化键盘：以全键盘为底，去掉 F1-F12 那一行，Esc 并入数字行，
-    Del / Ins 落到下方接替右侧 Alt / Ctrl，退格宽度保持 150。
-    两侧空白是触摸板（weight 由位置决定：靠左 0/1、居中 1/1、靠右 1/0）。
+    简化键盘：全键盘去掉 F1-F12 那一行，Esc 并入数字行，Del / Ins 接替右侧 Alt / Ctrl。
+    左侧固定 96dp 是鼠标三键（中/左/右），右侧是触摸板；位置由 spacer 与触摸板的 weight 控制。
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:padding="3dp">
 
-    <com.limelight.ui.gamemenu.TouchPadView
-        android:id="@+id/fv_keyboard_touch_simple_l"
+    <!-- 定位用空白：靠左 0 / 居中 1 / 靠右 1 -->
+    <View
+        android:id="@+id/v_simple_spacer"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@drawable/bg_ax_touchpad_flat" />
+        android:layout_weight="1" />
 
+    <!-- 左侧鼠标三键 -->
+    <LinearLayout
+        android:id="@+id/ll_simple_mouse"
+        android:layout_width="96dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_ax_key_num"
+            android:gravity="center"
+            android:tag="mouse_2"
+            android:text="中键"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_ax_key_num"
+            android:gravity="center"
+            android:tag="mouse_1"
+            android:text="左键"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_ax_key_num"
+            android:gravity="center"
+            android:tag="mouse_3"
+            android:text="右键"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- 键块 -->
     <LinearLayout
         android:id="@+id/ll_simple_keys"
         android:layout_width="780dp"
         android:layout_height="match_parent"
         android:background="#212121"
-        android:orientation="vertical"
-        android:padding="3dp">
+        android:orientation="vertical">
 
         <!-- 第 1 行 -->
         <LinearLayout
@@ -1195,7 +1236,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="310">
+                android:layout_weight="351">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1211,7 +1252,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="105">
+                android:layout_weight="100">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1322,6 +1363,7 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- 右侧空白 = 触摸板 -->
     <com.limelight.ui.gamemenu.TouchPadView
         android:id="@+id/fv_keyboard_touch_simple_r"
         android:layout_width="0dp"

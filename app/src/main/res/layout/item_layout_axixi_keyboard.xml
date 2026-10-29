@@ -1155,7 +1155,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="310"
+            android:layout_weight="351"
             android:background="@drawable/bg_ax_key_space"
             android:gravity="center"
             android:tag="62"
@@ -1166,7 +1166,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="105"
+            android:layout_weight="100"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="58"
