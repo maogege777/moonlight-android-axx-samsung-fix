@@ -925,6 +925,7 @@
 
                 <!-- 大回车上半段：宽 150，文字只在这里显示；与下面 100 宽的下半段拼成 L 形 -->
                 <TextView
+                    android:id="@+id/kb_enter_top"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/bg_ax_key_enter_top"
@@ -1171,6 +1172,7 @@
 
                 <!-- 大回车下半段：宽 100（与方向键列对齐），不显示文字，接缝与上半段无缝 -->
                 <TextView
+                    android:id="@+id/kb_enter_bottom"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/bg_ax_key_enter_bottom"

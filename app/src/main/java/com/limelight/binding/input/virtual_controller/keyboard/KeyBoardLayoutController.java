@@ -311,8 +311,23 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 
     private void keyDown(View v) {
         rememberKeyBg(v);
-        v.setBackgroundResource(R.drawable.bg_ax_keyboard_button_confirm);
+        v.setBackgroundResource(confirmRes(v));
         setSplitEnterPressed(v, true);
+    }
+
+    /**
+     * 按下态背景：大回车的上下两段各有与自身形状匹配的确认色（接缝侧直角、无边距），
+     * 其余按键仍用统一的矩形确认背景。
+     */
+    private int confirmRes(View v) {
+        int id = v == null ? View.NO_ID : v.getId();
+        if (id == R.id.kb_enter_top) {
+            return R.drawable.bg_ax_key_enter_top_confirm;
+        }
+        if (id == R.id.kb_enter_bottom) {
+            return R.drawable.bg_ax_key_enter_bottom_confirm;
+        }
+        return R.drawable.bg_ax_keyboard_button_confirm;
     }
 
     private void keyUp(View v) {
@@ -353,7 +368,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             }
             if (pressed) {
                 rememberKeyBg(part);
-                part.setBackgroundResource(R.drawable.bg_ax_keyboard_button_confirm);
+                part.setBackgroundResource(confirmRes(part));
             } else {
                 restoreKeyBg(part);
             }
