@@ -254,10 +254,12 @@ So row 4's Enter can only be 100 units wide, otherwise `↑` slides off `↓`.
 **Final layout** (user-confirmed): keep the two widths - row 3 Enter 150, row 4 Enter 100 - and
 make them read as one down-facing L:
 
-- `bg_ax_key_enter_top.xml`: 2dp inset on left/right/top, **no bottom inset**, only the top two
-  corners rounded. 150 wide, extends 50 units further left than the leg.
-- `bg_ax_key_enter_bottom.xml`: 2dp inset on left/right/bottom, **no top inset**, only the bottom
-  two corners rounded. 100 wide, flush with the far right edge, so `↑` stays exactly above `↓`.
+- `bg_ax_key_enter_top.xml`: 2dp inset on left/right/top, **no bottom inset**; 150 wide, extends
+  50 units further left than the leg; all corners except the one that meets the leg's right edge
+  are rounded (5dp), including the bottom-left corner at the step.
+- `bg_ax_key_enter_bottom.xml`: 2dp inset on left/right/bottom, **no top inset**; 100 wide, flush
+  with the far right edge, so `↑` stays exactly above `↓`; top-left, bottom-left and bottom-right
+  rounded, top-right square where it meets the wide half.
 - The label `Enter` is only on the wide top half.
 
 Because they are still two views, `KeyBoardLayoutController.keyDown / keyUp` now also updates every
