@@ -5,7 +5,8 @@
     字母键 100 -> 110（+10%），空间来自左修饰与尾部符号键：
       Tab 200 -> 130、Caps 230 -> 160、Shift 300 -> 240；
       [ ] \ ; ' , . / 80 -> 70；↑ 100 -> 120。
-    各行总权重统一为 1440（数字行由 1530 归一：Esc/` 90 -> 80、- / = 100 -> 80、⌫ 150 -> 120），
+    各行总权重统一为 1440（数字行由 1530 归一，再把 ⌫ 加长到 150 与下方回车上下对齐：
+    Esc 90 -> 75、` 90 -> 70、- 100 -> 70、= 100 -> 75、⌫ 150 -> 120 -> 150），
     键块整体宽度不变，左侧鼠标列与右侧滚轮/触摸板列不受影响。
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -73,7 +74,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="80">
+                android:layout_weight="75">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -89,7 +90,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="80">
+                android:layout_weight="70">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -375,7 +376,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="80">
+                android:layout_weight="70">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -401,7 +402,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="80">
+                android:layout_weight="75">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -427,7 +428,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="120">
+                android:layout_weight="150">
 
                 <TextView
                     android:layout_width="match_parent"
