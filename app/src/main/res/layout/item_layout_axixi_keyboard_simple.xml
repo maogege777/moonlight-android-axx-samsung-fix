@@ -1283,7 +1283,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_ax_key_alpha"
+                    android:background="@drawable/bg_ax_key_mod"
                     android:gravity="center"
                     android:tag="122"
                     android:text="Home"
@@ -1299,7 +1299,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_ax_key_alpha"
+                    android:background="@drawable/bg_ax_key_mod"
                     android:gravity="center"
                     android:tag="123"
                     android:text="End"
