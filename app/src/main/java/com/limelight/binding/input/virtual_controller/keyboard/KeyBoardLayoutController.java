@@ -499,12 +499,25 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 
         keyboardView.findViewById(R.id.lv_keyboard_simple).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, shortH));
 
-        // 简化键盘键块宽度：780dp，窄屏时最多占屏宽 - 112dp（左侧 64dp 鼠标列 + 边距）
-        int simpleWidth = Math.min(dip2px(context, 780),
-                context.getResources().getDisplayMetrics().widthPixels - dip2px(context, 112));
+        // 简化键盘宽度：手机（<=800dp）保持现状；屏幕更宽时，多出来的部分按比例分给两侧
+        //   鼠标列 = 64 + 超出 x 5%      触摸板 = 42 + 超出 x 10%
+        float density = context.getResources().getDisplayMetrics().density;
+        int screenW = context.getResources().getDisplayMetrics().widthPixels;
+        int screenDp = Math.round(screenW / density);
+        int excess = Math.max(0, screenDp - 800);
+        int mouseW = dip2px(context, 64f + excess * 0.05f);
+        int padW = dip2px(context, 42f + excess * 0.10f);
+        int simpleWidth = screenW - mouseW - padW - dip2px(context, 6);
+
         View simpleKeys = keyboardView.findViewById(R.id.ll_simple_keys);
         if (simpleKeys != null) {
             simpleKeys.setLayoutParams(new LinearLayout.LayoutParams(simpleWidth, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+        View simpleMouse = keyboardView.findViewById(R.id.ll_simple_mouse);
+        if (simpleMouse != null) {
+            LinearLayout.LayoutParams mlp = (LinearLayout.LayoutParams) simpleMouse.getLayoutParams();
+            mlp.width = mouseW;
+            simpleMouse.setLayoutParams(mlp);
         }
 
 
