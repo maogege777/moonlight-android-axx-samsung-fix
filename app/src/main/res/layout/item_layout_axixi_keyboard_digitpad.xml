@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    数字键盘 v6
-    ├─ G1 左手区 (weight 88)      Esc / 中键 / 左键 / 右键
-    ├─ G2 数字区 (weight 280)     NumLk ÷ × ⌫ / 7 8 9 − / 4 5 6 + / 1 2 3 Enter / 0(双格) .
-    └─ G3 右手区 (weight 374)     功能键 4 列(修饰键 1.5 列 + 方向键 1 列) + 右列(滚轮+触摸板)
-    组间间距 26dp 由 G2 的左右 margin 提供，面板总宽不变。
+    数字键盘 v7：数字区与「修饰键 + 方向键」组左右互换
+    ├─ G1 左手区   (weight 88)    Esc / 中键 / 左键 / 右键
+    ├─ G2 功能键区 (weight 224)   Shift Win PgUp / Ctrl Alt PgDn / ScrLk Home ↑ End / Del ← ↓ →
+    ├─ G3 数字区   (weight 255)   NumLk ÷ × ⌫ / 7 8 9 − / 4 5 6 + / 1 2 3 Enter / 0(双格) .
+    └─ G4 右列     (weight 150)   : \ + 滚轮 / 触摸板
+    组间间距统一 30dp（3 处共 90dp，接近原 88dp），各块宽度与按键尺寸基本不变，触摸板 x 位置不变。
+    按键背景 drawable、tag、字号一律沿用原值，未改任何配色。
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -65,13 +67,185 @@
             android:textSize="12sp" />
     </LinearLayout>
 
+    <!-- 功能键：4 列（修饰键各 1.5 列 + 方向键 1 列） -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_weight="224">
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="59"
+            android:text="Shift"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />            <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="117"
+            android:text="Win"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="92"
+            android:text="PgUp"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="113"
+            android:text="Ctrl"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />            <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="57"
+            android:text="Alt"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="93"
+            android:text="PgDn"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="116"
+            android:text="ScrLk"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="122"
+            android:text="Home"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_alpha"
+            android:gravity="center"
+            android:tag="19"
+            android:text="↑"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="123"
+            android:text="End"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_mod"
+            android:gravity="center"
+            android:tag="112"
+            android:text="Del"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_alpha"
+            android:gravity="center"
+            android:tag="21"
+            android:text="←"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_alpha"
+            android:gravity="center"
+            android:tag="20"
+            android:text="↓"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_key_alpha"
+            android:gravity="center"
+            android:tag="22"
+            android:text="→"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+    </LinearLayout>
+
     <!-- ==================== G2 数字区 ==================== -->
     <LinearLayout
         android:id="@+id/lv_digitpad"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginLeft="44dp"
-        android:layout_marginRight="44dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:layout_weight="255"
         android:orientation="vertical">
 
@@ -331,295 +505,116 @@
         </LinearLayout>
     </LinearLayout>
 
-        <!-- ==================== G3 右手区 ==================== -->
+    <!-- 右列：上半区左侧新增 : / \ 两个键，右侧滚轮（宽度减半、靠右）；下半触摸板 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="374"
-        android:orientation="horizontal">
+        android:layout_weight="150"
+        android:orientation="vertical">
 
-        <!-- 功能键：4 列（修饰键各 1.5 列 + 方向键 1 列） -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:orientation="vertical">
-
+        <!-- 上半区：高度 = 行1 + 行2，左右各占一半 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="59"
-                android:text="Shift"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="117"
-                android:text="Win"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="92"
-                android:text="PgUp"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="113"
-                android:text="Ctrl"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="57"
-                android:text="Alt"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="93"
-                android:text="PgDn"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="116"
-                android:text="ScrLk"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="122"
-                android:text="Home"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_alpha"
-                android:gravity="center"
-                android:tag="19"
-                android:text="↑"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="123"
-                android:text="End"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="112"
-                android:text="Del"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_alpha"
-                android:gravity="center"
-                android:tag="21"
-                android:text="←"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_alpha"
-                android:gravity="center"
-                android:tag="20"
-                android:text="↓"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_key_alpha"
-                android:gravity="center"
-                android:tag="22"
-                android:text="→"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-        </LinearLayout>
-        </LinearLayout>
-
-        <!-- 右列：上半区左侧新增 : / \ 两个键，右侧滚轮（宽度减半、靠右）；下半触摸板 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
             android:layout_weight="2"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <!-- 上半区：高度 = 行1 + 行2，左右各占一半 -->
+            <!-- 左半：: (角标 ;) 与 \ (角标 |)，每行一个 -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:orientation="horizontal">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <!-- 左半：: (角标 ;) 与 \ (角标 |)，每行一个 -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_ax_key_sym"
-                            android:gravity="center"
-                            android:tag="1001"
-                            android:text=":"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="top|right"
-                            android:layout_marginRight="8dp"
-                            android:layout_marginTop="4dp"
-                            android:text=";"
-                            android:textColor="#8CA0BC"
-                            android:textSize="9sp" />
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_ax_key_sym"
-                            android:gravity="center"
-                            android:tag="73"
-                            android:text="\\"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="top|right"
-                            android:layout_marginRight="8dp"
-                            android:layout_marginTop="4dp"
-                            android:text="|"
-                            android:textColor="#8CA0BC"
-                            android:textSize="9sp" />
-                    </FrameLayout>
-                </LinearLayout>
-
-                <!-- 右半：滚轮上下，宽度是原来的一半，靠右对齐 -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
 
                     <TextView
-                        android:id="@+id/mouse_up"
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_ax_key_num"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_ax_key_sym"
                         android:gravity="center"
-                        android:text="滚轮⬆"
+                        android:tag="1001"
+                        android:text=":"
                         android:textColor="@android:color/white"
-                        android:textSize="11sp" />
+                        android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/mouse_down"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|right"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:text=";"
+                        android:textColor="#8CA0BC"
+                        android:textSize="9sp" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_ax_key_num"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_ax_key_sym"
                         android:gravity="center"
-                        android:text="滚轮⬇"
+                        android:tag="73"
+                        android:text="\\"
                         android:textColor="@android:color/white"
-                        android:textSize="11sp" />
-                </LinearLayout>
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|right"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:text="|"
+                        android:textColor="#8CA0BC"
+                        android:textSize="9sp" />
+                </FrameLayout>
             </LinearLayout>
 
-            <com.limelight.ui.gamemenu.TouchPadView
-                android:id="@+id/fv_keyboard_touch"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:background="@drawable/bg_ax_touchpad" />
+            <!-- 右半：滚轮上下，宽度是原来的一半，靠右对齐 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/mouse_up"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_num"
+                    android:gravity="center"
+                    android:text="滚轮⬆"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/mouse_down"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_num"
+                    android:gravity="center"
+                    android:text="滚轮⬇"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp" />
+            </LinearLayout>
         </LinearLayout>
+
+        <com.limelight.ui.gamemenu.TouchPadView
+            android:id="@+id/fv_keyboard_touch"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="@drawable/bg_ax_touchpad" />
     </LinearLayout>
 </LinearLayout>
