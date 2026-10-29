@@ -1236,12 +1236,22 @@ public class StreamSettings extends Activity {
             if (activity == null) {
                 return;
             }
-            String json = FileUriUtils.openUriForRead(activity, uri);
+            final String json = FileUriUtils.openUriForRead(activity, uri);
+            if (TextUtils.isEmpty(json)) {
+                Toast.makeText(activity, "读取文件失败，请重新选择", Toast.LENGTH_SHORT).show();
+                return;
+            }
             final com.limelight.ui.gamemenu.AxiKeyBackup.BackupData parsed =
                     com.limelight.ui.gamemenu.AxiKeyBackup.parse(activity, json);
+            LimeLog.info("axi->import key backup sections="
+                    + (parsed == null ? "null" : parsed.sections));
             if (parsed == null || parsed.sections == 0) {
+                String head = json.trim();
+                if (head.length() > 40) {
+                    head = head.substring(0, 40) + "…";
+                }
                 AppDialog.showMessage(activity, "导入按键配置",
-                        "文件格式不正确，请选择本应用导出的按键配置文件。",
+                        "无法识别该文件，请选择「导出按键配置」生成的 .json 文件。\n文件开头：" + head,
                         getString(R.string.dialog_action_close), null);
                 return;
             }
@@ -1264,14 +1274,42 @@ public class StreamSettings extends Activity {
                 labels.add("虚拟手柄布局（" + parsed.gamepadLayouts.size() + " 个方案）");
                 bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_GAMEPAD_LAYOUTS);
             }
+
+            // 勾选界面用自建的 CheckBox 列表，不用 setMultiChoiceItems：
+            // AlertDialog 同时设置 message 与多选列表时，部分 ROM（如三星）只会渲染消息、
+            // 把列表丢掉，表现为“点了导入没有任何勾选项”。
             final boolean[] checked = new boolean[labels.size()];
             Arrays.fill(checked, true);
 
+            float density = activity.getResources().getDisplayMetrics().density;
+            android.widget.LinearLayout box = new android.widget.LinearLayout(activity);
+            box.setOrientation(android.widget.LinearLayout.VERTICAL);
+            box.setPadding((int) (20 * density), (int) (12 * density),
+                    (int) (20 * density), (int) (4 * density));
+
+            android.widget.TextView tip = new android.widget.TextView(activity);
+            tip.setText("勾选要恢复的内容；勾选的部分会被文件内容整体覆盖，未勾选的部分保持现状。");
+            tip.setTextSize(13);
+            tip.setPadding(0, 0, 0, (int) (8 * density));
+            box.addView(tip);
+
+            for (int i = 0; i < labels.size(); i++) {
+                final int index = i;
+                android.widget.CheckBox checkBox = new android.widget.CheckBox(activity);
+                checkBox.setText(labels.get(i));
+                checkBox.setTextSize(15);
+                checkBox.setChecked(true);
+                checkBox.setPadding(0, (int) (6 * density), 0, (int) (6 * density));
+                checkBox.setOnCheckedChangeListener((button, isChecked) -> checked[index] = isChecked);
+                box.addView(checkBox);
+            }
+
+            android.widget.ScrollView scrollView = new android.widget.ScrollView(activity);
+            scrollView.addView(box);
+
             new AlertDialog.Builder(activity)
                     .setTitle("导入按键配置")
-                    .setMessage("勾选要恢复的内容；勾选的部分会被文件内容整体覆盖，未勾选的部分保持现状。")
-                    .setMultiChoiceItems(labels.toArray(new String[0]), checked,
-                            (dialog, which, isChecked) -> checked[which] = isChecked)
+                    .setView(scrollView)
                     .setPositiveButton("导入", (dialog, which) -> {
                         int mask = 0;
                         for (int i = 0; i < bits.size(); i++) {

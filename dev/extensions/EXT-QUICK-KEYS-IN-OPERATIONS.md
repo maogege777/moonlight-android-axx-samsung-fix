@@ -142,9 +142,13 @@ write `ComboKeyStore`.
 - All **five** virtual-keyboard schemes and all **five** virtual-gamepad schemes are exported (the
   old Settings entry only exported the currently selected keyboard scheme). Schemes with no saved
   file are omitted (they are the default layout).
-- Import shows a multi-choice dialog (快捷键 / 组合键条 / 虚拟按键布局 / 虚拟手柄布局); only the
+- Import shows a checklist dialog (快捷键 / 组合键条 / 虚拟按键布局 / 虚拟手柄布局); only the
   checked sections are restored, and restoring is an overwrite of that section. Unchecked sections
-  keep their current content.
+  keep their current content. The checklist is a hand-built `ScrollView` + `CheckBox` view, **not**
+  `AlertDialog.setMultiChoiceItems`: combining `setMessage` with multi-choice items on some ROMs
+  (Samsung One UI in particular) renders only the message and silently drops the list, which looks
+  like "tapping import does nothing". Parse failures now also report the first 40 chars of the file
+  and log `axi->import key backup sections=` so a wrong file is diagnosable from the log.
 - Old files still import: `type: axi_quick_keys` → quick keys only; a bare JSON array (old
   "虚拟按键配置" export) → the currently selected keyboard scheme only.
 - Settings entry `export_quick_keys_file` / `import_quick_keys_file` now live at
