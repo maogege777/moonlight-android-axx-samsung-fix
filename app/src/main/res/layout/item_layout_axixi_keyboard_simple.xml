@@ -1163,13 +1163,21 @@
                     android:textColor="@android:color/white"
                     android:textSize="13sp" />
             </FrameLayout>
-
-            <com.limelight.ui.gamemenu.TouchPadView
-                android:id="@+id/fv_keyboard_touch_simple_mini"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="100"
-                android:background="@drawable/bg_ax_touchpad" />
+                android:layout_weight="100">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_ax_key_mod"
+                    android:gravity="center"
+                    android:tag="66"
+                    android:text="回车"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 第 5 行 -->

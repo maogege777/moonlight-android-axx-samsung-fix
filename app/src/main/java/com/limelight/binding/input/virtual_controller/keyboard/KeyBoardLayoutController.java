@@ -255,7 +255,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 
 
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_r), 1f);
-        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_mini), 1f);
+
 
 
 
@@ -504,9 +504,9 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         float density = context.getResources().getDisplayMetrics().density;
         int screenW = context.getResources().getDisplayMetrics().widthPixels;
         int screenDp = Math.round(screenW / density);
-        int excess = Math.max(0, screenDp - 800);
-        int mouseW = dip2px(context, 64f + excess * 0.05f);
-        int padW = dip2px(context, 42f + excess * 0.10f);
+        int excess = Math.min(480, Math.max(0, screenDp - 800));
+        int mouseW = dip2px(context, 64f + excess * 0.14f);
+        int padW = dip2px(context, 42f + excess * 0.19f);
         int simpleWidth = screenW - mouseW - padW - dip2px(context, 6);
 
         View simpleKeys = keyboardView.findViewById(R.id.ll_simple_keys);
