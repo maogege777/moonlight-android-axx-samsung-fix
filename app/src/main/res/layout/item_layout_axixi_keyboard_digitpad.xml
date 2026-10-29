@@ -540,7 +540,7 @@
                             android:layout_height="match_parent"
                             android:background="@drawable/bg_ax_key_sym"
                             android:gravity="center"
-                            android:tag="74"
+                            android:tag="1001"
                             android:text=":"
                             android:textColor="@android:color/white"
                             android:textSize="12sp" />
@@ -567,7 +567,7 @@
                             android:background="@drawable/bg_ax_key_sym"
                             android:gravity="center"
                             android:tag="73"
-                            android:text="\"
+                            android:text="\\"
                             android:textColor="@android:color/white"
                             android:textSize="12sp" />
 

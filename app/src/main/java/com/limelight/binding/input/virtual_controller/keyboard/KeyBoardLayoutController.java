@@ -76,6 +76,12 @@ public class KeyBoardLayoutController {
 
     //组合键模式
     private boolean isCombination=false;
+    /**
+     * 「:」键的伪 tag（不是真实 keycode）：普通点击时自动带 Shift，输出 :；
+     * 组合模式下勾选了 Shift 时反过来只发分号，输出 ;。
+     */
+    private static final String TAG_COLON = "1001";
+    private boolean colonShiftSent;
 
     private void initKeyboard(){
         //整块拦截触摸：键盘范围内的空白、行间距不再漏给下层串流画面。
@@ -114,6 +120,24 @@ public class KeyBoardLayoutController {
                             KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, code);
                             keyEvent.setSource(1);
                             sendKeyEvent(keyEvent);
+                            keyDown(v);
+                            return true;
+                        }
+
+                        if (TAG_COLON.equals(tag)) {
+                            // 「:」键：普通点击自动带 Shift 输出 :；
+                            // 组合模式里已勾选 Shift 时反过来，只发分号输出 ;
+                            colonShiftSent = !(isCombination && keyList.contains("59"));
+                            if (colonShiftSent) {
+                                KeyEvent colonShiftDown = new KeyEvent(KeyEvent.ACTION_DOWN,
+                                        KeyEvent.KEYCODE_SHIFT_LEFT);
+                                colonShiftDown.setSource(0);
+                                sendKeyEvent(colonShiftDown);
+                            }
+                            KeyEvent colonDown = new KeyEvent(KeyEvent.ACTION_DOWN,
+                                    KeyEvent.KEYCODE_SEMICOLON);
+                            colonDown.setSource(0);
+                            sendKeyEvent(colonDown);
                             keyDown(v);
                             return true;
                         }
@@ -174,6 +198,21 @@ public class KeyBoardLayoutController {
                             KeyEvent keyUP = new KeyEvent(KeyEvent.ACTION_UP, code);
                             keyUP.setSource(1);
                             sendKeyEvent(keyUP);
+                            keyUp(v);
+                            return true;
+                        }
+                        if (TAG_COLON.equals(tag2)) {
+                            KeyEvent colonUp = new KeyEvent(KeyEvent.ACTION_UP,
+                                    KeyEvent.KEYCODE_SEMICOLON);
+                            colonUp.setSource(0);
+                            sendKeyEvent(colonUp);
+                            if (colonShiftSent) {
+                                KeyEvent colonShiftUp = new KeyEvent(KeyEvent.ACTION_UP,
+                                        KeyEvent.KEYCODE_SHIFT_LEFT);
+                                colonShiftUp.setSource(0);
+                                sendKeyEvent(colonShiftUp);
+                            }
+                            colonShiftSent = false;
                             keyUp(v);
                             return true;
                         }
