@@ -1,4 +1,4 @@
-﻿# EXT-QUICK-KEYS-IN-OPERATIONS
+# EXT-QUICK-KEYS-IN-OPERATIONS
 
 - Change type: extension development
 - Status: implemented (v5), pending on-device verification

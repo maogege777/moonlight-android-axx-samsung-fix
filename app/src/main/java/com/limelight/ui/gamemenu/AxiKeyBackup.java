@@ -1,4 +1,4 @@
-﻿package com.limelight.ui.gamemenu;
+package com.limelight.ui.gamemenu;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
