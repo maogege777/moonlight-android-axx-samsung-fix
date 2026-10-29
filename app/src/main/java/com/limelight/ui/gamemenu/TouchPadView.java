@@ -26,10 +26,24 @@ public class TouchPadView extends View {
 
     private boolean isPressedFeedback = false;
 
+    /** 本次手势是否摸到过第二根手指（双指手势不当作单指点按）。 */
+    private boolean multiTouched = false;
+    /** 双指是否滑动过（滚动），滑动过就不再当作双指右键。 */
+    private boolean twoFingerMoved = false;
+
+    /** 面板上的文字标签（例如「触摸板」），字号随控件高度自适应。 */
+    private String labelText;
+    private Paint labelPaint;
+
     public TouchPadViewLister viewLister;
 
     public void setViewLister(TouchPadViewLister viewLister) {
         this.viewLister = viewLister;
+    }
+
+    public void setLabel(String text) {
+        this.labelText = text;
+        invalidate();
     }
 
     public interface TouchPadViewLister{
@@ -60,6 +74,11 @@ public class TouchPadView extends View {
 
         pressOverlayPaint = new Paint();
         pressOverlayPaint.setColor(Color.parseColor("#565656"));
+
+        labelPaint = new Paint();
+        labelPaint.setAntiAlias(true);
+        labelPaint.setColor(Color.parseColor("#7C8798"));
+        labelPaint.setTextAlign(Paint.Align.CENTER);
 
 //        // 初始中心位置
 //        post(() -> {
@@ -93,6 +112,22 @@ public class TouchPadView extends View {
 //            pressOverlayPaint.setAlpha(PRESS_FEEDBACK_ALPHA);
             canvas.drawRect(0, 0, getWidth(), getHeight(), pressOverlayPaint);
         }
+
+        // 文字标签画在按压反馈之上，按住时也能看清
+        drawLabel(canvas);
+    }
+
+    private void drawLabel(Canvas canvas) {
+        if (labelText == null || labelText.isEmpty() || labelPaint == null) {
+            return;
+        }
+        float size = Math.min(11 * getResources().getDisplayMetrics().scaledDensity, getHeight() * 0.30f);
+        if (size < 1f) {
+            return;
+        }
+        labelPaint.setTextSize(size);
+        float baseline = getHeight() / 2f - (labelPaint.ascent() + labelPaint.descent()) / 2f;
+        canvas.drawText(labelText, getWidth() / 2f, baseline, labelPaint);
     }
 
     @Override
@@ -107,17 +142,17 @@ public class TouchPadView extends View {
                 lastX = event.getX();
                 lastY = event.getY();
                 isMoving = false;
-                if (viewLister != null) {
-//                    viewLister.sendMouseLeft(true); // 左键按下
-                }
+                multiTouched = false;
+                twoFingerMoved = false;
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
+                multiTouched = true;
                 lastX = averageX(event);
                 lastY = averageY(event);
                 isMoving = false;
-                if (pointerCount == 2 && viewLister != null) {
-//                    viewLister.sendMouseRight(true); // 右键按下
+                if (pointerCount == 2) {
+                    twoFingerMoved = false;
                 }
                 break;
 
@@ -143,6 +178,8 @@ public class TouchPadView extends View {
                 } else if (pointerCount == 2) {
                     float dy = averageY(event) - lastY;
                     if (Math.abs(dy) > TOUCH_SLOP) {
+                        // 双指滚动了：这次手势不再算「双指轻点」
+                        twoFingerMoved = true;
                         if (viewLister != null) {
                             viewLister.sendMouseScroll(dy);
                         }
@@ -154,17 +191,28 @@ public class TouchPadView extends View {
             case MotionEvent.ACTION_UP:
                 isPressedFeedback = false;
                 invalidate();
-                if (viewLister != null) {
+                // 单指轻点 = 左键；拖动过、或这次手势出现过第二根手指，都不触发
+                if (viewLister != null && !isMoving && !multiTouched) {
                     viewLister.sendMouseLeft(true);
                     viewLister.sendMouseLeft(false);
                 }
+                multiTouched = false;
+                twoFingerMoved = false;
                 break;
 
             case MotionEvent.ACTION_POINTER_UP:
-                if (pointerCount == 2 && viewLister != null) {
-                    viewLister.sendMouseRight(true); // 右键抬起
-                    viewLister.sendMouseRight(false); // 左键抬起
+                // 双指轻点 = 右键；双指滑动过（滚动）就不触发
+                if (pointerCount == 2 && viewLister != null && !twoFingerMoved) {
+                    viewLister.sendMouseRight(true);
+                    viewLister.sendMouseRight(false);
                 }
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+                isPressedFeedback = false;
+                multiTouched = false;
+                twoFingerMoved = false;
+                invalidate();
                 break;
         }
         return true;
@@ -190,7 +238,4 @@ public class TouchPadView extends View {
     private float clamp(float value, float min, float max) {
         return Math.max(min, Math.min(value, max));
     }
-
-
 }
-

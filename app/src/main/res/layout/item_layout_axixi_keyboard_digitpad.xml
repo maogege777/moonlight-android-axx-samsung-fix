@@ -1,445 +1,513 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    数字键盘 v6
+    ├─ G1 左手区 (weight 88)      Esc / 中键 / 左键 / 右键
+    ├─ G2 数字区 (weight 280)     NumLk ÷ × ⌫ / 7 8 9 − / 4 5 6 + / 1 2 3 回车 / 0(双格) .
+    └─ G3 右手区 (weight 374)     主区(Shift Win ScrLk Home PgUp / Ctrl Alt Del End PgDn + 触摸板) + 滚轮整列
+    组间间距 26dp 由 G2 的左右 margin 提供，面板总宽不变。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="240dp"
+    android:layout_height="match_parent"
     android:background="#212121"
+    android:orientation="horizontal"
     android:padding="3dp">
 
-
+    <!-- ==================== G1 左手区 ==================== -->
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_weight="1"
         android:layout_width="0dp"
-        android:id="@+id/lv_digitpad_mouse_2"
-        android:layout_height="match_parent">
-
+        android:layout_height="match_parent"
+        android:layout_weight="88"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_ax_key_fn"
             android:gravity="center"
-            android:text="Esc"
             android:tag="111"
+            android:text="Esc"
             android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:background="@drawable/bg_ax_keyboard_button" />
+            android:textSize="12sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_ax_key_num"
             android:gravity="center"
-            android:text="左键"
-            android:tag="mouse_1"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:background="@drawable/bg_ax_keyboard_button" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="中键"
             android:tag="mouse_2"
+            android:text="中键"
             android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:background="@drawable/bg_ax_keyboard_button" />
+            android:textSize="12sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_ax_key_num"
             android:gravity="center"
-            android:text="右键"
-            android:tag="mouse_3"
+            android:tag="mouse_1"
+            android:text="左键"
             android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:background="@drawable/bg_ax_keyboard_button" />
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_ax_key_num"
+            android:gravity="center"
+            android:tag="mouse_3"
+            android:text="右键"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
     </LinearLayout>
 
+    <!-- ==================== G2 数字区 ==================== -->
     <LinearLayout
-        android:layout_weight="4"
-        android:layout_width="0dp"
         android:id="@+id/lv_digitpad"
-        android:orientation="vertical"
-        android:layout_height="match_parent">
-
-        <!-- 第一行 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="7"
-                android:tag="151"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="8"
-                android:tag="152"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="9"
-                android:tag="153"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="÷"
-                android:tag="154"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-        </LinearLayout>
-
-        <!-- 第二行 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="4"
-                android:tag="148"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="5"
-                android:tag="149"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="6"
-                android:tag="150"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="×"
-                android:tag="155"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-        </LinearLayout>
-        <!-- 第三行 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="1"
-                android:tag="145"
-                android:textColor="@android:color/white"
-                android:background="@drawable/bg_ax_keyboard_button"
-                android:textSize="12sp"
-                />
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="2"
-                android:tag="146"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="3"
-                android:tag="147"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="-"
-                android:tag="156"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-        </LinearLayout>
-
-        <!-- 第四行 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="0"
-                android:tag="144"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="."
-                android:tag="158"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="回车"
-                android:tag="66"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="+"
-                android:tag="157"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-        </LinearLayout>
-
-
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_weight="3"
         android:layout_width="0dp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:layout_weight="280"
+        android:orientation="vertical">
 
+        <!-- 行1：NumLk ÷ × ⌫ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:id="@+id/lv_digitpad_mouse"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_fn"
                 android:gravity="center"
-                android:text="Num"
                 android:tag="143"
+                android:text="NumLk"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
+                android:textSize="10sp" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_op"
                 android:gravity="center"
-                android:text="ScrLk"
-                android:tag="116"
+                android:tag="154"
+                android:text="÷"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
-
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="PgUp"
-                android:tag="92"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
+                android:textSize="14sp" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_op"
                 android:gravity="center"
-                android:text="PgDn"
-                android:tag="93"
+                android:tag="155"
+                android:text="×"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_fn"
+                android:gravity="center"
+                android:tag="67"
+                android:text="⌫"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
         </LinearLayout>
+
+        <!-- 行2：7 8 9 − -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:id="@+id/lv_digitpad_function"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
                 android:gravity="center"
-                android:text="Win"
-                android:tag="117"
+                android:tag="151"
+                android:text="7"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
+                android:textSize="14sp" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
                 android:gravity="center"
-                android:text="Ctrl"
-                android:tag="113"
+                android:tag="152"
+                android:text="8"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
+                android:textSize="14sp" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
                 android:gravity="center"
-                android:text="Shift"
-                android:tag="59"
+                android:tag="153"
+                android:text="9"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
+                android:textSize="14sp" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_op"
                 android:gravity="center"
-                android:text="Alt"
-                android:tag="57"
+                android:tag="156"
+                android:text="−"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:background="@drawable/bg_ax_keyboard_button" />
+                android:textSize="14sp" />
         </LinearLayout>
 
+        <!-- 行3：4 5 6 + -->
         <LinearLayout
-            android:layout_weight="2"
             android:layout_width="match_parent"
-            android:layout_height="0dp">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
+                android:gravity="center"
+                android:tag="148"
+                android:text="4"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
+                android:gravity="center"
+                android:tag="149"
+                android:text="5"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
+                android:gravity="center"
+                android:tag="150"
+                android:text="6"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_op"
+                android:gravity="center"
+                android:tag="157"
+                android:text="+"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- 行4+行5：1 2 3 / 0(双格) .  + 回车（跨两行） -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+
+            <!-- 数字列 -->
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="vertical">
 
-                <com.limelight.ui.gamemenu.TouchPadView
-                    android:id="@+id/fv_keyboard_touch"
-                    android:layout_width="0dp"
-                    android:layout_weight="3"
-                    android:background="@drawable/bg_ax_keyboard_button"
-                    android:layout_height="match_parent" />
-
+                <!-- 行4：1 2 3 -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_height="match_parent">
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:background="@drawable/bg_ax_key_num"
                         android:gravity="center"
-                        android:text="滚轮⬆"
-                        android:id="@+id/mouse_up"
+                        android:tag="145"
+                        android:text="1"
                         android:textColor="@android:color/white"
-                        android:textSize="12sp"
-                        android:background="@drawable/bg_ax_keyboard_button" />
+                        android:textSize="14sp" />
 
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:background="@drawable/bg_ax_key_num"
                         android:gravity="center"
-                        android:text="滚轮⬇"
-                        android:id="@+id/mouse_down"
+                        android:tag="146"
+                        android:text="2"
                         android:textColor="@android:color/white"
-                        android:textSize="12sp"
-                        android:background="@drawable/bg_ax_keyboard_button" />
+                        android:textSize="14sp" />
 
-
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_ax_key_num"
+                        android:gravity="center"
+                        android:tag="147"
+                        android:text="3"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
                 </LinearLayout>
 
+                <!-- 行5：0(双格) . -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
 
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:background="@drawable/bg_ax_key_num"
+                        android:gravity="center"
+                        android:tag="144"
+                        android:text="0"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_ax_key_num"
+                        android:gravity="center"
+                        android:tag="158"
+                        android:text="."
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+                </LinearLayout>
             </LinearLayout>
 
-
-
+            <!-- 回车：右下角，跨两行 -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_fn"
+                android:gravity="center"
+                android:tag="66"
+                android:text="回车"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
+    <!-- ==================== G3 右手区 ==================== -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="374"
+        android:orientation="horizontal">
+
+        <!-- 主区：2 行功能键 + 触摸板 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical">
+
+            <!-- 行1：Shift Win ScrLk Home PgUp -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="30"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="59"
+                    android:text="Shift"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="117"
+                    android:text="Win"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="116"
+                    android:text="ScrLk"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="122"
+                    android:text="Home"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="92"
+                    android:text="PgUp"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- 行2：Ctrl Alt Del End PgDn -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="30"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="113"
+                    android:text="Ctrl"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="57"
+                    android:text="Alt"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="112"
+                    android:text="Del"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="123"
+                    android:text="End"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_ax_key_fn"
+                    android:gravity="center"
+                    android:tag="93"
+                    android:text="PgDn"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- 触摸板 -->
+            <com.limelight.ui.gamemenu.TouchPadView
+                android:id="@+id/fv_keyboard_touch"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="134"
+                android:background="@drawable/bg_ax_touchpad" />
+        </LinearLayout>
+
+        <!-- 滚轮整列：两颗各占半列高 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mouse_up"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
+                android:gravity="center"
+                android:text="滚轮⬆"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/mouse_down"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ax_key_num"
+                android:gravity="center"
+                android:text="滚轮⬇"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

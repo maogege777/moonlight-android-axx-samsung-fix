@@ -7,6 +7,7 @@ package com.limelight.binding.input.virtual_controller.keyboard;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -31,6 +32,7 @@ import com.limelight.Game;
 import com.limelight.LimeLog;
 import com.limelight.R;
 import com.limelight.binding.input.ControllerHandler;
+import com.limelight.binding.input.evdev.EvdevListener;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.ui.gamemenu.GameKeyboardUpdateFragment;
 import com.limelight.ui.gamemenu.QuickKeyStore;
@@ -109,7 +111,7 @@ public class KeyBoardLayoutController {
                             KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, code);
                             keyEvent.setSource(1);
                             sendKeyEvent(keyEvent);
-                            v.setBackgroundResource(R.drawable.bg_ax_keyboard_button_confirm);
+                            keyDown(v);
                             return true;
                         }
 
@@ -121,13 +123,13 @@ public class KeyBoardLayoutController {
                                 case "57"://alt
                                 case "58"://alt right
                                 case "59"://shift
-                                case "60"://shift right
                                     if(!keyList.contains(tag)){
                                         keyList.add(tag);
+                                        rememberKeyBg(v);
                                         v.setBackgroundResource(R.drawable.bg_ax_keyboard_button_press);
                                     }else{
                                         keyList.remove(tag);
-                                        v.setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+                                        keyUp(v);
                                     }
                                     return true;
                             }
@@ -142,7 +144,7 @@ public class KeyBoardLayoutController {
                         KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, Integer.parseInt(tag));
                         keyEvent.setSource(0);
                         sendKeyEvent(keyEvent);
-                        v.setBackgroundResource(R.drawable.bg_ax_keyboard_button_confirm);
+                        keyDown(v);
                         return true;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
@@ -169,7 +171,7 @@ public class KeyBoardLayoutController {
                             KeyEvent keyUP = new KeyEvent(KeyEvent.ACTION_UP, code);
                             keyUP.setSource(1);
                             sendKeyEvent(keyUP);
-                            v.setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+                            keyUp(v);
                             return true;
                         }
                         if(isCombination){
@@ -180,7 +182,6 @@ public class KeyBoardLayoutController {
                                 case "57"://alt
                                 case "58"://alt right
                                 case "59"://shift
-                                case "60"://shift right
                                     return true;
                             }
                             // Release the main key before its modifiers.
@@ -191,51 +192,27 @@ public class KeyBoardLayoutController {
                                     KeyEvent keyEvent2 = new KeyEvent(KeyEvent.ACTION_UP, Integer.parseInt(t));
                                     keyEvent2.setSource(0);
                                     sendKeyEvent(keyEvent2);
-                                    keyboardView.findViewById(R.id.lv_keyboard).findViewWithTag(t).setBackgroundResource(R.drawable.bg_ax_keyboard_button);
-                                    keyboardView.findViewById(R.id.lv_keyboard_digitpad).findViewWithTag(t).setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+                                    View modView = keyboardView.findViewById(R.id.lv_keyboard).findViewWithTag(t);
+                                    if (modView != null) keyUp(modView);
+                                    modView = keyboardView.findViewById(R.id.lv_keyboard_digitpad).findViewWithTag(t);
+                                    if (modView != null) keyUp(modView);
                                 }
                                 keyList.clear();
                             }
-                            v.setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+                            keyUp(v);
                             return true;
                         }
                         KeyEvent keyUP = new KeyEvent(KeyEvent.ACTION_UP, Integer.parseInt(tag2));
                         keyUP.setSource(0);
                         sendKeyEvent(keyUP);
-                        v.setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+                        keyUp(v);
                         return true;
                 }
                 return false;
             }
         };
-        LinearLayout layout=keyboardView.findViewById(R.id.lv_keyboard);
-        for (int i = 0; i < layout.getChildCount(); i++){
-            LinearLayout keyboardRow = (LinearLayout) layout.getChildAt(i);
-            for (int j = 0; j < keyboardRow.getChildCount(); j++){
-                keyboardRow.getChildAt(j).setOnTouchListener(touchListener);
-            }
-        }
-
-        LinearLayout lv_digitpad=keyboardView.findViewById(R.id.lv_digitpad);
-        for (int i = 0; i < lv_digitpad.getChildCount(); i++){
-            LinearLayout keyboardRow = (LinearLayout) lv_digitpad.getChildAt(i);
-            for (int j = 0; j < keyboardRow.getChildCount(); j++){
-                keyboardRow.getChildAt(j).setOnTouchListener(touchListener);
-            }
-        }
-        LinearLayout lv_digitpad_mouse=keyboardView.findViewById(R.id.lv_digitpad_mouse);
-        for (int i = 0; i < lv_digitpad_mouse.getChildCount(); i++) {
-            lv_digitpad_mouse.getChildAt(i).setOnTouchListener(touchListener);
-        }
-        LinearLayout lv_digitpad_mouse_2=keyboardView.findViewById(R.id.lv_digitpad_mouse_2);
-        for (int i = 0; i < lv_digitpad_mouse_2.getChildCount(); i++) {
-            lv_digitpad_mouse_2.getChildAt(i).setOnTouchListener(touchListener);
-        }
-
-        LinearLayout lv_digitpad_function=keyboardView.findViewById(R.id.lv_digitpad_function);
-        for (int i = 0; i < lv_digitpad_function.getChildCount(); i++) {
-            lv_digitpad_function.getChildAt(i).setOnTouchListener(touchListener);
-        }
+        // 递归绑定：全键盘 + 数字键盘一次绑完（数字键盘的跨行回车多了一层容器）
+        bindKeys(keyboardView, touchListener);
 
         CheckBox btn_combination=keyboardView.findViewById(R.id.btn_combination);
         attachTopBarHaptic(btn_combination);
@@ -283,29 +260,9 @@ public class KeyBoardLayoutController {
             }
         });
 
-        TouchPadView touchPadView=keyboardView.findViewById(R.id.fv_keyboard_touch);
-
-        touchPadView.setViewLister(new TouchPadView.TouchPadViewLister() {
-            @Override
-            public void sendMouseMove(float dx, float dy) {
-                Game.instance.mouseMove((int) dx, (int) dy);
-            }
-
-            @Override
-            public void sendMouseLeft(boolean down) {
-//                Game.instance.mouseButtonEvent(1,down);
-            }
-
-            @Override
-            public void sendMouseRight(boolean down) {
-//                Game.instance.mouseButtonEvent(3,down);
-            }
-
-            @Override
-            public void sendMouseScroll(float distance) {
-//                Game.instance.mouseHScroll((byte) distance);
-            }
-        });
+        // 大触摸板 1:1；mini 触摸板面积只有其 1/21，位移放大 5 倍
+        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch), 1f);
+        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_mini), 5f);
 
         keyboardView.findViewById(R.id.btn_soft_phone).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -369,16 +326,109 @@ public class KeyBoardLayoutController {
 
     }
 
+    // ---------------------------------------------------------------- 键面配色 / 按键绑定
+
+    /**
+     * 记下按键的原始背景（分组配色），只记一次。
+     * 按下态和组合键高亮之后靠它还原，否则彩色键按一次就被刷回默认灰。
+     */
+    private void rememberKeyBg(View v) {
+        if (v != null && v.getTag(R.id.kb_key_bg) == null) {
+            v.setTag(R.id.kb_key_bg, v.getBackground());
+        }
+    }
+
+    private void keyDown(View v) {
+        rememberKeyBg(v);
+        v.setBackgroundResource(R.drawable.bg_ax_keyboard_button_confirm);
+    }
+
+    private void keyUp(View v) {
+        Object bg = (v == null) ? null : v.getTag(R.id.kb_key_bg);
+        if (bg instanceof Drawable) {
+            v.setBackground((Drawable) bg);
+        } else if (v != null) {
+            v.setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+        }
+    }
+
+    /**
+     * 递归把所有按键绑到同一个触摸监听。
+     * 数字键盘的「跨行回车 / 双格 0」多了一层容器，原来按「行 -> 键」两层写死的遍历会漏绑。
+     * 触摸板与滚轮自带监听，跳过；顶栏按钮没有 String tag，不会被误绑。
+     */
+    private void bindKeys(ViewGroup group, View.OnTouchListener listener) {
+        if (group == null) {
+            return;
+        }
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child instanceof TouchPadView) {
+                continue;
+            }
+            if (child.getId() == R.id.mouse_up || child.getId() == R.id.mouse_down) {
+                continue;
+            }
+            if (child instanceof ViewGroup) {
+                bindKeys((ViewGroup) child, listener);
+            } else if (child.getTag() instanceof String) {
+                child.setOnTouchListener(listener);
+            }
+        }
+    }
+
+    /**
+     * 触摸板：拖动移动光标、轻点左键、双指轻点右键。
+     * mini 触摸板只有 60x32dp，位移要放大，否则划满全宽也走不了多远。
+     */
+    private void bindTouchPad(TouchPadView pad, final float sensitivity) {
+        if (pad == null) {
+            return;
+        }
+        pad.setLabel("触摸板");
+        pad.setViewLister(new TouchPadView.TouchPadViewLister() {
+            @Override
+            public void sendMouseMove(float dx, float dy) {
+                if (Game.instance == null) {
+                    return;
+                }
+                Game.instance.mouseMove(Math.round(dx * sensitivity), Math.round(dy * sensitivity));
+            }
+
+            @Override
+            public void sendMouseLeft(boolean down) {
+                if (Game.instance == null) {
+                    return;
+                }
+                Game.instance.mouseButtonEvent(EvdevListener.BUTTON_LEFT, down);
+            }
+
+            @Override
+            public void sendMouseRight(boolean down) {
+                if (Game.instance == null) {
+                    return;
+                }
+                Game.instance.mouseButtonEvent(EvdevListener.BUTTON_RIGHT, down);
+            }
+
+            @Override
+            public void sendMouseScroll(float distance) {
+                // 双指滚动暂不接管：垂直滚动用滚轮键
+            }
+        });
+    }
     private void resetView(){
         keyList.clear();
 //        isCombination=false;
-        String[] keys={"113","114","117","57","58","59","60"};
+        String[] keys={"113","114","117","57","58","59"};
         for (String key:keys) {
-            if(keyboardView.findViewById(R.id.lv_keyboard).findViewWithTag(key)!=null){
-                keyboardView.findViewById(R.id.lv_keyboard).findViewWithTag(key).setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+            View v = keyboardView.findViewById(R.id.lv_keyboard).findViewWithTag(key);
+            if (v != null) {
+                keyUp(v);
             }
-            if(keyboardView.findViewById(R.id.lv_keyboard_digitpad).findViewWithTag(key)!=null){
-                keyboardView.findViewById(R.id.lv_keyboard_digitpad).findViewWithTag(key).setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+            v = keyboardView.findViewById(R.id.lv_keyboard_digitpad).findViewWithTag(key);
+            if (v != null) {
+                keyUp(v);
             }
         }
     }
