@@ -1114,16 +1114,17 @@ public class StreamSettings extends Activity {
                 });
             }
 
-            // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] BEGIN
-            // 自定义快捷键导出 / 导入：导出走 ACTION_CREATE_DOCUMENT（与主机配对备份同款，
-            // 可选保存路径与文件名），导入走 ACTION_OPEN_DOCUMENT，导入前二次确认并覆盖全部自定义项。
+            // EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] BEGIN
+            // 按键配置导出 / 导入：导出走 ACTION_CREATE_DOCUMENT（与主机配对备份同款，
+            // 可选保存路径与文件名），文件包含自定义快捷键、组合键条与全部虚拟按键布局方案；
+            // 导入走 ACTION_OPEN_DOCUMENT，解析后勾选要恢复的部分再覆盖。
             Preference quickKeysExport = findPreference("export_quick_keys_file");
             if (quickKeysExport != null) {
                 quickKeysExport.setOnPreferenceClickListener(preference -> {
                     Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("application/json");
-                    intent.putExtra(Intent.EXTRA_TITLE, "axi_quick_keys-"
+                    intent.putExtra(Intent.EXTRA_TITLE, "axi_keys_backup-"
                             + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US)
                                     .format(new java.util.Date()) + ".json");
                     startActivityForResult(intent, WRITE_QUICK_KEYS_REQUEST_CODE);
@@ -1203,8 +1204,8 @@ public class StreamSettings extends Activity {
         private static final int READ_QUICK_KEYS_REQUEST_CODE = 1009;
         private static final int WRITE_QUICK_KEYS_REQUEST_CODE = 1010;
 
-        /** 导出自定义快捷键到用户选定的文件（含默认组项；导出前确保已完成首次初始化）。 */
-        private void exportQuickKeys(Uri uri) {
+        /** 导出三处按键配置：自定义快捷键 + 组合键条 + 虚拟按键全部布局方案。 */
+        private void exportKeyBackup(Uri uri) {
             Activity activity = getActivity();
             if (activity == null) {
                 return;
@@ -1212,46 +1213,82 @@ public class StreamSettings extends Activity {
             boolean clearDefaultSpecial = PreferenceManager.getDefaultSharedPreferences(activity)
                     .getBoolean("checkbox_enable_clear_default_special_button", false);
             com.limelight.ui.gamemenu.QuickKeyStore.ensureSeeded(activity, clearDefaultSpecial);
-            String json = com.limelight.ui.gamemenu.QuickKeyStore.exportJson(activity);
+            String json = com.limelight.ui.gamemenu.AxiKeyBackup.exportAll(activity);
             if (TextUtils.isEmpty(json)) {
-                AppDialog.showMessage(activity, "导出自定义快捷键", "没有可导出的自定义快捷键。",
+                AppDialog.showMessage(activity, "导出按键配置", "没有可导出的内容。",
                         getString(R.string.dialog_action_close), null);
                 return;
             }
             boolean written = FileUriUtils.openUriForWrite(activity, uri, json);
-            AppDialog.showMessage(activity, "导出自定义快捷键",
-                    written ? "已导出，可在你选择的位置查看该配置文件。" : "写入失败，请重试或换一个保存位置。",
+            AppDialog.showMessage(activity, "导出按键配置",
+                    written ? "已导出：自定义快捷键、组合键条、虚拟按键与虚拟手柄布局方案。"
+                            : "写入失败，请重试或换一个保存位置。",
                     getString(R.string.dialog_action_close), null);
         }
 
-        /** 导入自定义快捷键：先确认，再覆盖全部自定义快捷键（含默认组项）。 */
-        private void importQuickKeys(Uri uri) {
-            Activity activity = getActivity();
+        /**
+         * 导入按键配置：解析文件后让用户勾选要恢复的部分（默认全选），
+         * 确认后按所选部分整体覆盖，未勾选的部分保持现状。
+         * 兼容旧的「自定义快捷键」导出文件与旧的「虚拟按键配置」导出文件。
+         */
+        private void importKeyBackup(Uri uri) {
+            final Activity activity = getActivity();
             if (activity == null) {
                 return;
             }
             String json = FileUriUtils.openUriForRead(activity, uri);
-            com.limelight.ui.gamemenu.QuickKeyStore.ImportResult parsed =
-                    com.limelight.ui.gamemenu.QuickKeyStore.parseImport(json);
-            if (parsed == null) {
-                AppDialog.showMessage(activity, "导入自定义快捷键",
-                        "文件格式不正确，请选择本应用导出的自定义快捷键配置文件。",
+            final com.limelight.ui.gamemenu.AxiKeyBackup.BackupData parsed =
+                    com.limelight.ui.gamemenu.AxiKeyBackup.parse(activity, json);
+            if (parsed == null || parsed.sections == 0) {
+                AppDialog.showMessage(activity, "导入按键配置",
+                        "文件格式不正确，请选择本应用导出的按键配置文件。",
                         getString(R.string.dialog_action_close), null);
                 return;
             }
-            int existingCount = com.limelight.ui.gamemenu.QuickKeyStore.loadCustom(activity).size();
-            AppDialog.showConfirm(activity, "导入自定义快捷键",
-                    "导入会覆盖当前全部自定义快捷键。\n当前 " + existingCount + " 项 → 导入 "
-                            + parsed.custom.size() + " 项。\n建议先导出备份。",
-                    "导入", true,
-                    () -> {
-                        // v4：导入即全量覆盖（含默认组项），并标记已初始化，导入后不会再追加默认组。
-                        com.limelight.ui.gamemenu.QuickKeyStore.replaceAllCustom(activity, parsed.custom);
-                        AppDialog.showMessage(activity, "导入自定义快捷键",
-                                "导入成功，共 " + parsed.custom.size() + " 项自定义快捷键。",
+
+            final java.util.List<String> labels = new java.util.ArrayList<>();
+            final java.util.List<Integer> bits = new java.util.ArrayList<>();
+            if ((parsed.sections & com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_QUICK_KEYS) != 0) {
+                labels.add("自定义快捷键（" + parsed.quickKeys.size() + " 项）");
+                bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_QUICK_KEYS);
+            }
+            if ((parsed.sections & com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_COMBO_KEYS) != 0) {
+                labels.add("组合键条（" + parsed.comboKeys.size() + " 项）");
+                bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_COMBO_KEYS);
+            }
+            if ((parsed.sections & com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_LAYOUTS) != 0) {
+                labels.add("虚拟按键布局（" + parsed.layouts.size() + " 个方案）");
+                bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_LAYOUTS);
+            }
+            if ((parsed.sections & com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_GAMEPAD_LAYOUTS) != 0) {
+                labels.add("虚拟手柄布局（" + parsed.gamepadLayouts.size() + " 个方案）");
+                bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_GAMEPAD_LAYOUTS);
+            }
+            final boolean[] checked = new boolean[labels.size()];
+            Arrays.fill(checked, true);
+
+            new AlertDialog.Builder(activity)
+                    .setTitle("导入按键配置")
+                    .setMessage("勾选要恢复的内容；勾选的部分会被文件内容整体覆盖，未勾选的部分保持现状。")
+                    .setMultiChoiceItems(labels.toArray(new String[0]), checked,
+                            (dialog, which, isChecked) -> checked[which] = isChecked)
+                    .setPositiveButton("导入", (dialog, which) -> {
+                        int mask = 0;
+                        for (int i = 0; i < bits.size(); i++) {
+                            if (checked[i]) {
+                                mask |= bits.get(i);
+                            }
+                        }
+                        if (mask == 0) {
+                            Toast.makeText(activity, "请至少选择一项", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        com.limelight.ui.gamemenu.AxiKeyBackup.restore(activity, parsed, mask);
+                        AppDialog.showMessage(activity, "导入按键配置", "已恢复所选内容。",
                                 getString(R.string.dialog_action_close), null);
-                    },
-                    null);
+                    })
+                    .setNegativeButton("取消", null)
+                    .show();
         }
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
 
@@ -1270,11 +1307,11 @@ public class StreamSettings extends Activity {
             }
             // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] BEGIN
             if (requestCode == WRITE_QUICK_KEYS_REQUEST_CODE) {
-                exportQuickKeys(data.getData());
+                exportKeyBackup(data.getData());
                 return;
             }
             if (requestCode == READ_QUICK_KEYS_REQUEST_CODE) {
-                importQuickKeys(data.getData());
+                importKeyBackup(data.getData());
                 return;
             }
             // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END

@@ -1,6 +1,7 @@
 package com.limelight.ui.gamemenu;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,6 +44,8 @@ import com.limelight.ui.BaseFragmentDialog.BaseGameMenuDialog;
 import com.limelight.utils.UiHelper;
 
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.limelight.binding.input.virtual_controller.keyboard.KeyBoardControllerConfigurationLoader.OSC_GAMEPAD_PREFERENCE;
 import static com.limelight.binding.input.virtual_controller.keyboard.KeyBoardControllerConfigurationLoader.OSC_GAMEPAD_PREFERENCE_VALUE;
@@ -856,6 +859,23 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                     }));
         }
 
+        // EXTENSION DEVELOPMENT [EXT-SCHEME-COPY] [NEW] BEGIN
+        // 方案复制入口：把某个档位的布局覆盖到另一个档位（虚拟按键 / 虚拟手柄共用同一套实现）
+        TextView copyEntry = new TextView(ctx);
+        copyEntry.setText("复制方案…");
+        copyEntry.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        copyEntry.setTextColor(0xFF7FB2FF);
+        copyEntry.setPadding(dpToPx(6), dpToPx(8), dpToPx(6), dpToPx(6));
+        copyEntry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismissSchemePopup();
+                showCopySchemeSourceDialog(isGamePad);
+            }
+        });
+        root.addView(copyEntry);
+        // EXTENSION DEVELOPMENT [EXT-SCHEME-COPY] [NEW] END
+
         // 底部橙色提示：告知长按按钮可快速开关（与自定义快捷键面板的提示同色）
         root.addView(createHintLabel(ctx,
                 isGamePad ? "长按「虚拟手柄」按钮可以快速开关" : "长按「虚拟按键」按钮可以快速开关"));
@@ -1310,6 +1330,97 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         dismissSchemePopup();
         dismissAllDialogs();
     }
+
+    // EXTENSION DEVELOPMENT [EXT-SCHEME-COPY] [NEW] BEGIN
+    /**
+     * 复制方案第一步：选择源方案。
+     * 没有保存过文件的方案会标注「默认布局」，仍然可选——复制它等于把目标方案也恢复为默认布局。
+     */
+    private void showCopySchemeSourceDialog(final boolean isGamePad) {
+        final Context ctx = getActivity();
+        if (ctx == null) {
+            return;
+        }
+        final String[] names = AxiKeyBackup.schemeNames(ctx, isGamePad);
+        final String[] values = AxiKeyBackup.schemeValues(ctx, isGamePad);
+        final String[] labels = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            labels[i] = names[i] + (AxiKeyBackup.hasLayout(ctx, values[i]) ? "" : "（默认布局）");
+        }
+        new AlertDialog.Builder(ctx)
+                .setTitle(isGamePad ? "复制虚拟手柄方案" : "复制虚拟按键方案")
+                .setItems(labels, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showCopySchemeTargetDialog(isGamePad, names, values, which);
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    /** 复制方案第二步：选择目标档位（排除源方案本身），点击后进入覆盖确认。 */
+    private void showCopySchemeTargetDialog(final boolean isGamePad, final String[] names,
+                                            final String[] values, final int sourceIndex) {
+        final Context ctx = getActivity();
+        if (ctx == null) {
+            return;
+        }
+        final List<String> labels = new ArrayList<>();
+        final List<Integer> targets = new ArrayList<>();
+        for (int i = 0; i < values.length; i++) {
+            if (i == sourceIndex) {
+                continue;
+            }
+            labels.add(names[i] + (AxiKeyBackup.hasLayout(ctx, values[i]) ? "（已有配置，会被覆盖）" : "（空）"));
+            targets.add(i);
+        }
+        new AlertDialog.Builder(ctx)
+                .setTitle("把「" + names[sourceIndex] + "」复制到…")
+                .setItems(labels.toArray(new String[0]), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        confirmCopyScheme(isGamePad, names, values, sourceIndex, targets.get(which));
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    /** 覆盖确认：目标方案若正在使用，复制后立即热重载；不会自动切换当前方案。 */
+    private void confirmCopyScheme(final boolean isGamePad, final String[] names,
+                                   final String[] values, final int sourceIndex, final int targetIndex) {
+        final Context ctx = getActivity();
+        if (ctx == null) {
+            return;
+        }
+        final boolean sourceHasLayout = AxiKeyBackup.hasLayout(ctx, values[sourceIndex]);
+        final String message = sourceHasLayout
+                ? "「" + names[sourceIndex] + "」的布局将覆盖「" + names[targetIndex] + "」，此操作不能撤销。"
+                : "「" + names[sourceIndex] + "」还没有保存过配置（默认布局），复制后「"
+                        + names[targetIndex] + "」也会恢复成默认布局。";
+        new AlertDialog.Builder(ctx)
+                .setTitle("覆盖方案")
+                .setMessage(message)
+                .setPositiveButton("覆盖", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        boolean ok = AxiKeyBackup.copyLayout(ctx, values[sourceIndex], values[targetIndex]);
+                        Toast.makeText(ctx, ok
+                                        ? "已把「" + names[sourceIndex] + "」复制到「" + names[targetIndex] + "」"
+                                        : "复制失败，请重试",
+                                Toast.LENGTH_SHORT).show();
+                        // 目标是当前正在用的方案时立刻重载，否则下次切换过去自然生效
+                        if (ok && values[targetIndex].equals(AxiKeyBackup.currentScheme(ctx, isGamePad))
+                                && game != null) {
+                            game.updateVirtualView();
+                        }
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+    // EXTENSION DEVELOPMENT [EXT-SCHEME-COPY] [NEW] END
 
     /** 让两个角标始终显示当前生效的方案序号，并跟随手柄/按键的启用状态换底色。 */
     private void refreshSchemeBadges() {

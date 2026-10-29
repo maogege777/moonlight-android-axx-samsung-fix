@@ -721,6 +721,28 @@
 
     </PreferenceCategory>
 
+    <!-- EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] BEGIN -->
+    <!-- 按键配置的统一导出 / 导入（自定义快捷键 + 组合键条 + 虚拟按键/虚拟手柄布局方案）。
+         设置面板中的位置由 SettingsCatalog 决定：「备份与恢复 › 按键配置」，紧随「主机与配对数据」。
+         注意：这里沿用原有的两个 preference key，老版本的设置项与监听逻辑不受影响。 -->
+    <PreferenceCategory android:title="按键配置备份"
+        android:key="category_axi_quick_keys">
+
+        <Preference
+            android:key="export_quick_keys_file"
+            android:title="导出按键配置"
+            android:summary="把「操作 › 自定义快捷键」、键盘顶栏组合键条与全部虚拟按键、虚拟手柄布局方案导出为一份配置文件，便于换机或分享。"
+            />
+
+        <Preference
+            android:key="import_quick_keys_file"
+            android:title="导入按键配置"
+            android:summary="选择配置文件后，可勾选要恢复的部分（快捷键 / 组合键条 / 虚拟按键布局 / 虚拟手柄布局），勾选的内容会被整体覆盖。"
+            />
+
+    </PreferenceCategory>
+    <!-- EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] END -->
+
     <PreferenceCategory android:title="主屏幕设置"
         android:key="category_axixi_screen">
 
@@ -758,27 +780,6 @@
             android:defaultValue="false" />
 
     </PreferenceCategory>
-
-    <!-- EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] BEGIN -->
-    <!-- 自定义快捷键的导出 / 导入。设置面板中的位置由 SettingsCatalog 决定：
-         「界面与通用 › 自定义快捷键」，紧随「应用行为」之后。 -->
-    <PreferenceCategory android:title="自定义快捷键"
-        android:key="category_axi_quick_keys">
-
-        <Preference
-            android:key="export_quick_keys_file"
-            android:title="导出自定义快捷键"
-            android:summary="导出「操作 › 自定义快捷键」的全部内容为配置文件（含图标与排列顺序），可用于换机或分享。"
-            />
-
-        <Preference
-            android:key="import_quick_keys_file"
-            android:title="导入自定义快捷键"
-            android:summary="选择配置文件，会覆盖当前全部自定义快捷键，导入前会先提示确认。"
-            />
-
-    </PreferenceCategory>
-    <!-- EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END -->
 
     <PreferenceCategory android:title="关于"
         android:key="category_axi_about">

@@ -407,7 +407,8 @@ public final class QuickKeyStore {
         }
     }
 
-    private static JSONObject itemJson(GameMenuQuickBean bean) throws Exception {
+    /** 单条导出的 JSON 结构；组合键条（ComboKeyStore）复用同一份字段定义。 */
+    public static JSONObject itemJson(GameMenuQuickBean bean) throws Exception {
         JSONObject object = new JSONObject();
         object.put("id", bean.getId());
         object.put("name", bean.getName() == null ? "" : bean.getName());
@@ -442,44 +443,63 @@ public final class QuickKeyStore {
 
             JSONArray data = root.optJSONArray("data");
             if (data != null) {
-                for (int i = 0; i < data.length(); i++) {
-                    JSONObject object = data.getJSONObject(i);
-                    GameMenuQuickBean bean = new GameMenuQuickBean();
-                    bean.setName(object.optString("name", ""));
-                    bean.setIcon(object.optString("icon", null));
-                    bean.setDesc(object.optString("desc", null));
-                    bean.setSort(object.optInt("sort", i + 1));
-                    String codes = object.optString("codes", null);
-                    if (!TextUtils.isEmpty(codes)) {
-                        bean.setCodes(codes);
-                    }
-                    JSONArray datas = object.optJSONArray("datas");
-                    if (datas != null && datas.length() > 0) {
-                        short[] values = new short[datas.length()];
-                        for (int j = 0; j < datas.length(); j++) {
-                            values[j] = (short) datas.getInt(j);
-                        }
-                        bean.setDatas(values);
-                    }
-                    if (TextUtils.isEmpty(bean.getCodes())
-                            && (bean.getDatas() == null || bean.getDatas().length == 0)) {
-                        continue; // 没有按键的条目没有意义，跳过
-                    }
-                    String id = object.optString("id", "");
-                    if (TextUtils.isEmpty(id) || id.startsWith(BUILTIN_PREFIX)) {
-                        id = PREF_QUICK_LIST_KEY + (System.currentTimeMillis() + i);
-                    }
-                    bean.setId(id);
-                    bean.setBtnType(4);
-                    result.custom.add(bean);
-                }
+                result.custom.addAll(parseItems(data, PREF_QUICK_LIST_KEY));
             }
 
-            sortCustom(result.custom);
             return result;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * 解析导出文件里的 data 段。字段定义（id/name/icon/sort/desc/codes/datas）在
+     * 「自定义快捷键」与「组合键条」之间完全一致，只有新生成 id 的前缀不同。
+     *
+     * @param idPrefix 新生成 id 的前缀，决定条目归属哪一份存储
+     */
+    public static List<GameMenuQuickBean> parseItems(JSONArray data, String idPrefix) {
+        List<GameMenuQuickBean> items = new ArrayList<>();
+        if (data == null) {
+            return items;
+        }
+        try {
+            for (int i = 0; i < data.length(); i++) {
+                JSONObject object = data.getJSONObject(i);
+                GameMenuQuickBean bean = new GameMenuQuickBean();
+                bean.setName(object.optString("name", ""));
+                bean.setIcon(object.optString("icon", null));
+                bean.setDesc(object.optString("desc", null));
+                bean.setSort(object.optInt("sort", i + 1));
+                String codes = object.optString("codes", null);
+                if (!TextUtils.isEmpty(codes)) {
+                    bean.setCodes(codes);
+                }
+                JSONArray datas = object.optJSONArray("datas");
+                if (datas != null && datas.length() > 0) {
+                    short[] values = new short[datas.length()];
+                    for (int j = 0; j < datas.length(); j++) {
+                        values[j] = (short) datas.getInt(j);
+                    }
+                    bean.setDatas(values);
+                }
+                if (TextUtils.isEmpty(bean.getCodes())
+                        && (bean.getDatas() == null || bean.getDatas().length == 0)) {
+                    continue; // 没有按键的条目没有意义，跳过
+                }
+                String id = object.optString("id", "");
+                if (TextUtils.isEmpty(id) || id.startsWith(BUILTIN_PREFIX)) {
+                    id = idPrefix + (System.currentTimeMillis() + i);
+                }
+                bean.setId(id);
+                bean.setBtnType(4);
+                items.add(bean);
+            }
+        } catch (Exception ignored) {
+            // 单条解析失败时返回已解析部分
+        }
+        sortCustom(items);
+        return items;
     }
 
     public static final class ImportResult {

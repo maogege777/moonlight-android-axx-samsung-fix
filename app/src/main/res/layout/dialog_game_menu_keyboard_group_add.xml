@@ -157,12 +157,14 @@
             <!-- EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END -->
 
             <TextView
+                android:id="@+id/tx_save_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="保存后长按组合键气泡按钮可以进行编辑和删除"
                 android:textColor="#E0A33A"
-                android:textSize="9dp" />
+                android:textSize="9dp"
+                android:visibility="gone" />
 
         </LinearLayout>
 

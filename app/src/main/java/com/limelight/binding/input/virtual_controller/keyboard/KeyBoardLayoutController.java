@@ -37,7 +37,7 @@ import com.limelight.binding.input.ControllerHandler;
 import com.limelight.binding.input.evdev.EvdevListener;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.ui.gamemenu.GameKeyboardUpdateFragment;
-import com.limelight.ui.gamemenu.QuickKeyStore;
+import com.limelight.ui.gamemenu.ComboKeyStore;
 import com.limelight.ui.gamemenu.bean.GameMenuQuickBean;
 import com.limelight.ui.gamemenu.TouchPadView;
 
@@ -620,8 +620,9 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
     // ---------------------------------------------------------------- 顶栏组合键条
 
     /**
-     * 重建顶栏右侧的组合键条：读自定义快捷键（跳过默认组），末尾固定一个「+」。
-     * 与「操作」面板、设置页的导入导出共用 QuickKeyStore，因此自动被导出/导入覆盖。
+     * 重建顶栏右侧的组合键条：读「组合键条」自己的数据（ComboKeyStore，与
+     * 「操作 › 自定义快捷键」互不影响），末尾固定一个「+」。
+     * 导出 / 导入走设置页的统一备份（AxiKeyBackup），组合键条作为其中一段。
      */
     private void rebuildComboBar() {
         if (llCombo == null) {
@@ -629,11 +630,8 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         }
         llCombo.removeAllViews();
         llCombo.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
-        List<GameMenuQuickBean> items = QuickKeyStore.loadCustom(context);
+        List<GameMenuQuickBean> items = ComboKeyStore.load(context);
         for (GameMenuQuickBean bean : items) {
-            if (QuickKeyStore.isSeedItem(bean)) {
-                continue;
-            }
             llCombo.addView(createComboChip(bean));
         }
         llCombo.addView(createComboAddButton());
@@ -756,7 +754,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
                 .setTitle("删除组合键")
                 .setMessage("确定删除「" + comboLabel(bean) + "」？")
                 .setPositiveButton("删除", (dialog, which) -> {
-                    QuickKeyStore.removeCustom(context, bean);
+                    ComboKeyStore.remove(context, bean);
                     rebuildComboBar();
                 })
                 .setNegativeButton("取消", null)
@@ -778,10 +776,13 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         fragment.setDimAmount(0.8f);
         fragment.setTitle(existing == null ? "添加组合键" : "编辑组合键");
         fragment.setKeyFrom(1);
+        // 组合键条只显示文字气泡，不需要图标选择；底部提示说明保存后如何编辑/删除。
+        fragment.setShowIconPicker(false);
+        fragment.setHintText("保存后长按组合键气泡可以编辑和删除");
         fragment.setExisting(existing);
         fragment.setOnClick(bean -> {
             if (bean != null) {
-                QuickKeyStore.saveCustom(context, bean);
+                ComboKeyStore.save(context, bean);
                 rebuildComboBar();
             }
         });

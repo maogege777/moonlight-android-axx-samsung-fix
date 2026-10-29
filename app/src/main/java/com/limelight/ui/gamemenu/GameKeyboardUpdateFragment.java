@@ -72,6 +72,11 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
     private GameMenuQuickBean existing;
     private String selectedIcon;
     private LinearLayout iconPickerContainer;
+    // 是否显示图标选择行：只有「操作 › 自定义快捷键」需要（按钮按图标 + 组合键显示）。
+    // 组合键条与虚拟按键的组合键只用文字，不显示图标选择。
+    private boolean showIconPicker;
+    // 底部橙色提示文案（null / 空 = 不显示），由调用方按场景决定。
+    private String hintText;
     // 编辑内置项（只有 VK 码 datas）时为 true：允许不重新按键、只改名称或图标，
     // 保存时沿用原组合键。
     private boolean inheritedCombo;
@@ -136,6 +141,7 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
             }
         }
         buildIconPicker(v);
+        applyHintText(v);
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
 
 
@@ -306,15 +312,15 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
     /** 图标选择器：横向滚动的 vector 图标库，选中项高亮；不选择则保存时留空（回落默认图标）。 */
     private void buildIconPicker(View root) {
         iconPickerContainer = root.findViewById(R.id.lv_icon_picker);
-        // 全键盘组合键条不需要图标：keyFrom==1（自定义快捷键）时整块隐藏，
-        // 避免挤压键盘区域，也避免用户误以为必须选图标。
+        // 是否显示图标行由调用方按场景决定（showIconPicker），不再用 keyFrom 判断：
+        // keyFrom 表示“自定义快捷键语义”，而组合键条同样走 keyFrom==1，却不需要图标。
         View iconRow = root.findViewById(R.id.ll_icon_picker);
-        if (iconRow != null && keyFrom == 1) {
-            iconRow.setVisibility(View.GONE);
-            return;
-        }
-        if (iconPickerContainer == null) {
-            return;
+        if (iconRow != null) {
+            if (!showIconPicker) {
+                iconRow.setVisibility(View.GONE);
+                return;
+            }
+            iconRow.setVisibility(View.VISIBLE);
         }
         if (iconPickerContainer == null) {
             return;
@@ -373,15 +379,32 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
         }
     }
 
+    /** 底部橙色提示按场景显示：自定义快捷键面板与组合键条各自一句，虚拟按键面板不显示。 */
+    private void applyHintText(View root) {
+        TextView hint = root.findViewById(R.id.tx_save_hint);
+        if (hint == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(hintText)) {
+            hint.setVisibility(View.GONE);
+            return;
+        }
+        hint.setVisibility(View.VISIBLE);
+        hint.setText(hintText);
+    }
+
+    public void setShowIconPicker(boolean showIconPicker) {
+        this.showIconPicker = showIconPicker;
+    }
+
+    public void setHintText(String hintText) {
+        this.hintText = hintText;
+    }
+
     public void setExisting(GameMenuQuickBean existing) {
         this.existing = existing;
     }
     // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
-
-    @Override
-    public float getDimAmount() {
-        return 0.9f;
-    }
 
     public void setTitle(String title) {
         this.title = title;

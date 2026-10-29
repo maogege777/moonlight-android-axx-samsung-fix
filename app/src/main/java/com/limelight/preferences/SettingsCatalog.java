@@ -74,8 +74,12 @@ final class SettingsCatalog {
                 "checkbox_enable_perf_overlay_lite_ext", "performance_overlayLite_magin_top",
                 "checkbox_enable_post_stream_toast"),
             new Section("悬浮球", "checkbox_enable_ax_floating")),
-        new Group("备份与恢复", "导出或导入主机配对数据",
-            new Section("主机与配对数据", "export_pairing_backup", "import_pairing_backup")),
+        new Group("备份与恢复", "主机配对与按键配置的备份",
+            new Section("主机与配对数据", "export_pairing_backup", "import_pairing_backup"),
+            // EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] BEGIN
+            // 按键配置的统一备份：自定义快捷键 + 组合键条 + 虚拟按键/虚拟手柄布局方案。
+            new Section("按键配置", "export_quick_keys_file", "import_quick_keys_file")),
+            // EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] END
         new Group("日志采集", "记录串流并管理日志文件",
             new Section("串流日志", "checkbox_enable_stream_session_logging", "manage_stream_session_logs"),
             new Section("输入调试", "checkbox_enable_accessibility_show_log")),
@@ -83,12 +87,7 @@ final class SettingsCatalog {
             new Section("界面", "list_languages", "change_screen_label_key",
                 "checkbox_enable_screen_bg", "import_image_file_key", "checkbox_enable_screen_obscure"),
             new Section("应用行为", "checkbox_enable_pass_menu", "checkbox_enable_pip", "checkbox_enable_exdisplay",
-                "checkbox_enable_game_manager_quest", "checkbox_disable_warnings"),
-            // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] BEGIN
-            // 自定义快捷键的导出 / 导入，紧随「应用行为」之后。
-            new Section("自定义快捷键", "export_quick_keys_file", "import_quick_keys_file")
-            // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
-            )
+                "checkbox_enable_game_manager_quest", "checkbox_disable_warnings"))
     };
 
     // These legacy rows are represented by one editor, or no longer apply to the new surface.

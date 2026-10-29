@@ -300,6 +300,9 @@ public class GameFunctionFragment extends BaseGameMenuDialog implements View.OnC
         fragment.setDimAmount(0.8f);
         fragment.setTitle(existing == null ? "设置快捷键" : "编辑快捷键");
         fragment.setKeyFrom(1);
+        // 「操作 › 自定义快捷键」的按钮按图标 + 名称 + 组合键显示，是唯一需要图标选择的位置。
+        fragment.setShowIconPicker(true);
+        fragment.setHintText("保存后长按按钮可以进行编辑和删除");
         fragment.setExisting(existing);
         fragment.setOnClick(bean -> {
             if (bean == null) {

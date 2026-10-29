@@ -1,8 +1,8 @@
 # EXT-QUICK-KEYS-IN-OPERATIONS
 
 - Change type: extension development
-- Status: implemented (v4), pending on-device verification
-- Added: 2026-10-15 · v4 revision: 2026-10-16
+- Status: implemented (v5), pending on-device verification
+- Added: 2026-10-15 · v4 revision: 2026-10-16 · v5 revision: 2026-10-29
 - Purpose: fold the stream menu's "Quick keys" (「快捷键」) feature into the sidebar
   "Operations" (「操作」) panel as a "Custom quick keys" (「自定义快捷键」) grid group, and add
   export/import of the user's custom quick keys in Settings › Interface & General.
@@ -92,3 +92,112 @@ this machine has no JDK or Android SDK. On-device checks still needed: first-run
 fresh install and on an old install with existing user keys, empty-name buttons, 清空按键 keeping
 the name, opaque dialogs over the game画面, tap closing the full menu stack, export → fresh
 device → import round-trip.
+
+---
+
+## v5 changes (user-confirmed, 2026-10-29)
+
+### 1. Icon picker is scene-driven, not `keyFrom`-driven
+
+`keyFrom == 1` means "quick-key semantics" (empty name allowed, quick-key id prefix, mouse/function
+tabs hidden) and is shared by **two** live entry points: the Operations panel's custom quick keys
+and the virtual keyboard's combo bar. Commit `426374a4` used `keyFrom == 1` as a proxy for "combo
+bar" to hide the icon row, which also removed the icon picker from the Operations panel - the only
+place whose buttons actually render an icon.
+
+- `GameKeyboardUpdateFragment` now has `showIconPicker` (default `false`) and `hintText`
+  (default empty = hidden); the icon row and the orange hint are driven by those two fields.
+- `GameFunctionFragment.openQuickKeyEditor` sets `showIconPicker(true)` and
+  `"保存后长按按钮可以进行编辑和删除"`.
+- `KeyBoardLayoutController.openComboEditor` leaves the icon picker off and sets
+  `"保存后长按组合键气泡可以编辑和删除"`.
+- `KeyBoardController` (virtual-key combo editor) sets neither, so both are hidden.
+- `tx_save_hint` got an id and defaults to `gone`, so the hint no longer shows in the virtual-key
+  editor where "组合键气泡" does not exist.
+
+### 2. Combo bar has its own store (no longer shares QuickKeyStore)
+
+`ComboKeyStore` (new) stores the combo bar entries in SharedPreferences `combo_axi_keyAssemble`
+(prefix `combo_assemble_key_`). One-shot migration copies the QuickKeyStore **user** entries
+(seed group excluded, semantics unchanged) at first run, guarded by
+`combo_axi_keyAssemble_meta.migrated_from_quick_keys`, so an upgraded device shows exactly the
+same chips as before and the two lists are independent afterwards.
+`KeyBoardLayoutController.rebuildComboBar / openComboEditor / confirmDeleteCombo` now read and
+write `ComboKeyStore`.
+
+### 3. One backup file for all three key stores, selective restore
+
+`AxiKeyBackup` (new) exports a single file:
+
+```json
+{ "type": "axi_key_backup", "version": 1, "exportedAt": "...",
+  "quickKeys": { "type": "axi_quick_keys", "version": 2, "data": [ ... ] },
+  "comboKeys": { "type": "axi_combo_keys", "version": 1, "data": [ ... ] },
+  "keyboardLayouts": { "OSC_Keyboard": [ ... ], "OSC_Keyboard_2": [ ... ] },
+  "keyboardScheme": "OSC_Keyboard",
+  "gamepadLayouts": { "gamePad": [ ... ], "gamePad_2": [ ... ] },
+  "gamepadScheme": "gamePad" }
+```
+
+- All **five** virtual-keyboard schemes and all **five** virtual-gamepad schemes are exported (the
+  old Settings entry only exported the currently selected keyboard scheme). Schemes with no saved
+  file are omitted (they are the default layout).
+- Import shows a multi-choice dialog (快捷键 / 组合键条 / 虚拟按键布局 / 虚拟手柄布局); only the
+  checked sections are restored, and restoring is an overwrite of that section. Unchecked sections
+  keep their current content.
+- Old files still import: `type: axi_quick_keys` → quick keys only; a bare JSON array (old
+  "虚拟按键配置" export) → the currently selected keyboard scheme only.
+- Settings entry `export_quick_keys_file` / `import_quick_keys_file` now live at
+  **设置 › 备份与恢复 › 按键配置** (Section added to the existing 备份与恢复 group in
+  `SettingsCatalog`; the preference keys are unchanged). The separate
+  「导入/导出虚拟按键配置」 and 「导入/导出虚拟手柄配置」 entries stay, as the fine-grained
+  "replace one scheme" operations.
+
+### 4. Copy a scheme slot onto another (keyboard and gamepad)
+
+In the long-press scheme popup of both 虚拟手柄 and 虚拟按键, a "复制方案…" row opens a two-step
+picker: source scheme → target scheme → overwrite confirmation. `AxiKeyBackup.copyLayout` copies
+`files/axi_<scheme>.txt` (same naming for both controller kinds, see
+`KeyBoardController`'s `fileName`). If the source scheme has no saved file (i.e. it is the default
+layout), the target file is deleted so the target also returns to the default layout - the
+confirmation text states this explicitly. If the target is the currently active scheme, the layout
+is hot-reloaded through `game.updateVirtualView()`; the active scheme is never switched.
+
+### 5. Dialog dim follows the caller again
+
+`GameKeyboardUpdateFragment` overrode `getDimAmount()` with a hard-coded `0.9f`, which silently
+discarded every caller's `setDimAmount(0.8f)` (the base class reads `mDimAmount` in
+`BaseGameMenuFragmentDialog.onStart`). The override is removed, so all entry points use 0.8.
+
+### Files added in v5
+
+- `ComboKeyStore.java`, `AxiKeyBackup.java`
+
+### Files modified in v5
+
+- `GameKeyboardUpdateFragment.java` (scene flags, hint, dim), `GameFunctionFragment.java`
+  (`showIconPicker` + hint), `KeyBoardLayoutController.java` (ComboKeyStore + hint),
+  `GameMenuFragment.java` (scheme copy), `QuickKeyStore.java` (`itemJson`/`parseItems` made
+  reusable), `SettingsCatalog.java` (new 备份与恢复 › 按键配置 section),
+  `StreamSettings.java` (unified export / selective import), `preferences.xml`,
+  `dialog_game_menu_keyboard_group_add.xml` (`tx_save_hint` id)
+
+### Storage (v5)
+
+- Combo bar: SharedPreferences `combo_axi_keyAssemble` (prefix `combo_assemble_key_`), meta
+  `combo_axi_keyAssemble_meta` with the one-shot `migrated_from_quick_keys` flag.
+- Virtual keyboard/gamepad layouts: unchanged, `files/axi_<scheme>.txt` (5 schemes each,
+  `keyboard_axi_values` / `gamepad_axi_values`).
+- Quick keys: unchanged (`quick_axi_keyAssemble`).
+
+### Still open
+
+- The two orphan fragments `GameListQuickFragment` / `GameListKeyBoardFragment` are unreachable
+  (no `new` call anywhere) but still provide `PREF_KEYBOARD_LIST_*` constants used by three files.
+  Deleting them should be its own change (move the constants first).
+- v5 on-device checks: icon row only in the Operations editor; combo bar unaffected by quick-key
+  edits and vice versa; migration keeps existing chips; combined export includes all saved
+  keyboard **and** gamepad schemes; selective import leaves unchecked sections alone; copying a
+  scheme between slots (both kinds), including the default-layout source case; old export files
+  still import.
+
