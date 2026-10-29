@@ -7,10 +7,12 @@ package com.limelight.binding.input.virtual_controller.keyboard;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -50,6 +52,8 @@ public class KeyBoardLayoutController {
     private Vibrator vibrator;
     private LinearLayout keyboardView;
     private RadioGroup rg_keyboard;
+    private TextView tvMode;
+    private TextView btnTypingAlign;
 
     /** 顶栏右侧的组合键条：自定义快捷键，横向滚动 + 末尾添加按钮 */
     private HorizontalScrollView hsvCombo;
@@ -196,6 +200,8 @@ public class KeyBoardLayoutController {
                                     if (modView != null) keyUp(modView);
                                     modView = keyboardView.findViewById(R.id.lv_keyboard_digitpad).findViewWithTag(t);
                                     if (modView != null) keyUp(modView);
+                                    modView = keyboardView.findViewById(R.id.lv_keyboard_simple).findViewWithTag(t);
+                                    if (modView != null) keyUp(modView);
                                 }
                                 keyList.clear();
                             }
@@ -236,45 +242,34 @@ public class KeyBoardLayoutController {
         keyboardView.findViewById(R.id.iv_game_menu).setOnClickListener(v -> Game.instance.showGameMenu());
         attachTopBarHaptic(keyboardView.findViewById(R.id.iv_game_menu));
 
-        rg_keyboard=keyboardView.findViewById(R.id.rg_keyboard);
-        // 模式切换按钮按下即震（重复点同一个也有反馈，所以挂在触摸层而非状态变化）
-        attachTopBarHaptic(keyboardView.findViewById(R.id.rbt_keyboard_1));
-        attachTopBarHaptic(keyboardView.findViewById(R.id.rbt_keyboard_2));
-        rg_keyboard.check(R.id.rbt_keyboard_1);
+        rg_keyboard = keyboardView.findViewById(R.id.rg_keyboard);
+        tvMode = keyboardView.findViewById(R.id.btn_keyboard_mode);
+        btnTypingAlign = keyboardView.findViewById(R.id.btn_typing_align);
 
-        rg_keyboard.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(R.id.rbt_keyboard_1==checkedId){
-                    resetView();
-                    keyboardView.findViewById(R.id.lv_keyboard).setVisibility(View.VISIBLE);
-                    keyboardView.findViewById(R.id.lv_keyboard_digitpad).setVisibility(View.GONE);
-                    return;
-                }
-                if(R.id.rbt_keyboard_2==checkedId){
-                    resetView();
-                    keyboardView.findViewById(R.id.lv_keyboard).setVisibility(View.GONE);
-                    keyboardView.findViewById(R.id.lv_keyboard_digitpad).setVisibility(View.VISIBLE);
-                    return;
-                }
-            }
+        // 顶栏「模式 ▾」：点开下拉，真正切换仍交给隐藏的 RadioGroup
+        tvMode.setOnClickListener(v -> showModeMenu());
+        attachTopBarHaptic(tvMode);
+
+        // 简化键盘专用的位置气泡：左 -> 中 -> 右 循环，写回偏好
+        btnTypingAlign.setOnClickListener(v -> {
+            prefConfig.keyboard_typing_align = (prefConfig.keyboard_typing_align + 1) % 3;
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putInt(PREF_KEYBOARD_TYPING_ALIGN, prefConfig.keyboard_typing_align).apply();
+            updateTypingAlignText();
+            applyTypingAlign();
         });
+        attachTopBarHaptic(btnTypingAlign);
 
+        rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(checkedId));
+        rg_keyboard.check(R.id.rbt_keyboard_1);
         // 两块触摸板都按 1:1 位移，和数字键盘手感一致
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch), 1f);
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_mini), 1f);
 
-        keyboardView.findViewById(R.id.btn_soft_phone).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!Game.instance.hasWindowFocus()) {
-                    new Handler().postDelayed(() -> Game.instance.toggleKeyboard(),10);
-                    return;
-                }
-                Game.instance.toggleKeyboard();
-            }
-        });
-        attachTopBarHaptic(keyboardView.findViewById(R.id.btn_soft_phone));
+        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_l), 1f);
+
+        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_r), 1f);
+
 
         keyboardView.findViewById(R.id.mouse_up).setOnTouchListener(new View.OnTouchListener() {
             private Runnable repeater = new Runnable() {
@@ -420,6 +415,105 @@ public class KeyBoardLayoutController {
             }
         });
     }
+    // ---------------------------------------------------------------- 键盘模式 / 简化键盘位置
+
+    private static final String PREF_KEYBOARD_TYPING_ALIGN = "keyboard_typing_align";
+
+    /** 顶栏「模式 ▾」下拉：三个模式单选，选中后 check 隐藏的 RadioGroup。 */
+    private void showModeMenu() {
+        final int[] ids = {R.id.rbt_keyboard_1, R.id.rbt_keyboard_3, R.id.rbt_keyboard_2};
+        final String[] names = {"电脑全键盘", "简化键盘", "数字键盘"};
+        int checked = rg_keyboard.getCheckedRadioButtonId();
+        int current = 0;
+        for (int i = 0; i < ids.length; i++) {
+            if (ids[i] == checked) {
+                current = i;
+            }
+        }
+        new AlertDialog.Builder(context)
+                .setTitle("键盘模式")
+                .setSingleChoiceItems(names, current, (dialog, which) -> {
+                    dialog.dismiss();
+                    rg_keyboard.check(ids[which]);
+                })
+                .show();
+    }
+
+    /** 模式切换：谁能见、根容器要不要透明、位置气泡要不要显示，全在这里。 */
+    private void onModeChanged(int checkedId) {
+        resetView();
+
+        View full = keyboardView.findViewById(R.id.lv_keyboard);
+        View digit = keyboardView.findViewById(R.id.lv_keyboard_digitpad);
+        View simple = keyboardView.findViewById(R.id.lv_keyboard_simple);
+
+        boolean isSimple = (checkedId == R.id.rbt_keyboard_3);
+
+        full.setVisibility(checkedId == R.id.rbt_keyboard_1 ? View.VISIBLE : View.GONE);
+        digit.setVisibility(checkedId == R.id.rbt_keyboard_2 ? View.VISIBLE : View.GONE);
+        simple.setVisibility(isSimple ? View.VISIBLE : View.GONE);
+
+        // 简化键盘两侧是空白（触摸板），根容器必须透明才"浮动"；其他模式保留深色底板
+        keyboardView.setBackgroundColor(isSimple ? Color.TRANSPARENT : 0xFF212121);
+
+        // 位置气泡只在简化键盘下才有意义
+        btnTypingAlign.setVisibility(isSimple ? View.VISIBLE : View.GONE);
+
+        if (tvMode != null) {
+            tvMode.setText("模式 · " + modeName(checkedId) + " ▾");
+        }
+
+        if (isSimple) {
+            updateTypingAlignText();
+            applyTypingAlign();
+        }
+    }
+
+    private String modeName(int checkedId) {
+        if (checkedId == R.id.rbt_keyboard_2) {
+            return "数字键盘";
+        }
+        if (checkedId == R.id.rbt_keyboard_3) {
+            return "简化键盘";
+        }
+        return "电脑全键盘";
+    }
+
+    private void updateTypingAlignText() {
+        if (btnTypingAlign == null) {
+            return;
+        }
+        String[] names = {"靠左", "居中", "靠右"};
+        int a = Math.max(0, Math.min(2, prefConfig.keyboard_typing_align));
+        btnTypingAlign.setText("位置 · " + names[a]);
+    }
+
+    /**
+     * 简化键盘的位置：两侧空白由两块触摸板的 weight 分配。
+     * 靠左 = 左 0 右 1，居中 = 1/1，靠右 = 1/0，键盘挪到哪触摸板就自动变大变小。
+     */
+    private void applyTypingAlign() {
+        View simple = keyboardView.findViewById(R.id.lv_keyboard_simple);
+        if (simple == null) {
+            return;
+        }
+        int align = Math.max(0, Math.min(2, prefConfig.keyboard_typing_align));
+        setPadWeight(simple.findViewById(R.id.fv_keyboard_touch_simple_l), align == 0 ? 0f : 1f);
+        setPadWeight(simple.findViewById(R.id.fv_keyboard_touch_simple_r), align == 2 ? 0f : 1f);
+    }
+
+    private void setPadWeight(View v, float weight) {
+        if (v == null) {
+            return;
+        }
+        ViewGroup.LayoutParams lp = v.getLayoutParams();
+        if (lp instanceof LinearLayout.LayoutParams) {
+            LinearLayout.LayoutParams llp = (LinearLayout.LayoutParams) lp;
+            llp.width = 0;
+            llp.weight = weight;
+            v.setLayoutParams(llp);
+        }
+    }
     private void resetView(){
         keyList.clear();
 //        isCombination=false;
@@ -430,6 +524,10 @@ public class KeyBoardLayoutController {
                 keyUp(v);
             }
             v = keyboardView.findViewById(R.id.lv_keyboard_digitpad).findViewWithTag(key);
+            if (v != null) {
+                keyUp(v);
+            }
+            v = keyboardView.findViewById(R.id.lv_keyboard_simple).findViewWithTag(key);
             if (v != null) {
                 keyUp(v);
             }
@@ -470,6 +568,8 @@ public class KeyBoardLayoutController {
         LinearLayout.LayoutParams params1=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dip2px(context,height));
         keyboardView.findViewById(R.id.lv_keyboard).setLayoutParams(params1);
         keyboardView.findViewById(R.id.lv_keyboard_digitpad).setLayoutParams(params1);
+
+        keyboardView.findViewById(R.id.lv_keyboard_simple).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip2px(context, height)));
 
 
         keyboardView.setAlpha(prefConfig.oscKeyboardOpacity/100f);

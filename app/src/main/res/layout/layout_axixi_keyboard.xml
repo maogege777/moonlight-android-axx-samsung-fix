@@ -12,74 +12,83 @@
         android:layout_marginLeft="5dp"
         android:layout_marginBottom="2dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#212121">
+
+        <!-- 模式切换的真实逻辑仍由这个隐藏的 RadioGroup 承载，界面上的「模式 ▾」下拉去 check 它 -->
         <RadioGroup
-            android:layout_width="150dp"
-            android:layout_height="27dp"
             android:id="@+id/rg_keyboard"
-            android:orientation="horizontal">
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/ic_game_menu_btn_selector"
-                android:gravity="center"
-                android:padding="4dp"
-                android:button="@null"
                 android:id="@+id/rbt_keyboard_1"
-                android:text="电脑全键盘"
-                android:textSize="10dp" />
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:button="@null"
+                android:text="电脑全键盘" />
 
             <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/ic_game_menu_btn_selector"
-                android:gravity="center"
-                android:padding="4dp"
+                android:id="@+id/rbt_keyboard_3"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
                 android:button="@null"
-                android:id="@+id/rbt_keyboard_2"
-                android:text="数字键盘"
-                android:textSize="10dp" />
+                android:text="简化键盘" />
 
+            <RadioButton
+                android:id="@+id/rbt_keyboard_2"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:button="@null"
+                android:text="数字键盘" />
         </RadioGroup>
-        <CheckBox
-            android:layout_width="70dp"
+
+        <TextView
+            android:id="@+id/btn_keyboard_mode"
+            android:layout_width="92dp"
             android:layout_height="27dp"
-            android:layout_toRightOf="@+id/rg_keyboard"
+            android:layout_alignParentLeft="true"
             android:background="@drawable/ic_game_menu_btn_selector"
             android:gravity="center"
-            android:padding="4dp"
-            android:layout_marginRight="5dp"
-            android:button="@null"
+            android:text="模式 · 电脑全键盘 ▾"
+            android:textColor="@android:color/white"
+            android:textSize="10dp" />
+
+        <CheckBox
             android:id="@+id/btn_combination"
+            android:layout_width="70dp"
+            android:layout_height="27dp"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/btn_keyboard_mode"
+            android:background="@drawable/ic_game_menu_btn_selector"
+            android:button="@null"
+            android:gravity="center"
             android:text="组合键模式"
             android:textSize="10dp" />
 
         <TextView
-            android:layout_width="70dp"
+            android:id="@+id/btn_typing_align"
+            android:layout_width="78dp"
             android:layout_height="27dp"
+            android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/btn_combination"
             android:background="@drawable/ic_game_menu_btn_selector"
             android:gravity="center"
-            android:layout_marginRight="5dp"
-            android:padding="4dp"
-            android:id="@+id/btn_soft_phone"
-            android:text="手机软键盘"
+            android:text="位置 · 居中"
             android:textColor="@android:color/white"
-            android:textSize="10dp" />
+            android:textSize="10dp"
+            android:visibility="gone" />
 
         <HorizontalScrollView
             android:id="@+id/hsv_combo"
             android:layout_width="match_parent"
             android:layout_height="27dp"
-            android:layout_toRightOf="@+id/btn_soft_phone"
-            android:layout_toLeftOf="@+id/iv_game_menu"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="5dp"
+            android:layout_toRightOf="@+id/btn_typing_align"
+            android:layout_toLeftOf="@+id/iv_game_menu"
             android:fillViewport="true"
             android:scrollbars="none">
 
@@ -92,29 +101,25 @@
         </HorizontalScrollView>
 
         <ImageView
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/iv_down"
-            android:textColor="@android:color/white"
-            android:src="@drawable/ic_axi_menu"
-            android:layout_marginRight="2dp"
             android:id="@+id/iv_game_menu"
-            android:padding="6dp"
             android:layout_width="27dp"
-            android:layout_height="27dp"/>
+            android:layout_height="27dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="2dp"
+            android:layout_toLeftOf="@+id/iv_down"
+            android:padding="6dp"
+            android:src="@drawable/ic_axi_menu" />
 
         <ImageView
+            android:id="@+id/iv_down"
+            android:layout_width="wrap_content"
+            android:layout_height="27dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:textColor="@android:color/white"
-            android:src="@drawable/ic_axi_down"
-            android:id="@+id/iv_down"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="27dp"/>
-
+            android:src="@drawable/ic_axi_down" />
     </RelativeLayout>
-
 
     <include
         android:id="@+id/lv_keyboard"
@@ -131,5 +136,12 @@
         android:visibility="gone"
         android:layout_alignParentBottom="true"
         layout="@layout/item_layout_axixi_keyboard_digitpad"/>
+
+    <include
+        android:id="@+id/lv_keyboard_simple"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:visibility="gone"
+        layout="@layout/item_layout_axixi_keyboard_simple"/>
 
 </LinearLayout>
