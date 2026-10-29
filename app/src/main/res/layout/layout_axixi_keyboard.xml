@@ -52,7 +52,7 @@
             android:layout_alignParentLeft="true"
             android:background="@drawable/ic_game_menu_btn_selector"
             android:gravity="center"
-            android:text="模式 · 电脑全键盘 ▾"
+            android:text="布局 · 简化键盘 ▾"
             android:textColor="@android:color/white"
             android:textSize="10dp" />
 

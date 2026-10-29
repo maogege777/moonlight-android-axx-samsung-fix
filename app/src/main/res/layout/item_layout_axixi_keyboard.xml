@@ -205,11 +205,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="~"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -231,11 +231,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="!"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
         <!-- 继续更新其他 TextView 的 android:tag 值 -->
         <FrameLayout
@@ -257,11 +257,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="@"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -283,11 +283,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="#"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
         <!-- 以此类推，更新其他 TextView 的 android:tag 值 -->
         <FrameLayout
@@ -309,11 +309,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="$"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -335,11 +335,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="%"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -361,11 +361,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="^"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -387,11 +387,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="&amp;"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -413,11 +413,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="*"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -439,11 +439,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="("
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -465,11 +465,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text=")"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -491,11 +491,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="_"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -517,11 +517,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="+"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <TextView
@@ -682,11 +682,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="{"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -708,11 +708,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="}"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -734,11 +734,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="|"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
     </LinearLayout>
 
@@ -877,11 +877,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text=":"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -903,11 +903,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="&quot;"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <TextView
@@ -1035,11 +1035,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="&lt;"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -1061,11 +1061,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="&gt;"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <FrameLayout
@@ -1087,11 +1087,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|right"
-                android:layout_marginRight="6dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="?"
                 android:textColor="#8CA0BC"
-                android:textSize="8sp" />
+                android:textSize="9sp" />
         </FrameLayout>
 
         <TextView

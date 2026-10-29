@@ -246,8 +246,8 @@ public class KeyBoardLayoutController {
         tvMode = keyboardView.findViewById(R.id.btn_keyboard_mode);
         btnTypingAlign = keyboardView.findViewById(R.id.btn_typing_align);
 
-        // 顶栏「模式 ▾」：点开下拉，真正切换仍交给隐藏的 RadioGroup
-        tvMode.setOnClickListener(v -> showModeMenu());
+        // 顶栏「布局 ▾」：每点一次在 简化 -> 全键盘 -> 数字 之间循环
+        tvMode.setOnClickListener(v -> cycleMode());
         attachTopBarHaptic(tvMode);
 
         // 简化键盘专用的位置气泡：左 -> 中 -> 右 循环，写回偏好
@@ -261,7 +261,7 @@ public class KeyBoardLayoutController {
         attachTopBarHaptic(btnTypingAlign);
 
         rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(checkedId));
-        rg_keyboard.check(R.id.rbt_keyboard_1);
+        rg_keyboard.check(R.id.rbt_keyboard_3);
         // 两块触摸板都按 1:1 位移，和数字键盘手感一致
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch), 1f);
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_mini), 1f);
@@ -269,6 +269,7 @@ public class KeyBoardLayoutController {
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_l), 1f);
 
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_r), 1f);
+        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_mini), 1f);
 
 
         keyboardView.findViewById(R.id.mouse_up).setOnTouchListener(new View.OnTouchListener() {
@@ -419,24 +420,18 @@ public class KeyBoardLayoutController {
 
     private static final String PREF_KEYBOARD_TYPING_ALIGN = "keyboard_typing_align";
 
-    /** 顶栏「模式 ▾」下拉：三个模式单选，选中后 check 隐藏的 RadioGroup。 */
-    private void showModeMenu() {
-        final int[] ids = {R.id.rbt_keyboard_1, R.id.rbt_keyboard_3, R.id.rbt_keyboard_2};
-        final String[] names = {"电脑全键盘", "简化键盘", "数字键盘"};
-        int checked = rg_keyboard.getCheckedRadioButtonId();
-        int current = 0;
-        for (int i = 0; i < ids.length; i++) {
-            if (ids[i] == checked) {
-                current = i;
-            }
+    /** 顶栏「布局 ▾」：点一下就在 简化 -> 全键盘 -> 数字 之间循环，不弹菜单。 */
+    private void cycleMode() {
+        int cur = rg_keyboard.getCheckedRadioButtonId();
+        int next;
+        if (cur == R.id.rbt_keyboard_3) {
+            next = R.id.rbt_keyboard_1;      // 简化 -> 全键盘
+        } else if (cur == R.id.rbt_keyboard_1) {
+            next = R.id.rbt_keyboard_2;      // 全键盘 -> 数字
+        } else {
+            next = R.id.rbt_keyboard_3;      // 数字 -> 简化
         }
-        new AlertDialog.Builder(context)
-                .setTitle("键盘模式")
-                .setSingleChoiceItems(names, current, (dialog, which) -> {
-                    dialog.dismiss();
-                    rg_keyboard.check(ids[which]);
-                })
-                .show();
+        rg_keyboard.check(next);
     }
 
     /** 模式切换：谁能见、根容器要不要透明、位置气泡要不要显示，全在这里。 */
@@ -460,7 +455,7 @@ public class KeyBoardLayoutController {
         btnTypingAlign.setVisibility(isSimple ? View.VISIBLE : View.GONE);
 
         if (tvMode != null) {
-            tvMode.setText("模式 · " + modeName(checkedId) + " ▾");
+            tvMode.setText("布局 · " + modeName(checkedId) + " ▾");
         }
 
         if (isSimple) {
