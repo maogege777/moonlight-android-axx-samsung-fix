@@ -231,38 +231,45 @@ and in code comments:
 - The confirm dialog for deleting an entry reads 删除全键盘快捷键, and the editor hint is now
   "保存后长按气泡可以编辑和删除" (the 组合键条 wording no longer appears).
 
-### 2. Simplified keyboard: the two Enters are now one connected key
+### 2. Simplified keyboard: the right-hand Enter is now one real key
 
-`item_layout_axixi_keyboard_simple.xml` used to draw two separate Enter keys - row 3's
-(weight 150) and the one added in `7ddcf14a` at the end of row 4 (weight 100). They looked like
-two stacked keys of different widths, with a visible seam.
+`item_layout_axixi_keyboard_simple.xml` used to draw two Enter keys - row 3's (weight 150) and
+the one added in `7ddcf14a` at the end of row 4 (weight 100). Note they were never a "tall Enter in
+a shared column": the row-4 `↑` has to stay on the `↓` column of row 5, and that is what fixes the
+geometry:
 
-**Do not merge them into one shared column.** An earlier attempt wrapped rows 3+4 in a horizontal
-container with a single tall Enter on the right (`weight=150`, `match_parent` height). That forced
-the left column of both rows to 1290, which scaled row 4's keys by 1290/1340 and moved the `↑` off
-the `↓` column in row 5 (they stopped being aligned and stopped being the same width). The arrow
-cluster is what constrains the geometry:
-
-- row 4 (without Enter) sums to 1340, `↑` occupies 1240..1340;
+- row 4 (without Enter) sums to 1340 and `↑` occupies 1240..1340;
 - row 5 sums to 1440, its last three keys are `← ↓ →` at 1140..1240 / 1240..1340 / 1340..1440.
 
-So `↑` only stays above `↓` while row 4's Enter is exactly 100 units wide, and row 3's Enter must
-stay 150 units - i.e. the original weights are the only ones that work.
+So row 4's Enter can only be 100 units wide, otherwise `↑` slides off `↓`.
 
-The keys are therefore kept as two views (both `tag="66"`, so both fire Enter as before), and only
-their backgrounds change so they read as one L-shaped key:
+**Two rejected attempts** (both looked wrong on device):
 
-- `bg_ax_key_enter_top.xml` - 2dp inset left/right/top, no bottom inset, only the top corners
-  rounded (5dp), bottom corners square;
-- `bg_ax_key_enter_bottom.xml` - 2dp inset left/right/bottom, no top inset, only the bottom
-  corners rounded, top corners square;
-- the label 回车 lives on the wide top half only.
+1. Wrap rows 3+4 in a horizontal container with one tall Enter of `weight=150`. The left column of
+   both rows became 1290, which scaled row 4 by 1290/1340 - `↑` moved left and got narrower.
+2. Keep the 150/100 widths but draw them as one shape with two backgrounds
+   (`bg_ax_key_enter_top/bottom`, square joint, no inset at the seam). It looked joined, but it was
+   still two views: two tap targets, and the inner corner plus the 2dp insets never matched.
 
-Result: a seamless stepped key - wide on row 3, narrow on row 4, right edges flush at the far
-right, and the step's inner corner is square. A true ISO shape (narrow top, wide bottom) is
-geometrically impossible here: the wide bottom half would have to sit at 1290..1440 and would
-cover the `↑` column, which conflicts with the "↑ aligned with ↓" requirement; getting ISO would
-mean shifting the whole arrow cluster one unit to the left in both rows.
+**Final layout**: rows 3+4 are wrapped in a horizontal container (`weight=2` inside
+`ll_simple_keys`, row heights unchanged); the left part is a vertical container (`weight=1340`)
+holding both rows (each `weight=1`), and the right column is a **single TextView Enter**
+(`weight=100`, `match_parent` height, `bg_ax_key_mod`). One view means one tap target, one set of
+5dp corners, and the same 2dp inset as every other key. Side effect: row 3's keys now fill 1340
+instead of 1290, so they are ~3.9% wider; row 4 is byte-for-byte unchanged, so `↑` stays exactly
+above `↓`.
+
+### 3. Other layout tweaks in the same pass
+
+- `Enter` is the label everywhere (simplified, digitpad, digitpad add dialog); 回车 is gone from
+  layouts and comments.
+- The wheel keys are labelled 滚轮⬆ / 滚轮⬇ instead of 滚动⬆ / 滚动⬇ (both keyboards).
+- Full keyboard F-row: `ESC` had `marginRight=5dp` and `Ins` had `marginLeft=5dp`, which made the
+  gaps around F1 / F12 wider than between the F keys. Both margins are removed, so every key in
+  that row now has the standard 4dp spacing (2dp inset on each side).
+- Digitpad right column: `ScrLk / Home / PgUp / Del / End / PgDn` were 9.5sp and the wheel keys
+  10sp; all are now 11sp, matching `Shift`.
+
 
 
 

@@ -2,7 +2,7 @@
 <!--
     数字键盘 v6
     ├─ G1 左手区 (weight 88)      Esc / 中键 / 左键 / 右键
-    ├─ G2 数字区 (weight 280)     NumLk ÷ × ⌫ / 7 8 9 − / 4 5 6 + / 1 2 3 回车 / 0(双格) .
+    ├─ G2 数字区 (weight 280)     NumLk ÷ × ⌫ / 7 8 9 − / 4 5 6 + / 1 2 3 Enter / 0(双格) .
     └─ G3 右手区 (weight 374)     功能键 4 列(修饰键 1.5 列 + 方向键 1 列) + 右列(滚轮+触摸板)
     组间间距 26dp 由 G2 的左右 margin 提供，面板总宽不变。
 -->
@@ -231,7 +231,7 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- 行4+行5：1 2 3 / 0(双格) .  + 回车（跨两行） -->
+        <!-- 行4+行5：1 2 3 / 0(双格) .  + Enter（跨两行） -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -317,7 +317,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- 回车：右下角，跨两行 -->
+            <!-- Enter：右下角，跨两行 -->
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -325,7 +325,7 @@
                 android:background="@drawable/bg_ax_key_mod"
                 android:gravity="center"
                 android:tag="66"
-                android:text="回车"
+                android:text="Enter"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -427,7 +427,7 @@
                 android:tag="116"
                 android:text="ScrLk"
                 android:textColor="@android:color/white"
-                android:textSize="9.5sp" />            <TextView
+                android:textSize="11sp" />            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -436,7 +436,7 @@
                 android:tag="122"
                 android:text="Home"
                 android:textColor="@android:color/white"
-                android:textSize="9.5sp" />            <TextView
+                android:textSize="11sp" />            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -445,7 +445,7 @@
                 android:tag="92"
                 android:text="PgUp"
                 android:textColor="@android:color/white"
-                android:textSize="9.5sp" />            <TextView
+                android:textSize="11sp" />            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -470,7 +470,7 @@
                 android:tag="112"
                 android:text="Del"
                 android:textColor="@android:color/white"
-                android:textSize="9.5sp" />            <TextView
+                android:textSize="11sp" />            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -479,7 +479,7 @@
                 android:tag="123"
                 android:text="End"
                 android:textColor="@android:color/white"
-                android:textSize="9.5sp" />            <TextView
+                android:textSize="11sp" />            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -488,7 +488,7 @@
                 android:tag="93"
                 android:text="PgDn"
                 android:textColor="@android:color/white"
-                android:textSize="9.5sp" />            <TextView
+                android:textSize="11sp" />            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -515,9 +515,9 @@
                 android:layout_weight="1"
                 android:background="@drawable/bg_ax_key_num"
                 android:gravity="center"
-                android:text="滚动⬆"
+                android:text="滚轮⬆"
                 android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/mouse_down"
@@ -526,9 +526,9 @@
                 android:layout_weight="1"
                 android:background="@drawable/bg_ax_key_num"
                 android:gravity="center"
-                android:text="滚动⬇"
+                android:text="滚轮⬇"
                 android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                android:textSize="11sp" />
 
             <com.limelight.ui.gamemenu.TouchPadView
                 android:id="@+id/fv_keyboard_touch"

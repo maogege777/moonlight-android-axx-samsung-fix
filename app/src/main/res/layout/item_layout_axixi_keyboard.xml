@@ -12,11 +12,11 @@
         android:layout_weight="100"
         android:orientation="horizontal">
 
+        <!-- ESC 与 F1～F12 之间不再额外留边距，整行按键间距一致 -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="96"
-            android:layout_marginRight="5dp"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="111"
@@ -156,11 +156,11 @@
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 
+        <!-- F12 与 Ins 之间同样不留额外边距 -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="96"
-            android:layout_marginLeft="5dp"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="124"
