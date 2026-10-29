@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -81,6 +83,39 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
     // 保存时沿用原组合键。
     private boolean inheritedCombo;
     // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
+
+    // EXTENSION DEVELOPMENT [EXT-KEYBOARD-EDITOR-COVERAGE] [ADDED] BEGIN
+    /**
+     * 按键编辑器（自定义快捷键 / 全键盘快捷键 / 虚拟按键）横屏必须铺满整个窗口。
+     *
+     * <p>基类 {@code BaseGameMenuFragmentDialog.onStart()} 横屏是
+     * {@code params.gravity = Gravity.END} + {@code params.width = 调用方 setWidth 的值}，
+     * 窗口靠右。只要调用方算出的像素比实际窗口窄，左侧就会露出一条没被窗口盖住的区域，
+     * 能看到游戏画面或下层菜单。各入口取值并不统一（有的用 getCurrentWindowMetrics()
+     * 的 bounds.width()，有的用 displayMetrics.widthPixels），在带刘海 / 导航栏的设备上
+     * 两者不相等，于是「添加虚拟按键」铺满、另外两个入口左侧留空。</p>
+     *
+     * <p>这里直接改成 MATCH_PARENT，与调用方传入的宽度无关，三条入口的覆盖范围一致。
+     * 竖屏下基类本来就用 MATCH_PARENT，不需要处理。</p>
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            return;
+        }
+        if (getDialog() == null || getDialog().getWindow() == null) {
+            return;
+        }
+        Window window = getDialog().getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        if (params.width == WindowManager.LayoutParams.MATCH_PARENT) {
+            return;
+        }
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        window.setAttributes(params);
+    }
+    // EXTENSION DEVELOPMENT [EXT-KEYBOARD-EDITOR-COVERAGE] [ADDED] END
 
     @Override
     public void bindView(View v) {
