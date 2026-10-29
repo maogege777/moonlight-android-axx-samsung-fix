@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 大回车上半段（F 行，宽度 150）：只圆上侧两个角，接缝一侧保持直角且不留边距，
+     与 bg_ax_key_enter_bottom 拼成一个向下的 L 形回车（朝右不延伸，避免压到触摸板）。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:bottom="0dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp">
+        <shape>
+            <solid android:color="#2B3138" />
+            <corners
+                android:topLeftRadius="5dp"
+                android:topRightRadius="5dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
+        </shape>
+    </item>
+</layer-list>

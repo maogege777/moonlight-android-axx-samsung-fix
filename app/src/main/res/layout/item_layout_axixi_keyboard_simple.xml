@@ -699,20 +699,6 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- 第 3、4 行共用右侧的整键 Enter：两行包进横向容器，左侧竖向容器放两行，
-             Enter 单独一列跨两行（单一 View，点击与圆角都是一个整体，不再拼接两半） -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1340"
-                android:orientation="vertical">
-
         <!-- 第 3 行 -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -932,6 +918,22 @@
                     android:textSize="9sp" />
             </FrameLayout>
 
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="150">
+
+                <!-- 大回车上半段：宽 150，文字只在这里显示；与下面 100 宽的下半段拼成 L 形 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_ax_key_enter_top"
+                    android:gravity="center"
+                    android:tag="66"
+                    android:text="Enter"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 第 4 行 -->
@@ -1162,22 +1164,19 @@
                     android:textColor="@android:color/white"
                     android:textSize="13sp" />
             </FrameLayout>
-        </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Enter：单个按键跨第 3、4 行。宽度取 100（与第 5 行的 → 同列），
-                 这样第 4 行的 ↑ 才能与第 5 行的 ↓ 保持同列同宽。 -->
-            <TextView
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="100"
-                android:background="@drawable/bg_ax_key_mod"
-                android:gravity="center"
-                android:tag="66"
-                android:text="Enter"
-                android:textColor="@android:color/white"
-                android:textSize="11sp" />
+                android:layout_weight="100">
+
+                <!-- 大回车下半段：宽 100（与方向键列对齐），不显示文字，接缝与上半段无缝 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_ax_key_enter_bottom"
+                    android:gravity="center"
+                    android:tag="66" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 第 5 行 -->
@@ -1379,7 +1378,7 @@
             android:layout_weight="1"
             android:background="@drawable/bg_ax_key_num"
             android:gravity="center"
-            android:text="滚轮⬆"
+            android:text="滚动⬆"
             android:textColor="@android:color/white"
             android:textSize="11sp" />
 
@@ -1390,7 +1389,7 @@
             android:layout_weight="1"
             android:background="@drawable/bg_ax_key_num"
             android:gravity="center"
-            android:text="滚轮⬇"
+            android:text="滚动⬇"
             android:textColor="@android:color/white"
             android:textSize="11sp" />
 

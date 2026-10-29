@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 大回车下半段（V 行，宽度 100，与方向键列对齐）：接缝一侧直角、不留边距，
+     底部外侧圆角与其它按键一致；按下时由 KeyBoardLayoutController 与上半段同步高亮 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="0dp">
+        <shape>
+            <solid android:color="#2B3138" />
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="0dp"
+                android:bottomLeftRadius="5dp"
+                android:bottomRightRadius="5dp" />
+        </shape>
+    </item>
+</layer-list>

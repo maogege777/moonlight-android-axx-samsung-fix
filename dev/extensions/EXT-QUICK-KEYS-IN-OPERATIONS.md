@@ -251,13 +251,23 @@ So row 4's Enter can only be 100 units wide, otherwise `↑` slides off `↓`.
    (`bg_ax_key_enter_top/bottom`, square joint, no inset at the seam). It looked joined, but it was
    still two views: two tap targets, and the inner corner plus the 2dp insets never matched.
 
-**Final layout**: rows 3+4 are wrapped in a horizontal container (`weight=2` inside
-`ll_simple_keys`, row heights unchanged); the left part is a vertical container (`weight=1340`)
-holding both rows (each `weight=1`), and the right column is a **single TextView Enter**
-(`weight=100`, `match_parent` height, `bg_ax_key_mod`). One view means one tap target, one set of
-5dp corners, and the same 2dp inset as every other key. Side effect: row 3's keys now fill 1340
-instead of 1290, so they are ~3.9% wider; row 4 is byte-for-byte unchanged, so `↑` stays exactly
-above `↓`.
+**Final layout** (user-confirmed): keep the two widths - row 3 Enter 150, row 4 Enter 100 - and
+make them read as one down-facing L:
+
+- `bg_ax_key_enter_top.xml`: 2dp inset on left/right/top, **no bottom inset**, only the top two
+  corners rounded. 150 wide, extends 50 units further left than the leg.
+- `bg_ax_key_enter_bottom.xml`: 2dp inset on left/right/bottom, **no top inset**, only the bottom
+  two corners rounded. 100 wide, flush with the far right edge, so `↑` stays exactly above `↓`.
+- The label `Enter` is only on the wide top half.
+
+Because they are still two views, `KeyBoardLayoutController.keyDown / keyUp` now also updates every
+other view tagged `66` inside `lv_keyboard_simple` (`setSplitEnterPressed` + `collectTagged`), so a
+press highlights both halves at once - otherwise each half would flash on its own and still feel
+like two keys.
+
+A single 100-wide TextView spanning both rows was also tried: it is one real view, but the user
+found the key too narrow to hit comfortably, which is why the L shape (wide top, narrow leg) is
+the accepted trade-off. Extending to the right is not an option - it would eat the touchpad width.
 
 ### 3. Other layout tweaks in the same pass
 

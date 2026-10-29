@@ -312,14 +312,62 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
     private void keyDown(View v) {
         rememberKeyBg(v);
         v.setBackgroundResource(R.drawable.bg_ax_keyboard_button_confirm);
+        setSplitEnterPressed(v, true);
     }
 
     private void keyUp(View v) {
+        restoreKeyBg(v);
+        setSplitEnterPressed(v, false);
+    }
+
+    private void restoreKeyBg(View v) {
         Object bg = (v == null) ? null : v.getTag(R.id.kb_key_bg);
         if (bg instanceof Drawable) {
             v.setBackground((Drawable) bg);
         } else if (v != null) {
             v.setBackgroundResource(R.drawable.bg_ax_keyboard_button);
+        }
+    }
+
+    /**
+     * 简化键盘的大回车由上下两段（tag 66）拼成 L 形：按下 / 抬起时两段同步变色，
+     * 否则看起来像是两个各自独立的按键。
+     */
+    private void setSplitEnterPressed(View v, boolean pressed) {
+        if (keyboardView == null || !(v.getTag() instanceof String)
+                || !"66".equals(v.getTag())) {
+            return;
+        }
+        View simple = keyboardView.findViewById(R.id.lv_keyboard_simple);
+        if (!(simple instanceof ViewGroup)) {
+            return;
+        }
+        List<View> parts = new ArrayList<>();
+        collectTagged((ViewGroup) simple, "66", parts);
+        if (parts.size() < 2) {
+            return; // 只有一段（例如数字键盘）时不需要同步
+        }
+        for (View part : parts) {
+            if (part == v) {
+                continue;
+            }
+            if (pressed) {
+                rememberKeyBg(part);
+                part.setBackgroundResource(R.drawable.bg_ax_keyboard_button_confirm);
+            } else {
+                restoreKeyBg(part);
+            }
+        }
+    }
+
+    private void collectTagged(ViewGroup group, String tag, List<View> out) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                collectTagged((ViewGroup) child, tag, out);
+            } else if (tag.equals(child.getTag())) {
+                out.add(child);
+            }
         }
     }
 
