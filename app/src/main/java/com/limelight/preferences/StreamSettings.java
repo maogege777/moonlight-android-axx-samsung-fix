@@ -1116,7 +1116,7 @@ public class StreamSettings extends Activity {
 
             // EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] BEGIN
             // 按键配置导出 / 导入：导出走 ACTION_CREATE_DOCUMENT（与主机配对备份同款，
-            // 可选保存路径与文件名），文件包含自定义快捷键、组合键条与全部虚拟按键布局方案；
+            // 可选保存路径与文件名），文件包含自定义快捷键、全键盘快捷键与全部虚拟按键布局方案；
             // 导入走 ACTION_OPEN_DOCUMENT，解析后勾选要恢复的部分再覆盖。
             Preference quickKeysExport = findPreference("export_quick_keys_file");
             if (quickKeysExport != null) {
@@ -1204,7 +1204,7 @@ public class StreamSettings extends Activity {
         private static final int READ_QUICK_KEYS_REQUEST_CODE = 1009;
         private static final int WRITE_QUICK_KEYS_REQUEST_CODE = 1010;
 
-        /** 导出三处按键配置：自定义快捷键 + 组合键条 + 虚拟按键全部布局方案。 */
+        /** 导出三处按键配置：自定义快捷键 + 全键盘快捷键 + 虚拟按键/虚拟手柄全部布局方案。 */
         private void exportKeyBackup(Uri uri) {
             Activity activity = getActivity();
             if (activity == null) {
@@ -1221,7 +1221,7 @@ public class StreamSettings extends Activity {
             }
             boolean written = FileUriUtils.openUriForWrite(activity, uri, json);
             AppDialog.showMessage(activity, "导出按键配置",
-                    written ? "已导出：自定义快捷键、组合键条、虚拟按键与虚拟手柄布局方案。"
+                    written ? "已导出：自定义快捷键、全键盘快捷键、虚拟按键与虚拟手柄布局方案。"
                             : "写入失败，请重试或换一个保存位置。",
                     getString(R.string.dialog_action_close), null);
         }
@@ -1262,9 +1262,9 @@ public class StreamSettings extends Activity {
                 labels.add("自定义快捷键（" + parsed.quickKeys.size() + " 项）");
                 bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_QUICK_KEYS);
             }
-            if ((parsed.sections & com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_COMBO_KEYS) != 0) {
-                labels.add("组合键条（" + parsed.comboKeys.size() + " 项）");
-                bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_COMBO_KEYS);
+            if ((parsed.sections & com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_FULL_KEYBOARD_KEYS) != 0) {
+                labels.add("全键盘快捷键（" + parsed.fullKeyboardKeys.size() + " 项）");
+                bits.add(com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_FULL_KEYBOARD_KEYS);
             }
             if ((parsed.sections & com.limelight.ui.gamemenu.AxiKeyBackup.SECTION_LAYOUTS) != 0) {
                 labels.add("虚拟按键布局（" + parsed.layouts.size() + " 个方案）");

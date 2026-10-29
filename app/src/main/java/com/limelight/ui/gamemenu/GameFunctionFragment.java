@@ -298,7 +298,7 @@ public class GameFunctionFragment extends BaseGameMenuDialog implements View.OnC
         GameKeyboardUpdateFragment fragment = new GameKeyboardUpdateFragment();
         fragment.setWidth(fullScreenWidth());
         fragment.setDimAmount(0.8f);
-        fragment.setTitle(existing == null ? "设置快捷键" : "编辑快捷键");
+        fragment.setTitle(existing == null ? "添加自定义快捷键" : "编辑自定义快捷键");
         fragment.setKeyFrom(1);
         // 「操作 › 自定义快捷键」的按钮按图标 + 名称 + 组合键显示，是唯一需要图标选择的位置。
         fragment.setShowIconPicker(true);

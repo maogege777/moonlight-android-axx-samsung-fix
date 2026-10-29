@@ -37,7 +37,7 @@ import com.limelight.binding.input.ControllerHandler;
 import com.limelight.binding.input.evdev.EvdevListener;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.ui.gamemenu.GameKeyboardUpdateFragment;
-import com.limelight.ui.gamemenu.ComboKeyStore;
+import com.limelight.ui.gamemenu.FullKeyboardKeyStore;
 import com.limelight.ui.gamemenu.bean.GameMenuQuickBean;
 import com.limelight.ui.gamemenu.TouchPadView;
 
@@ -54,7 +54,7 @@ public class KeyBoardLayoutController {
     private RadioGroup rg_keyboard;
     private TextView tvMode;
 
-    /** 顶栏右侧的组合键条：自定义快捷键，横向滚动 + 末尾添加按钮 */
+    /** 顶栏右侧的全键盘快捷键栏：自定义快捷键，横向滚动 + 末尾添加按钮 */
     private HorizontalScrollView hsvCombo;
     private LinearLayout llCombo;
     private PreferenceConfiguration prefConfig;
@@ -617,12 +617,12 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         });
     }
 
-    // ---------------------------------------------------------------- 顶栏组合键条
+    // ---------------------------------------------------------------- 顶栏全键盘快捷键
 
     /**
-     * 重建顶栏右侧的组合键条：读「组合键条」自己的数据（ComboKeyStore，与
-     * 「操作 › 自定义快捷键」互不影响），末尾固定一个「+」。
-     * 导出 / 导入走设置页的统一备份（AxiKeyBackup），组合键条作为其中一段。
+     * 重建顶栏右侧的全键盘快捷键栏：读「全键盘快捷键」自己的数据（FullKeyboardKeyStore，
+     * 与「操作 › 自定义快捷键」互不影响），末尾固定一个「+」。
+     * 导出 / 导入走设置页的统一备份（AxiKeyBackup），全键盘快捷键作为其中一段。
      */
     private void rebuildComboBar() {
         if (llCombo == null) {
@@ -630,7 +630,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         }
         llCombo.removeAllViews();
         llCombo.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
-        List<GameMenuQuickBean> items = ComboKeyStore.load(context);
+        List<GameMenuQuickBean> items = FullKeyboardKeyStore.load(context);
         for (GameMenuQuickBean bean : items) {
             llCombo.addView(createComboChip(bean));
         }
@@ -751,17 +751,17 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 
     private void confirmDeleteCombo(final GameMenuQuickBean bean) {
         new AlertDialog.Builder(context)
-                .setTitle("删除组合键")
+                .setTitle("删除全键盘快捷键")
                 .setMessage("确定删除「" + comboLabel(bean) + "」？")
                 .setPositiveButton("删除", (dialog, which) -> {
-                    ComboKeyStore.remove(context, bean);
+                    FullKeyboardKeyStore.remove(context, bean);
                     rebuildComboBar();
                 })
                 .setNegativeButton("取消", null)
                 .show();
     }
 
-    /** 打开现有编辑器：新增或编辑自定义组合键，保存后刷新组合键条。 */
+    /** 打开全键盘快捷键编辑器：新增或编辑，保存后刷新顶栏。 */
     private void openComboEditor(GameMenuQuickBean existing) {
         if (!(context instanceof Activity)) {
             return;
@@ -774,15 +774,15 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         }
         fragment.setWidth(width);
         fragment.setDimAmount(0.8f);
-        fragment.setTitle(existing == null ? "添加组合键" : "编辑组合键");
+        fragment.setTitle(existing == null ? "添加全键盘快捷键" : "编辑全键盘快捷键");
         fragment.setKeyFrom(1);
-        // 组合键条只显示文字气泡，不需要图标选择；底部提示说明保存后如何编辑/删除。
+        // 全键盘快捷键只显示文字气泡，不需要图标选择；底部提示说明保存后如何编辑/删除。
         fragment.setShowIconPicker(false);
-        fragment.setHintText("保存后长按组合键气泡可以编辑和删除");
+        fragment.setHintText("保存后长按气泡可以编辑和删除");
         fragment.setExisting(existing);
         fragment.setOnClick(bean -> {
             if (bean != null) {
-                ComboKeyStore.save(context, bean);
+                FullKeyboardKeyStore.save(context, bean);
                 rebuildComboBar();
             }
         });

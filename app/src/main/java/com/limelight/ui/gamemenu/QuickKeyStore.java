@@ -407,7 +407,7 @@ public final class QuickKeyStore {
         }
     }
 
-    /** 单条导出的 JSON 结构；组合键条（ComboKeyStore）复用同一份字段定义。 */
+    /** 单条导出的 JSON 结构；全键盘快捷键（FullKeyboardKeyStore）复用同一份字段定义。 */
     public static JSONObject itemJson(GameMenuQuickBean bean) throws Exception {
         JSONObject object = new JSONObject();
         object.put("id", bean.getId());
@@ -454,7 +454,7 @@ public final class QuickKeyStore {
 
     /**
      * 解析导出文件里的 data 段。字段定义（id/name/icon/sort/desc/codes/datas）在
-     * 「自定义快捷键」与「组合键条」之间完全一致，只有新生成 id 的前缀不同。
+     * 「自定义快捷键」与「全键盘快捷键」之间完全一致，只有新生成 id 的前缀不同。
      *
      * @param idPrefix 新生成 id 的前缀，决定条目归属哪一份存储
      */

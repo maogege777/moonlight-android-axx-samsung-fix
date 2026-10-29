@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="组合键"
+            android:text="快捷键"
             android:id="@+id/tx_title"
             android:textColor="@android:color/white"
             android:textSize="13dp" />
@@ -161,7 +161,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="保存后长按组合键气泡按钮可以进行编辑和删除"
+                android:text="保存后长按按钮可以进行编辑和删除"
                 android:textColor="#E0A33A"
                 android:textSize="9dp"
                 android:visibility="gone" />

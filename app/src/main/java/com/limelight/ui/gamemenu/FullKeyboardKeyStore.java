@@ -14,43 +14,46 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-// EXTENSION DEVELOPMENT [EXT-COMBO-KEY-STORE] [NEW] BEGIN
+// EXTENSION DEVELOPMENT [EXT-FULL-KEYBOARD-KEYS] [NEW] BEGIN
 /**
- * 虚拟全键盘顶栏「组合键条」的数据层（与「操作 › 自定义快捷键」彻底分开）。
+ * 虚拟全键盘顶栏「全键盘快捷键」的数据层（与「操作 › 自定义快捷键」彻底分开）。
  *
- * 背景：v5 之前组合键条直接读 QuickKeyStore 的全量数据并过滤默认组，导致
- * 「操作」面板新增的快捷键会同时出现在组合键条上，两处无法各自维护。
- * 现在组合键条有独立存储 combo_axi_keyAssemble，key 前缀 combo_assemble_key_。
+ * 背景：v5 之前这一栏直接读 QuickKeyStore 的全量数据并过滤默认组，导致
+ * 「操作」面板新增的快捷键会同时出现在全键盘快捷键栏上，两处无法各自维护。
+ * 现在全键盘快捷键有独立存储（见下方 PREF_* 常量，历史命名仍保留 combo 字样，
+ * 是为了兼容已经写进用户设备的旧数据，不要改字符串值）。
  *
  * 升级迁移：首次运行时把 QuickKeyStore 里的“用户自建项”（不含 11 项默认组）
  * 复制一份过来，保证升级后顶栏胶囊内容与升级前完全一致；复制只做一次
  * （meta 标记 migrated_from_quick_keys），此后两处增删互不影响。
  */
-public final class ComboKeyStore {
+public final class FullKeyboardKeyStore {
 
-    public static final String PREF_COMBO_LIST_NAME = "combo_axi_keyAssemble";
-    public static final String PREF_COMBO_LIST_KEY = "combo_assemble_key_";
-    public static final String PREF_COMBO_META_NAME = "combo_axi_keyAssemble_meta";
+    // 历史命名：字符串值是已落盘的存储名，改动会导致用户数据丢失，只允许改常量名。
+    public static final String PREF_FULL_KEYBOARD_LIST_NAME = "combo_axi_keyAssemble";
+    public static final String PREF_FULL_KEYBOARD_LIST_KEY = "combo_assemble_key_";
+    public static final String PREF_FULL_KEYBOARD_META_NAME = "combo_axi_keyAssemble_meta";
 
+    // 导出文件里的 type 同样保持旧值，兼容此前导出的文件。
     public static final String EXPORT_TYPE = "axi_combo_keys";
     public static final int EXPORT_VERSION = 1;
 
     private static final String MIGRATED_KEY = "migrated_from_quick_keys";
 
-    private ComboKeyStore() {
+    private FullKeyboardKeyStore() {
     }
 
-    /** 首次升级：把「操作 › 自定义快捷键」里的用户项复制一份到组合键条（不含默认组）。 */
+    /** 首次升级：把「操作 › 自定义快捷键」里的用户项复制一份到全键盘快捷键（不含默认组）。 */
     public static void ensureMigrated(Context context) {
-        SharedPreferences meta = context.getSharedPreferences(PREF_COMBO_META_NAME, Activity.MODE_PRIVATE);
+        SharedPreferences meta = context.getSharedPreferences(PREF_FULL_KEYBOARD_META_NAME, Activity.MODE_PRIVATE);
         if (meta.getBoolean(MIGRATED_KEY, false)) {
             return;
         }
         meta.edit().putBoolean(MIGRATED_KEY, true).apply();
 
-        SharedPreferences pref = context.getSharedPreferences(PREF_COMBO_LIST_NAME, Activity.MODE_PRIVATE);
+        SharedPreferences pref = context.getSharedPreferences(PREF_FULL_KEYBOARD_LIST_NAME, Activity.MODE_PRIVATE);
         if (!pref.getAll().isEmpty()) {
-            return; // 已有组合键条数据（例如刚导入过）：不覆盖
+            return; // 已有全键盘快捷键数据（例如刚导入过）：不覆盖
         }
 
         List<GameMenuQuickBean> source = QuickKeyStore.loadCustom(context);
@@ -68,7 +71,7 @@ public final class ComboKeyStore {
 
     /** 导入后同样视为已完成迁移，避免默认组或旧数据被再次复制进来。 */
     public static void markMigrated(Context context) {
-        context.getSharedPreferences(PREF_COMBO_META_NAME, Activity.MODE_PRIVATE).edit()
+        context.getSharedPreferences(PREF_FULL_KEYBOARD_META_NAME, Activity.MODE_PRIVATE).edit()
                 .putBoolean(MIGRATED_KEY, true)
                 .apply();
     }
@@ -78,7 +81,7 @@ public final class ComboKeyStore {
     public static List<GameMenuQuickBean> load(Context context) {
         ensureMigrated(context);
         List<GameMenuQuickBean> items = new ArrayList<>();
-        SharedPreferences pref = context.getSharedPreferences(PREF_COMBO_LIST_NAME, Activity.MODE_PRIVATE);
+        SharedPreferences pref = context.getSharedPreferences(PREF_FULL_KEYBOARD_LIST_NAME, Activity.MODE_PRIVATE);
         Map<String, String> map = (Map<String, String>) pref.getAll();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             GameMenuQuickBean bean = fromJson(entry.getValue());
@@ -109,7 +112,7 @@ public final class ComboKeyStore {
         if (bean.getSort() <= 0) {
             bean.setSort(nextSort(context));
         }
-        context.getSharedPreferences(PREF_COMBO_LIST_NAME, Activity.MODE_PRIVATE).edit()
+        context.getSharedPreferences(PREF_FULL_KEYBOARD_LIST_NAME, Activity.MODE_PRIVATE).edit()
                 .putString(bean.getId(), new Gson().toJson(bean))
                 .apply();
     }
@@ -118,14 +121,14 @@ public final class ComboKeyStore {
         if (bean == null || TextUtils.isEmpty(bean.getId())) {
             return;
         }
-        context.getSharedPreferences(PREF_COMBO_LIST_NAME, Activity.MODE_PRIVATE).edit()
+        context.getSharedPreferences(PREF_FULL_KEYBOARD_LIST_NAME, Activity.MODE_PRIVATE).edit()
                 .remove(bean.getId())
                 .apply();
     }
 
-    /** 导入语义：覆盖全部组合键条内容；导入后不再执行升级迁移。 */
+    /** 导入语义：覆盖全部全键盘快捷键；导入后不再执行升级迁移。 */
     public static void replaceAll(Context context, List<GameMenuQuickBean> beans) {
-        SharedPreferences pref = context.getSharedPreferences(PREF_COMBO_LIST_NAME, Activity.MODE_PRIVATE);
+        SharedPreferences pref = context.getSharedPreferences(PREF_FULL_KEYBOARD_LIST_NAME, Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();
         if (beans != null) {
@@ -158,9 +161,9 @@ public final class ComboKeyStore {
         }
     }
 
-    /** 解析组合键条导出文件；返回空列表表示没有有效条目。 */
+    /** 解析全键盘快捷键导出文件；返回空列表表示没有有效条目。 */
     public static List<GameMenuQuickBean> parseItems(org.json.JSONArray data) {
-        return QuickKeyStore.parseItems(data, PREF_COMBO_LIST_KEY);
+        return QuickKeyStore.parseItems(data, PREF_FULL_KEYBOARD_LIST_KEY);
     }
 
     private static GameMenuQuickBean fromJson(String json) {
@@ -185,4 +188,4 @@ public final class ComboKeyStore {
         });
     }
 }
-// EXTENSION DEVELOPMENT [EXT-COMBO-KEY-STORE] [NEW] END
+// EXTENSION DEVELOPMENT [EXT-FULL-KEYBOARD-KEYS] [NEW] END

@@ -77,7 +77,7 @@ final class SettingsCatalog {
         new Group("备份与恢复", "主机配对与按键配置的备份",
             new Section("主机与配对数据", "export_pairing_backup", "import_pairing_backup"),
             // EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] BEGIN
-            // 按键配置的统一备份：自定义快捷键 + 组合键条 + 虚拟按键/虚拟手柄布局方案。
+            // 按键配置的统一备份：自定义快捷键 + 全键盘快捷键 + 虚拟按键/虚拟手柄布局方案。
             new Section("按键配置", "export_quick_keys_file", "import_quick_keys_file")),
             // EXTENSION DEVELOPMENT [EXT-KEY-BACKUP] [MODIFIED] END
         new Group("日志采集", "记录串流并管理日志文件",

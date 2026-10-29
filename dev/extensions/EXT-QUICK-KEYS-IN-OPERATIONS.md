@@ -1,4 +1,4 @@
-# EXT-QUICK-KEYS-IN-OPERATIONS
+﻿# EXT-QUICK-KEYS-IN-OPERATIONS
 
 - Change type: extension development
 - Status: implemented (v5), pending on-device verification
@@ -115,15 +115,17 @@ place whose buttons actually render an icon.
 - `tx_save_hint` got an id and defaults to `gone`, so the hint no longer shows in the virtual-key
   editor where "组合键气泡" does not exist.
 
-### 2. Combo bar has its own store (no longer shares QuickKeyStore)
+### 2. 全键盘快捷键 has its own store (no longer shares QuickKeyStore)
 
-`ComboKeyStore` (new) stores the combo bar entries in SharedPreferences `combo_axi_keyAssemble`
-(prefix `combo_assemble_key_`). One-shot migration copies the QuickKeyStore **user** entries
+`FullKeyboardKeyStore` (new; v6 renamed from `ComboKeyStore`) stores the 全键盘快捷键 entries in
+SharedPreferences `combo_axi_keyAssemble` (prefix `combo_assemble_key_`; both the pref name and the
+`axi_combo_keys` export type are kept verbatim so data written by earlier builds still loads).
+One-shot migration copies the QuickKeyStore **user** entries
 (seed group excluded, semantics unchanged) at first run, guarded by
 `combo_axi_keyAssemble_meta.migrated_from_quick_keys`, so an upgraded device shows exactly the
 same chips as before and the two lists are independent afterwards.
 `KeyBoardLayoutController.rebuildComboBar / openComboEditor / confirmDeleteCombo` now read and
-write `ComboKeyStore`.
+write `FullKeyboardKeyStore`.
 
 ### 3. One backup file for all three key stores, selective restore
 
@@ -142,7 +144,7 @@ write `ComboKeyStore`.
 - All **five** virtual-keyboard schemes and all **five** virtual-gamepad schemes are exported (the
   old Settings entry only exported the currently selected keyboard scheme). Schemes with no saved
   file are omitted (they are the default layout).
-- Import shows a checklist dialog (快捷键 / 组合键条 / 虚拟按键布局 / 虚拟手柄布局); only the
+- Import shows a checklist dialog (自定义快捷键 / 全键盘快捷键 / 虚拟按键布局 / 虚拟手柄布局); only the
   checked sections are restored, and restoring is an overwrite of that section. Unchecked sections
   keep their current content. The checklist is a hand-built `ScrollView` + `CheckBox` view, **not**
   `AlertDialog.setMultiChoiceItems`: combining `setMessage` with multi-choice items on some ROMs
@@ -175,12 +177,12 @@ discarded every caller's `setDimAmount(0.8f)` (the base class reads `mDimAmount`
 
 ### Files added in v5
 
-- `ComboKeyStore.java`, `AxiKeyBackup.java`
+- `FullKeyboardKeyStore.java`, `AxiKeyBackup.java`
 
 ### Files modified in v5
 
 - `GameKeyboardUpdateFragment.java` (scene flags, hint, dim), `GameFunctionFragment.java`
-  (`showIconPicker` + hint), `KeyBoardLayoutController.java` (ComboKeyStore + hint),
+  (`showIconPicker` + hint), `KeyBoardLayoutController.java` (FullKeyboardKeyStore + hint),
   `GameMenuFragment.java` (scheme copy), `QuickKeyStore.java` (`itemJson`/`parseItems` made
   reusable), `SettingsCatalog.java` (new 备份与恢复 › 按键配置 section),
   `StreamSettings.java` (unified export / selective import), `preferences.xml`,
@@ -204,4 +206,43 @@ discarded every caller's `setDimAmount(0.8f)` (the base class reads `mDimAmount`
   keyboard **and** gamepad schemes; selective import leaves unchecked sections alone; copying a
   scheme between slots (both kinds), including the default-layout source case; old export files
   still import.
+
+---
+
+## v6 changes (terminology + simplified keyboard, 2026-10-29)
+
+### 1. Terminology normalized around the three editors
+
+The three entry points into `GameKeyboardUpdateFragment` now share one vocabulary, in UI strings
+and in code comments:
+
+| Entry point | Editor title |
+|---|---|
+| 操作 › 自定义快捷键 | 添加自定义快捷键 / 编辑自定义快捷键 |
+| 全键盘顶栏 | 添加全键盘快捷键 / 编辑全键盘快捷键 |
+| 虚拟按键布局编辑 | 添加虚拟按键 |
+
+- "组合键条" is gone from UI, comments and docs; the feature is called **全键盘快捷键**.
+  `ComboKeyStore` was renamed to `FullKeyboardKeyStore` (new constant names
+  `PREF_FULL_KEYBOARD_*`), while every persisted identifier keeps its old value on purpose:
+  SharedPreferences `combo_axi_keyAssemble` / prefix `combo_assemble_key_`, and the export
+  `type: "axi_combo_keys"` plus the outer JSON key `"comboKeys"` (the parser also accepts
+  `"fullKeyboardKeys"` for files written during the transition).
+- The confirm dialog for deleting an entry reads 删除全键盘快捷键, and the editor hint is now
+  "保存后长按气泡可以编辑和删除" (the 组合键条 wording no longer appears).
+
+### 2. Simplified keyboard: one tall Enter instead of two
+
+`item_layout_axixi_keyboard_simple.xml` used to have two Enter keys - row 3's (weight 150) and the
+one added in `7ddcf14a` at the end of row 4 (weight 100) - which looked like two separate,
+differently sized keys stacked at the right edge.
+
+Rows 3 and 4 are now wrapped in one horizontal container (`weight=2` inside `ll_simple_keys`, so
+the row heights are unchanged); the left part is a vertical container holding both rows
+(`weight=1` each), and a single Enter occupies the right column (`weight=150`, `match_parent`
+height), so it visually spans both rows. `KeyBoardLayoutController.bindKeys` walks the tree
+recursively, so the extra nesting needs no binding change; the digitpad already used the same
+"跨行回车" pattern. Row 4's remaining keys are ~3.7% narrower because the left column is now
+1440-150 instead of 1440-100, and both rows end flush at the Enter's left edge.
+
 

@@ -699,6 +699,20 @@
             </FrameLayout>
         </LinearLayout>
 
+        <!-- 第 3、4 行共用右侧的大回车：两行整体包一层横向容器，回车单独成一列跨两行，
+             避免出现两个宽度不一致、上下分开的回车键。 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1290"
+                android:orientation="vertical">
+
         <!-- 第 3 行 -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -918,21 +932,6 @@
                     android:textSize="9sp" />
             </FrameLayout>
 
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="150">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/bg_ax_key_mod"
-                    android:gravity="center"
-                    android:tag="66"
-                    android:text="回车"
-                    android:textColor="@android:color/white"
-                    android:textSize="11sp" />
-            </FrameLayout>
         </LinearLayout>
 
         <!-- 第 4 行 -->
@@ -1163,10 +1162,15 @@
                     android:textColor="@android:color/white"
                     android:textSize="13sp" />
             </FrameLayout>
+        </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 跨第 3、4 行的大回车键（原有两个回车已合并到这里） -->
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="100">
+                android:layout_weight="150">
 
                 <TextView
                     android:layout_width="match_parent"

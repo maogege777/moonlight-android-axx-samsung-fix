@@ -73,7 +73,7 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
     private String selectedIcon;
     private LinearLayout iconPickerContainer;
     // 是否显示图标选择行：只有「操作 › 自定义快捷键」需要（按钮按图标 + 组合键显示）。
-    // 组合键条与虚拟按键的组合键只用文字，不显示图标选择。
+    // 全键盘快捷键与虚拟按键只用文字，不显示图标选择。
     private boolean showIconPicker;
     // 底部橙色提示文案（null / 空 = 不显示），由调用方按场景决定。
     private String hintText;
@@ -313,7 +313,7 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
     private void buildIconPicker(View root) {
         iconPickerContainer = root.findViewById(R.id.lv_icon_picker);
         // 是否显示图标行由调用方按场景决定（showIconPicker），不再用 keyFrom 判断：
-        // keyFrom 表示“自定义快捷键语义”，而组合键条同样走 keyFrom==1，却不需要图标。
+        // keyFrom 表示“自定义快捷键语义”，而全键盘快捷键同样走 keyFrom==1，却不需要图标。
         View iconRow = root.findViewById(R.id.ll_icon_picker);
         if (iconRow != null) {
             if (!showIconPicker) {
@@ -379,7 +379,7 @@ public class GameKeyboardUpdateFragment extends BaseGameMenuDialog implements Vi
         }
     }
 
-    /** 底部橙色提示按场景显示：自定义快捷键面板与组合键条各自一句，虚拟按键面板不显示。 */
+    /** 底部橙色提示按场景显示：自定义快捷键面板与全键盘快捷键各自一句，虚拟按键面板不显示。 */
     private void applyHintText(View root) {
         TextView hint = root.findViewById(R.id.tx_save_hint);
         if (hint == null) {

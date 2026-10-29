@@ -209,7 +209,7 @@ public class KeyBoardController {
             }else{
                 fragment.setWidth((context.getResources().getDisplayMetrics().heightPixels*2)/3);
             }
-            fragment.setTitle("组合键");
+            fragment.setTitle("添加虚拟按键");
             fragment.setOnClick(bean -> {
                 LimeLog.info("axi->组合键:"+new Gson().toJson(bean));
                 addItem(bean);

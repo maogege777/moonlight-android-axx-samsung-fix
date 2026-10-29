@@ -1,4 +1,4 @@
-package com.limelight.ui.gamemenu;
+﻿package com.limelight.ui.gamemenu;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * 三处按键数据的统一备份层：
  *  - 自定义快捷键（QuickKeyStore，含默认组）
- *  - 组合键条（ComboKeyStore，独立存储）
+ *  - 全键盘快捷键（FullKeyboardKeyStore，独立存储）
  *  - 虚拟按键 5 个布局方案（files/axi_<方案值>.txt）
  *
  * 导出为单一文件，导入时可勾选要恢复的部分（见 {@link #SECTION_*}）。
@@ -45,10 +45,10 @@ public final class AxiKeyBackup {
     public static final int VERSION = 1;
 
     public static final int SECTION_QUICK_KEYS = 1;
-    public static final int SECTION_COMBO_KEYS = 2;
+    public static final int SECTION_FULL_KEYBOARD_KEYS = 2;
     public static final int SECTION_LAYOUTS = 4;
     public static final int SECTION_GAMEPAD_LAYOUTS = 8;
-    public static final int SECTION_ALL = SECTION_QUICK_KEYS | SECTION_COMBO_KEYS
+    public static final int SECTION_ALL = SECTION_QUICK_KEYS | SECTION_FULL_KEYBOARD_KEYS
             | SECTION_LAYOUTS | SECTION_GAMEPAD_LAYOUTS;
 
     private AxiKeyBackup() {
@@ -67,7 +67,8 @@ public final class AxiKeyBackup {
             String quickJson = QuickKeyStore.exportJson(context);
             root.put("quickKeys", new JSONObject(quickJson));
 
-            String comboJson = ComboKeyStore.exportJson(context);
+            String comboJson = FullKeyboardKeyStore.exportJson(context);
+            // 字段名沿用 "comboKeys"：已经导出的文件用的是这个名字，改名会导致旧备份读不进来。
             root.put("comboKeys", new JSONObject(comboJson));
 
             JSONObject layouts = new JSONObject();
@@ -110,7 +111,7 @@ public final class AxiKeyBackup {
     public static final class BackupData {
         public int sections;
         public List<GameMenuQuickBean> quickKeys = new ArrayList<>();
-        public List<GameMenuQuickBean> comboKeys = new ArrayList<>();
+        public List<GameMenuQuickBean> fullKeyboardKeys = new ArrayList<>();
         /** 方案值 → 布局 JSON（原样保存，还原时直接落盘）。 */
         public final Map<String, String> layouts = new LinkedHashMap<>();
         public final Map<String, String> gamepadLayouts = new LinkedHashMap<>();
@@ -150,10 +151,13 @@ public final class AxiKeyBackup {
                     }
                 }
                 JSONObject combo = root.optJSONObject("comboKeys");
+                if (combo == null) {
+                    combo = root.optJSONObject("fullKeyboardKeys"); // 兼容过渡期写出的字段名
+                }
                 if (combo != null) {
-                    data.comboKeys = QuickKeyStore.parseItems(combo.optJSONArray("data"),
-                            ComboKeyStore.PREF_COMBO_LIST_KEY);
-                    data.sections |= SECTION_COMBO_KEYS;
+                    data.fullKeyboardKeys = QuickKeyStore.parseItems(combo.optJSONArray("data"),
+                            FullKeyboardKeyStore.PREF_FULL_KEYBOARD_LIST_KEY);
+                    data.sections |= SECTION_FULL_KEYBOARD_KEYS;
                 }
                 JSONObject layouts = root.optJSONObject("keyboardLayouts");
                 if (layouts != null) {
@@ -199,10 +203,10 @@ public final class AxiKeyBackup {
                 return data;
             }
 
-            if (ComboKeyStore.EXPORT_TYPE.equals(type)) {
-                data.comboKeys = QuickKeyStore.parseItems(root.optJSONArray("data"),
-                        ComboKeyStore.PREF_COMBO_LIST_KEY);
-                data.sections = SECTION_COMBO_KEYS;
+            if (FullKeyboardKeyStore.EXPORT_TYPE.equals(type)) {
+                data.fullKeyboardKeys = QuickKeyStore.parseItems(root.optJSONArray("data"),
+                        FullKeyboardKeyStore.PREF_FULL_KEYBOARD_LIST_KEY);
+                data.sections = SECTION_FULL_KEYBOARD_KEYS;
                 return data;
             }
             return null;
@@ -221,8 +225,8 @@ public final class AxiKeyBackup {
         if ((sections & SECTION_QUICK_KEYS) != 0) {
             QuickKeyStore.replaceAllCustom(context, data.quickKeys);
         }
-        if ((sections & SECTION_COMBO_KEYS) != 0) {
-            ComboKeyStore.replaceAll(context, data.comboKeys);
+        if ((sections & SECTION_FULL_KEYBOARD_KEYS) != 0) {
+            FullKeyboardKeyStore.replaceAll(context, data.fullKeyboardKeys);
         }
         if ((sections & SECTION_LAYOUTS) != 0) {
             restoreLayouts(context, data.layouts, false, data.keyboardScheme);
