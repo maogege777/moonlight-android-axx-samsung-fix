@@ -258,8 +258,16 @@ make them read as one down-facing L:
   50 units further left than the leg; all corners except the one that meets the leg's right edge
   are rounded (5dp), including the bottom-left corner at the step.
 - `bg_ax_key_enter_bottom.xml`: 2dp inset on left/right/bottom, **no top inset**; 100 wide, flush
-  with the far right edge, so `↑` stays exactly above `↓`; top-left, bottom-left and bottom-right
-  rounded, top-right square where it meets the wide half.
+  with the far right edge, so `↑` stays exactly above `↓`; the bottom two corners are rounded,
+  **both top corners are square** - the top edge must stay flush with the wide half above it.
+
+Why the inner (9 o'clock) corner is square: a real fillet there would have to *add* material
+outside the leg's rectangle (the gap between the wide half's underside and the leg's left edge),
+and a shape/layer-list drawable is clipped to its view bounds and can only cut corners. Rounding
+the leg's top-left instead (tried) simply cuts a 5dp notch, which reads as a gap on device. If a
+rounded inner corner is ever required, it needs either a self-drawn/vector L path on a single
+overlay view, or an extra small circular view parked at the junction (and wired into the
+split-Enter press state).
 - The label `Enter` is only on the wide top half.
 
 Because they are still two views, `KeyBoardLayoutController.keyDown / keyUp` now also updates every
