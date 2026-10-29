@@ -186,148 +186,343 @@
         android:layout_weight="100"
         android:orientation="horizontal">
 
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="90"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="68"
-            android:text="~`"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="90">
 
-        <TextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="68"
+                android:text="`"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="~"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="8"
-            android:text="1"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="8"
+                android:text="1"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="!"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
         <!-- 继续更新其他 TextView 的 android:tag 值 -->
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="9"
-            android:text="2"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
 
-        <TextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="9"
+                android:text="2"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="@"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="10"
-            android:text="3"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="10"
+                android:text="3"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="#"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
         <!-- 以此类推，更新其他 TextView 的 android:tag 值 -->
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="11"
-            android:text="4"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="12"
-            android:text="5"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="11"
+                android:text="4"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="13"
-            android:text="6"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="$"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
 
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="14"
-            android:text="7"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="15"
-            android:text="8"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="12"
+                android:text="5"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="16"
-            android:text="9"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="%"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
 
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="7"
-            android:text="0"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="69"
-            android:text="_-"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="13"
+                android:text="6"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
 
-        <TextView
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="^"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="70"
-            android:text="+="
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="14"
+                android:text="7"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="&amp;"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="15"
+                android:text="8"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="*"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="16"
+                android:text="9"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="("
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="7"
+                android:text="0"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text=")"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="69"
+                android:text="-"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="_"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="70"
+                android:text="="
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="+"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
 
         <TextView
             android:layout_width="0dp"
@@ -468,38 +663,83 @@
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="71"
-            android:text="{["
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="72"
-            android:text="}]"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="71"
+                android:text="["
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
 
-        <TextView
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="{"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="73"
-            android:text="|\\"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="72"
+                android:text="]"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="}"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="73"
+                android:text="\"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="|"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -618,27 +858,57 @@
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="74"
-            android:text=":;"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
 
-        <TextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="74"
+                android:text=";"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text=":"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="75"
-            android:text="&quot;'"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="75"
+                android:text="'"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="&quot;"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
 
         <TextView
             android:layout_width="0dp"
@@ -746,38 +1016,83 @@
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 
-        <TextView
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="55"
-            android:text="&lt;,"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="56"
-            android:text=">."
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="55"
+                android:text=","
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
 
-        <TextView
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="&lt;"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100"
-            android:background="@drawable/bg_ax_key_sym"
-            android:gravity="center"
-            android:tag="76"
-            android:text="&#63;/"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="56"
+                android:text="."
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="&gt;"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_ax_key_sym"
+                android:gravity="center"
+                android:tag="76"
+                android:text="/"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:text="?"
+                android:textColor="#8CA0BC"
+                android:textSize="8sp" />
+        </FrameLayout>
 
         <TextView
             android:layout_width="0dp"

@@ -453,8 +453,8 @@ public class KeyBoardLayoutController {
         digit.setVisibility(checkedId == R.id.rbt_keyboard_2 ? View.VISIBLE : View.GONE);
         simple.setVisibility(isSimple ? View.VISIBLE : View.GONE);
 
-        // 简化键盘两侧是空白（触摸板），根容器必须透明才"浮动"；其他模式保留深色底板
-        keyboardView.setBackgroundColor(isSimple ? Color.TRANSPARENT : 0xFF212121);
+        // 三种模式共用同一块深色底板：顶栏、触摸板、键块连成一体，不再分区块
+        keyboardView.setBackgroundColor(0xFF212121);
 
         // 位置气泡只在简化键盘下才有意义
         btnTypingAlign.setVisibility(isSimple ? View.VISIBLE : View.GONE);
@@ -570,6 +570,14 @@ public class KeyBoardLayoutController {
         keyboardView.findViewById(R.id.lv_keyboard_digitpad).setLayoutParams(params1);
 
         keyboardView.findViewById(R.id.lv_keyboard_simple).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip2px(context, height)));
+
+        // 简化键盘键块宽度：按设计放大到 780dp（原来的 1.5 倍），窄屏时最多占屏宽 - 48dp，保证两侧触摸板还在
+        int simpleWidth = Math.min(dip2px(context, 780),
+                context.getResources().getDisplayMetrics().widthPixels - dip2px(context, 48));
+        View simpleKeys = keyboardView.findViewById(R.id.ll_simple_keys);
+        if (simpleKeys != null) {
+            simpleKeys.setLayoutParams(new LinearLayout.LayoutParams(simpleWidth, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
 
 
         keyboardView.setAlpha(prefConfig.oscKeyboardOpacity/100f);
