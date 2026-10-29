@@ -258,58 +258,45 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_simple_mini), 1f);
 
 
-        keyboardView.findViewById(R.id.mouse_up).setOnTouchListener(new View.OnTouchListener() {
-            private Runnable repeater = new Runnable() {
-                @Override
-                public void run() {
-                    Game.instance.mouseHighResScroll(true);
-                    keyboardView.findViewById(R.id.mouse_up).postDelayed(this, 100);
-                }
-            };
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        vibrateTap();
-                        keyboardView.findViewById(R.id.mouse_up).post(repeater);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        keyboardView.findViewById(R.id.mouse_up).removeCallbacks(repeater);
-                        return true;
-                }
-                return false;
-            }
-        });
-
-        keyboardView.findViewById(R.id.mouse_down).setOnTouchListener(new View.OnTouchListener() {
-            private Runnable repeater = new Runnable() {
-                @Override
-                public void run() {
-                    Game.instance.mouseHighResScroll(false);
-                    keyboardView.findViewById(R.id.mouse_down).postDelayed(this, 100);
-                }
-            };
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        vibrateTap();
-                        keyboardView.findViewById(R.id.mouse_down).post(repeater);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        keyboardView.findViewById(R.id.mouse_down).removeCallbacks(repeater);
-                        return true;
-                }
-                return false;
-            }
-        });
-
+        bindScrollButton(keyboardView.findViewById(R.id.mouse_up), true);
+        bindScrollButton(keyboardView.findViewById(R.id.mouse_down), false);
+        bindScrollButton(keyboardView.findViewById(R.id.simple_scroll_up), true);
+        bindScrollButton(keyboardView.findViewById(R.id.simple_scroll_down), false);
     }
 
+    /** 滚轮键：按下连发（100ms 一次），抬手停止，按下时震一次。 */
+    private void bindScrollButton(View btn, final boolean up) {
+        if (btn == null) {
+            return;
+        }
+        btn.setOnTouchListener(new View.OnTouchListener() {
+            private final Runnable repeater = new Runnable() {
+                @Override
+                public void run() {
+                    if (Game.instance != null) {
+                        Game.instance.mouseHighResScroll(up);
+                    }
+                    btn.postDelayed(this, 100);
+                }
+            };
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        vibrateTap();
+                        btn.post(repeater);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        btn.removeCallbacks(repeater);
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
     // ---------------------------------------------------------------- 键面配色 / 按键绑定
 
     /**

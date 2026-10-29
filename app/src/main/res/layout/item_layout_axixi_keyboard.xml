@@ -545,7 +545,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="140"
+            android:layout_weight="200"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="61"
@@ -666,7 +666,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -692,7 +692,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -718,7 +718,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -751,7 +751,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="170"
+            android:layout_weight="230"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="115"
@@ -861,7 +861,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -887,7 +887,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -913,7 +913,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="170"
+            android:layout_weight="150"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="66"
@@ -931,7 +931,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="200"
+            android:layout_weight="300"
             android:background="@drawable/bg_ax_key_mod"
             android:gravity="center"
             android:tag="59"
@@ -1019,7 +1019,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -1045,7 +1045,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -1071,7 +1071,7 @@
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="100">
+            android:layout_weight="80">
 
             <TextView
                 android:layout_width="match_parent"
@@ -1097,7 +1097,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="120"
+            android:layout_weight="100"
             android:background="@drawable/bg_ax_key_alpha"
             android:gravity="center"
             android:tag="19"
@@ -1109,7 +1109,7 @@
             android:id="@+id/fv_keyboard_touch_mini"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="120"
+            android:layout_weight="100"
             android:background="@drawable/bg_ax_touchpad" />
     </LinearLayout>
 
