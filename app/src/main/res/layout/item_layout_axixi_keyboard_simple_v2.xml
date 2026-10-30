@@ -102,13 +102,13 @@
             </FrameLayout>
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout android:id="@+id/ll_v2_ops" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal">
+    <LinearLayout android:id="@+id/ll_v2_ops" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_marginLeft="8dp" android:layout_marginRight="8dp" android:orientation="horizontal">
         <LinearLayout android:id="@+id/ll_v2_mouse" android:layout_width="56dp" android:layout_height="match_parent" android:orientation="vertical">
             <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_ax_key_num" android:gravity="center" android:tag="mouse_2" android:text="中键" android:textColor="@android:color/white" android:textSize="11sp" />
             <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_ax_key_num" android:gravity="center" android:tag="mouse_1" android:text="左键" android:textColor="@android:color/white" android:textSize="11sp" />
             <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_ax_key_num" android:gravity="center" android:tag="mouse_3" android:text="右键" android:textColor="@android:color/white" android:textSize="11sp" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/ll_v2_pad" android:layout_width="92dp" android:layout_height="match_parent" android:orientation="vertical">
+        <LinearLayout android:id="@+id/ll_v2_pad" android:layout_width="76dp" android:layout_height="match_parent" android:orientation="vertical">
             <TextView android:id="@+id/v2_scroll_up" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_ax_key_num" android:gravity="center" android:text="滚轮⬆" android:textColor="@android:color/white" android:textSize="11sp" />
             <TextView android:id="@+id/v2_scroll_down" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_ax_key_num" android:gravity="center" android:text="滚轮⬇" android:textColor="@android:color/white" android:textSize="11sp" />
             <com.limelight.ui.gamemenu.TouchPadView android:id="@+id/fv_keyboard_touch_v2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="3" android:background="@drawable/bg_ax_touchpad" />
@@ -116,35 +116,35 @@
     </LinearLayout>
     <LinearLayout android:id="@+id/ll_v2_right" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="760" android:orientation="vertical">
         <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="96">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="13" android:text="6" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="^" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="96">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="14" android:text="7" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="&amp;" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="96">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="15" android:text="8" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="*" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="96">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="16" android:text="9" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="(" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="96">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="7" android:text="0" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text=")" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="70">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="60">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="69" android:text="-" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="_" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="75">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="70">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="70" android:text="=" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="+" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="115">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="150">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_mod" android:gravity="center" android:tag="67" android:text="⌫" android:textColor="@android:color/white" android:textSize="13sp" />
             </FrameLayout>
         </LinearLayout>
