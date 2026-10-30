@@ -476,16 +476,17 @@
 
                     <TextView
                         android:id="@+id/tx_kb_variant_full_no"
-                        android:layout_width="11dp"
-                        android:layout_height="11dp"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
                         android:layout_gravity="top|right"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginRight="3dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginRight="1dp"
                         android:background="@drawable/bg_kb_variant_badge"
                         android:gravity="center"
                         android:includeFontPadding="false"
-                        android:textColor="#D7E4F7"
+                        android:textColor="#FFFFFF"
                         android:textSize="7dp"
+                        android:textStyle="bold"
                         android:visibility="gone" />
                 </FrameLayout>
 
@@ -509,16 +510,17 @@
 
                     <TextView
                         android:id="@+id/tx_kb_variant_simple_no"
-                        android:layout_width="11dp"
-                        android:layout_height="11dp"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
                         android:layout_gravity="top|right"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginRight="3dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginRight="1dp"
                         android:background="@drawable/bg_kb_variant_badge"
                         android:gravity="center"
                         android:includeFontPadding="false"
-                        android:textColor="#D7E4F7"
+                        android:textColor="#FFFFFF"
                         android:textSize="7dp"
+                        android:textStyle="bold"
                         android:visibility="gone" />
                 </FrameLayout>
 
@@ -541,16 +543,17 @@
 
                     <TextView
                         android:id="@+id/tx_kb_variant_digitpad_no"
-                        android:layout_width="11dp"
-                        android:layout_height="11dp"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
                         android:layout_gravity="top|right"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginRight="3dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginRight="1dp"
                         android:background="@drawable/bg_kb_variant_badge"
                         android:gravity="center"
                         android:includeFontPadding="false"
-                        android:textColor="#D7E4F7"
+                        android:textColor="#FFFFFF"
                         android:textSize="7dp"
+                        android:textStyle="bold"
                         android:visibility="gone" />
                 </FrameLayout>
             </LinearLayout>
