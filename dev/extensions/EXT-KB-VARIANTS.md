@@ -56,8 +56,8 @@
 - chip：`FrameLayout` 包一层，底 `TextView` + 角标 `TextView`
 - 点亮：`ic_game_menu_btn_green_selector` + 白字粗体 + 角标显示序号
 - 熄灭：`ic_game_menu_btn_selector` + `#9AA0A6` 常规字重 + 无角标
-- 角标：11dp 圆形、`#26FFFFFF`、7dp 浅蓝字，位于 chip 内部右上角（`top:2dp right:3dp`），
-  chip 设 `overflow:hidden` 语义上保证不出框
+- 角标：12dp 圆形、`#59000000`（35% 黑，白字可辨但不抢视线）、7dp 白色粗体字，
+  位于 chip 内部右上角（`top:1dp right:1dp`），chip 设 `overflow:hidden` 语义上保证不出框
 
 ## 文案
 
