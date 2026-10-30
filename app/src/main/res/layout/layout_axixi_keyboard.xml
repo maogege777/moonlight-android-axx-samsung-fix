@@ -50,7 +50,7 @@
                 android:layout_width="1dp"
                 android:layout_height="1dp"
                 android:button="@null"
-                android:text="简化v2" />
+                android:text="分离式键盘" />
             <!-- EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END -->
         </RadioGroup>
 

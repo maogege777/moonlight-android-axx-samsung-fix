@@ -309,10 +309,8 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         bindScrollButton(keyboardView.findViewById(R.id.simple_scroll_up), true);
         bindScrollButton(keyboardView.findViewById(R.id.simple_scroll_down), false);
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
-        // 简化v2 的中间操作区：触摸板 + 滚轮上下（id 与另外两套布局不重复）
+        // 分离式键盘的中间操作区：触摸板单独绑定；上方六个导航键带 tag，走 bindKeys 的通用监听
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_v2), 1f);
-        bindScrollButton(keyboardView.findViewById(R.id.v2_scroll_up), true);
-        bindScrollButton(keyboardView.findViewById(R.id.v2_scroll_down), false);
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] END
     }
 
@@ -413,7 +411,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             return;
         }
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
-        // 同步范围只看「v 所在的那套布局」：简化键盘与简化v2 都有 tag 66 的上下两段，
+        // 同步范围只看「v 所在的那套布局」：简化键盘与分离式键盘都有 tag 66 的上下两段，
         // 原来写死 lv_keyboard_simple 会把变色同步到另一套（不可见的）布局上。
         ViewGroup container = keyboardContainerOf(v);
         if (container == null) {
@@ -486,11 +484,6 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             if (child.getId() == R.id.mouse_up || child.getId() == R.id.mouse_down) {
                 continue;
             }
-            // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
-            if (child.getId() == R.id.v2_scroll_up || child.getId() == R.id.v2_scroll_down) {
-                continue;
-            }
-            // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
             if (child instanceof ViewGroup) {
                 bindKeys((ViewGroup) child, listener);
             } else if (child.getTag() instanceof String) {
@@ -637,7 +630,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         }
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
         if (checkedId == R.id.rbt_keyboard_simple_v2) {
-            return "简化v2";
+            return "分离式键盘";
         }
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
         if (checkedId == R.id.rbt_keyboard_3) {
@@ -707,7 +700,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 //        params.leftMargin = 20 + buttonSize;
 //        params.topMargin = 15;
 
-        // 全键盘保持原高度；简化键盘 / 简化v2 / 数字键盘各矮一个 F 行（约 33dp）
+        // 全键盘保持原高度；简化键盘 / 分离式键盘 / 数字键盘各矮一个 F 行（约 33dp）
         int fullH = dip2px(context, height);
         int shortH = Math.max(dip2px(context, 110), fullH - dip2px(context, 33));
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, fullH);
@@ -738,7 +731,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         }
 
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
-        // 简化v2：左右半区用固定权重（645 / 760）分掉剩余宽度，只有中间操作区需要按像素设置。
+        // 分离式键盘：左右半区用固定权重（645 / 760）分掉剩余宽度，只有中间操作区需要按像素设置。
         // 操作区两侧各有 8dp 间隔（XML 里的 margin），这部分宽度是从触摸板列让出来的，
         // 所以触摸板列基数取 76dp 而不是 92dp，总占用仍是 56 + 76 + 8*2 = 148dp。
         // 操作区沿用简化键盘那套「屏越宽越宽」的规则，避免平板上触摸板反而比简化键盘小。
@@ -760,7 +753,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
     }
 
     // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
-    /** 只改列宽，保留 XML 里的高度与其它布局属性（简化v2 的中间操作区）。 */
+    /** 只改列宽，保留 XML 里的高度与其它布局属性（分离式键盘的中间操作区）。 */
     private void setColumnWidth(View column, int widthPx) {
         if (column == null || column.getLayoutParams() == null) {
             return;

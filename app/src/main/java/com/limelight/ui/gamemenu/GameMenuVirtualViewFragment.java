@@ -83,7 +83,7 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
 
     // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
     // 全键盘布局启停：四个 chip 与 KeyboardVariantStore.ALL 一一对应
-    // （电脑全键盘 / 简化键盘 / 简化v2 / 数字键盘），顺序必须与 ALL 保持一致
+    // （电脑全键盘 / 简化键盘 / 分离式键盘 / 数字键盘），顺序必须与 ALL 保持一致
     private static final int[] KB_VARIANT_CHIP_IDS = {
             R.id.kb_variant_full, R.id.kb_variant_simple,
             R.id.kb_variant_simplev2, R.id.kb_variant_digitpad};

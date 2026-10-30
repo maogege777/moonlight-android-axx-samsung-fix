@@ -524,7 +524,7 @@
                         android:visibility="gone" />
                 </FrameLayout>
 
-                <!-- 简化v2：左右分离 + 中间鼠标/滚轮/触摸板 -->
+                <!-- 分离式键盘：左右分离 + 中间导航键/鼠标/触摸板 -->
                 <FrameLayout
                     android:id="@+id/kb_variant_simplev2"
                     android:layout_width="0dp"
@@ -538,7 +538,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="简化v2"
+                        android:text="分离式键盘"
                         android:textColor="#9AA0A6"
                         android:textSize="10dp" />
 
