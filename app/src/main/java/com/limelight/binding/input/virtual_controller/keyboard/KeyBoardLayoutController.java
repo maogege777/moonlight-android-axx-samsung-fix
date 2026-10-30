@@ -326,11 +326,19 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         vibrateTap();
+                        // EXTENSION DEVELOPMENT [EXT-KB-WHEEL-PRESSED] [MODIFIED] BEGIN
+                        // 滚轮键自带监听，不经过 bindKeys 的触摸监听，原本没有按压态；
+                        // 复用普通按键的 keyDown/keyUp，按下高亮、抬手（或取消）还原配色。
+                        keyDown(btn);
+                        // EXTENSION DEVELOPMENT [EXT-KB-WHEEL-PRESSED] [MODIFIED] END
                         btn.post(repeater);
                         return true;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
                         btn.removeCallbacks(repeater);
+                        // EXTENSION DEVELOPMENT [EXT-KB-WHEEL-PRESSED] [MODIFIED] BEGIN
+                        keyUp(btn);
+                        // EXTENSION DEVELOPMENT [EXT-KB-WHEEL-PRESSED] [MODIFIED] END
                         return true;
                 }
                 return false;
