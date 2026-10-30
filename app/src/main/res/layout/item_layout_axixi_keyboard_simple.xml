@@ -4,7 +4,8 @@
     左侧 64dp 鼠标三键；右侧上方两格是滚轮，下方是触摸板。
     字母键 100 -> 110（+10%），空间来自左修饰与尾部符号键：
       Tab 200 -> 130、Caps 230 -> 160、Shift 300 -> 240；
-      [ ] \ ; ' 80 -> 70；本行 , . / 吸收 ↑ 让出的 20，改为 77 / 77 / 76；
+      [ ] \ ; ' 80 -> 70；本行 , . / 回到 70 / 70 / 69；
+      字母键 100 -> 110，本行（ZXCV…M）再吃下 ↑ 让出的 20，统一为 113；
       ↑ 保持 100，与下一行 ↓ 同宽且严格对齐（1240..1340）。
     各行总权重统一为 1440（数字行由 1530 归一，再把 ⌫ 加长到 150 与下方回车上下对齐：
     Esc 90 -> 75、` 90 -> 70、- 100 -> 70、= 100 -> 75、⌫ 150 -> 120 -> 150），
@@ -969,7 +970,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="110">
+                android:layout_weight="113">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -985,7 +986,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="110">
+                android:layout_weight="113">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1001,7 +1002,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="110">
+                android:layout_weight="113">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1017,7 +1018,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="110">
+                android:layout_weight="113">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1033,7 +1034,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="110">
+                android:layout_weight="113">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1049,7 +1050,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="110">
+                android:layout_weight="113">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1065,7 +1066,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="110">
+                android:layout_weight="113">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1081,7 +1082,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="77">
+                android:layout_weight="70">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1107,7 +1108,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="77">
+                android:layout_weight="70">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1133,7 +1134,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="76">
+                android:layout_weight="69">
 
                 <TextView
                     android:layout_width="match_parent"
