@@ -1,5 +1,6 @@
 package com.limelight.ui.gamemenu;
 
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
@@ -14,9 +15,12 @@ import android.widget.Toast;
 import com.limelight.R;
 import com.limelight.binding.input.virtual_controller.VirtualController;
 import com.limelight.binding.input.virtual_controller.keyboard.KeyBoardController;
+import com.limelight.binding.input.virtual_controller.keyboard.KeyboardVariantStore;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.ui.BaseFragmentDialog.BaseGameMenuDialog;
 import com.limelight.utils.UiHelper;
+
+import java.util.List;
 
 import static com.limelight.binding.input.virtual_controller.keyboard.KeyBoardControllerConfigurationLoader.OSC_GAMEPAD_PREFERENCE;
 import static com.limelight.binding.input.virtual_controller.keyboard.KeyBoardControllerConfigurationLoader.OSC_GAMEPAD_PREFERENCE_VALUE;
@@ -77,6 +81,20 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
 
     private RadioGroup rg_game_virtual_key_color;
 
+    // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
+    // 全键盘布局启停：三个 chip 与 KeyboardVariantStore.ALL 一一对应（电脑全键盘 / 简化键盘 / 数字键盘）
+    private static final int[] KB_VARIANT_CHIP_IDS = {
+            R.id.kb_variant_full, R.id.kb_variant_simple, R.id.kb_variant_digitpad};
+    private static final int[] KB_VARIANT_LABEL_IDS = {
+            R.id.tx_kb_variant_full, R.id.tx_kb_variant_simple, R.id.tx_kb_variant_digitpad};
+    private static final int[] KB_VARIANT_BADGE_IDS = {
+            R.id.tx_kb_variant_full_no, R.id.tx_kb_variant_simple_no, R.id.tx_kb_variant_digitpad_no};
+
+    private final View[] kbVariantChips = new View[3];
+    private final TextView[] kbVariantLabels = new TextView[3];
+    private final TextView[] kbVariantBadges = new TextView[3];
+    // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END
+
     private KeyBoardController.ControllerMode gamePadMode;
     private KeyBoardController.ControllerMode gameKeyMode;
 
@@ -113,6 +131,18 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         rg_game_virtual_pad_key=v.findViewById(R.id.rg_game_virtual_key);
 
         rg_game_virtual_key_color=v.findViewById(R.id.rg_game_virtual_key_color);
+
+        // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
+        for (int i = 0; i < KB_VARIANT_CHIP_IDS.length; i++) {
+            kbVariantChips[i] = v.findViewById(KB_VARIANT_CHIP_IDS[i]);
+            kbVariantLabels[i] = v.findViewById(KB_VARIANT_LABEL_IDS[i]);
+            kbVariantBadges[i] = v.findViewById(KB_VARIANT_BADGE_IDS[i]);
+            if (kbVariantChips[i] != null) {
+                kbVariantChips[i].setOnClickListener(this);
+            }
+        }
+        renderKbVariants();
+        // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END
 
         sb_gamepad_scale_factor=v.findViewById(R.id.sb_gamepad_scale_factor);
         tx_gamepad_scale_factor=v.findViewById(R.id.tx_gamepad_scale_factor);
@@ -397,6 +427,40 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         btn_vibration_strength.setText("震感强度\n" + prefConfig.vibratePressMs + "ms");
     }
 
+    // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
+    /**
+     * 刷新全键盘布局启停按钮：点亮 = 启用（绿底 + 白字粗体 + 顺序角标），
+     * 角标数字就是顶栏「布局 ▾」按钮每次点击的切换顺序。
+     */
+    private void renderKbVariants() {
+        if (getActivity() == null) {
+            return;
+        }
+        List<String> enabled = KeyboardVariantStore.getEnabled(getActivity());
+        for (int i = 0; i < KB_VARIANT_CHIP_IDS.length; i++) {
+            String variant = KeyboardVariantStore.ALL[i];
+            int index = enabled.indexOf(variant);
+            boolean on = index >= 0;
+
+            if (kbVariantChips[i] != null) {
+                kbVariantChips[i].setBackgroundResource(on
+                        ? R.drawable.ic_game_menu_btn_green_selector
+                        : R.drawable.ic_game_menu_btn_selector);
+            }
+            if (kbVariantLabels[i] != null) {
+                kbVariantLabels[i].setTextColor(on ? 0xFFFFFFFF : 0xFF9AA0A6);
+                kbVariantLabels[i].setTypeface(null, on ? Typeface.BOLD : Typeface.NORMAL);
+            }
+            if (kbVariantBadges[i] != null) {
+                kbVariantBadges[i].setVisibility(on ? View.VISIBLE : View.GONE);
+                if (on) {
+                    kbVariantBadges[i].setText(String.valueOf(index + 1));
+                }
+            }
+        }
+    }
+    // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END
+
     private void initViewHeight(){
         sb_height_keyboard_all.setProgress(prefConfig.oscKeyboardHeight);
         tx_height_keyboard_all.setText("高度："+prefConfig.oscKeyboardHeight);
@@ -422,6 +486,21 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
             dismiss();
             return;
         }
+
+        // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
+        for (int i = 0; i < KB_VARIANT_CHIP_IDS.length; i++) {
+            if (v.getId() != KB_VARIANT_CHIP_IDS[i]) {
+                continue;
+            }
+            // 至少保留一种：只剩一个时再点它会被拒绝，状态不变
+            if (KeyboardVariantStore.toggle(getActivity(), KeyboardVariantStore.ALL[i]) == null) {
+                Toast.makeText(getActivity(), "至少要保留一种键盘布局", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            renderKbVariants();
+            return;
+        }
+        // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END
 
         if(v.getId()==R.id.btn_right){
             if(onClick!=null){

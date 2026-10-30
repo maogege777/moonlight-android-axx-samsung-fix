@@ -283,11 +283,12 @@ public class KeyBoardLayoutController {
         rg_keyboard = keyboardView.findViewById(R.id.rg_keyboard);
         tvMode = keyboardView.findViewById(R.id.btn_keyboard_mode);
 
-        // 顶栏「布局 ▾」：每点一次在 简化 -> 全键盘 -> 数字 之间循环
+        // 顶栏「布局 ▾」：在菜单里点亮的布局之间按点亮顺序循环（EXT-KB-VARIANTS）
         tvMode.setOnClickListener(v -> cycleMode());
         attachTopBarHaptic(tvMode);
 rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(checkedId));
-        rg_keyboard.check(R.id.rbt_keyboard_3);
+        // 首次显示取「已启用」列表的第一个（新装与老用户此时都是简化键盘）
+        ensureEnabledMode();
         // 两块触摸板都按 1:1 位移，和数字键盘手感一致
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch), 1f);
         bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_mini), 1f);
@@ -493,19 +494,61 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
     }
     // ---------------------------------------------------------------- 键盘模式
 
-    /** 顶栏「布局 ▾」：点一下就在 简化 -> 全键盘 -> 数字 之间循环，不弹菜单。 */
+    // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
+    /** 布局标识与隐藏 RadioGroup 里按钮 id 的对照（顺序与 KeyboardVariantStore.ALL 一致）。 */
+    private static final String[] MODE_VARIANTS = {
+            KeyboardVariantStore.VARIANT_FULL,
+            KeyboardVariantStore.VARIANT_SIMPLE,
+            KeyboardVariantStore.VARIANT_DIGITPAD};
+    private static final int[] MODE_VIEW_IDS = {
+            R.id.rbt_keyboard_1, R.id.rbt_keyboard_3, R.id.rbt_keyboard_2};
+
+    /**
+     * 顶栏「布局 ▾」：只在「已启用」的布局里循环，顺序 = 菜单里点亮的顺序。
+     * 启停与顺序来源：菜单 › 虚拟手柄与虚拟按键 › 全键盘。
+     */
     private void cycleMode() {
-        int cur = rg_keyboard.getCheckedRadioButtonId();
-        int next;
-        if (cur == R.id.rbt_keyboard_3) {
-            next = R.id.rbt_keyboard_1;      // 简化 -> 全键盘
-        } else if (cur == R.id.rbt_keyboard_1) {
-            next = R.id.rbt_keyboard_2;      // 全键盘 -> 数字
-        } else {
-            next = R.id.rbt_keyboard_3;      // 数字 -> 简化
+        List<String> enabled = KeyboardVariantStore.getEnabled(context);
+        if (enabled.size() <= 1) {
+            Toast.makeText(context, "只启用了一种布局", Toast.LENGTH_SHORT).show();
+            return;
         }
-        rg_keyboard.check(next);
+        int pos = enabled.indexOf(variantOfViewId(rg_keyboard.getCheckedRadioButtonId()));
+        int next = pos < 0 ? 0 : (pos + 1) % enabled.size();
+        rg_keyboard.check(viewIdOfVariant(enabled.get(next)));
     }
+
+    /** 当前布局被关掉时自动切到第 1 个已启用布局（菜单「更新配置」后生效）。 */
+    private void ensureEnabledMode() {
+        if (rg_keyboard == null) {
+            return;
+        }
+        List<String> enabled = KeyboardVariantStore.getEnabled(context);
+        int checked = rg_keyboard.getCheckedRadioButtonId();
+        if (checked != -1 && enabled.contains(variantOfViewId(checked))) {
+            return;
+        }
+        rg_keyboard.check(viewIdOfVariant(enabled.get(0)));
+    }
+
+    private static String variantOfViewId(int viewId) {
+        for (int i = 0; i < MODE_VARIANTS.length; i++) {
+            if (MODE_VIEW_IDS[i] == viewId) {
+                return MODE_VARIANTS[i];
+            }
+        }
+        return KeyboardVariantStore.VARIANT_SIMPLE;
+    }
+
+    private static int viewIdOfVariant(String variant) {
+        for (int i = 0; i < MODE_VARIANTS.length; i++) {
+            if (MODE_VARIANTS[i].equals(variant)) {
+                return MODE_VIEW_IDS[i];
+            }
+        }
+        return R.id.rbt_keyboard_3;
+    }
+    // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END
 
     /** 模式切换：谁能见、根容器要不要透明、位置气泡要不要显示，全在这里。 */
     private void onModeChanged(int checkedId) {
@@ -566,6 +609,8 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
     }
 
     public void show() {
+        // 菜单里关掉的布局不应该再被显示：切到第 1 个已启用布局
+        ensureEnabledMode();
         keyboardView.setVisibility(View.VISIBLE);
     }
 
@@ -584,6 +629,8 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 
     public void refreshLayout() {
         frame_layout.removeView(keyboardView);
+        // 布局启停可能刚在菜单里改过，先纠正当前布局再重算尺寸
+        ensureEnabledMode();
 //        DisplayMetrics screen = context.getResources().getDisplayMetrics();
 //        (int)(screen.heightPixels/0.4)
         int height=prefConfig.oscKeyboardHeight;

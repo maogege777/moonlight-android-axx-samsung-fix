@@ -419,6 +419,153 @@
 
             </RadioGroup>
 
+            <!-- EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN -->
+            <!-- 全键盘布局启停：点亮=启用，角标数字=顶栏「布局」按钮的切换顺序；至少保留 1 个 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="全键盘"
+                    android:textColor="@android:color/white"
+                    android:textSize="12dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="点亮=启用 · 角标顺序=切换顺序"
+                    android:textColor="#FFC107"
+                    android:textSize="9dp"
+                    android:textStyle="italic" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginRight="5dp"
+                android:orientation="horizontal">
+
+                <!-- 电脑全键盘 -->
+                <FrameLayout
+                    android:id="@+id/kb_variant_full"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ic_game_menu_btn_selector">
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_full"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="电脑全键盘"
+                        android:textColor="#9AA0A6"
+                        android:textSize="10dp" />
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_full_no"
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:layout_gravity="top|right"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginRight="3dp"
+                        android:background="@drawable/bg_kb_variant_badge"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:textColor="#D7E4F7"
+                        android:textSize="7dp"
+                        android:visibility="gone" />
+                </FrameLayout>
+
+                <!-- 简化键盘 -->
+                <FrameLayout
+                    android:id="@+id/kb_variant_simple"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ic_game_menu_btn_selector">
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_simple"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="简化键盘"
+                        android:textColor="#9AA0A6"
+                        android:textSize="10dp" />
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_simple_no"
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:layout_gravity="top|right"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginRight="3dp"
+                        android:background="@drawable/bg_kb_variant_badge"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:textColor="#D7E4F7"
+                        android:textSize="7dp"
+                        android:visibility="gone" />
+                </FrameLayout>
+
+                <!-- 数字键盘 -->
+                <FrameLayout
+                    android:id="@+id/kb_variant_digitpad"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/ic_game_menu_btn_selector">
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_digitpad"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="数字键盘"
+                        android:textColor="#9AA0A6"
+                        android:textSize="10dp" />
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_digitpad_no"
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:layout_gravity="top|right"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginRight="3dp"
+                        android:background="@drawable/bg_kb_variant_badge"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:textColor="#D7E4F7"
+                        android:textSize="7dp"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="点一次「布局」切到下一个，最后回到 1；至少留 1 个，关掉正在用的会自动切到 1。"
+                android:textColor="#9AA0A6"
+                android:textSize="8dp" />
+            <!-- EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END -->
+
 <!--            <TextView-->
 <!--                android:layout_width="wrap_content"-->
 <!--                android:layout_height="wrap_content"-->

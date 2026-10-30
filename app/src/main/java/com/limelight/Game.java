@@ -541,6 +541,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         // 自定义快捷键 v4：安装后首次运行时初始化默认组（QuickKeyStore 内部只执行一次）。
         com.limelight.ui.gamemenu.QuickKeyStore.ensureSeeded(this, prefConfig.enableClearDefaultSpecial);
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
+        // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [MODIFIED] BEGIN
+        // 全键盘布局启停：全新安装只启用 简化 + 数字；覆盖安装不初始化（内部按首次安装时间判断）。
+        com.limelight.binding.input.virtual_controller.keyboard.KeyboardVariantStore
+                .ensureInstalledDefault(this);
+        // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [MODIFIED] END
         if (backgroundReconnectAttempt > 0) {
             logSessionInfo("CONNECT", "开始后台回连，第 " + backgroundReconnectAttempt + "/"
                     + MAX_BACKGROUND_RECONNECT_ATTEMPTS + " 次");

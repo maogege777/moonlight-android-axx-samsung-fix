@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    EXTENSION DEVELOPMENT [EXT-KB-VARIANTS]
+    全键盘布局启停按钮右上角的顺序角标底：半透明白圆，弱化处理、不抢按键文字的视线。
+    只复用面板里已有的白/浅蓝，不引入新配色。
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#26FFFFFF" />
+</shape>
