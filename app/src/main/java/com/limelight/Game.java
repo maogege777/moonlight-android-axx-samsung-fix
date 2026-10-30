@@ -1096,8 +1096,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         // 全键盘首次展开要 inflate 三个布局（约 500 个 View），这里在串流起来后空闲时
         // 先建好并保持隐藏，用户第一次点「键盘」时只做一次 setVisibility。
         // 延迟执行 + null 判断：用户提前点开则走原有路径，不会重复初始化。
-        if (prefConfig.enableKeyboard && rootView != null) {
-            rootView.postDelayed(() -> {
+        if (prefConfig.enableKeyboard && rootView instanceof View) {
+            // rootView 是 ViewParent（streamView.getParent()），需要转成 View 才能 postDelayed
+            ((View) rootView).postDelayed(() -> {
                 if (keyBoardLayoutController == null) {
                     initkeyBoardLayoutController(false);
                 }
