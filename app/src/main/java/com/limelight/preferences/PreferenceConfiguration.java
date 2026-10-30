@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.HapticFeedbackConstants;
+import android.view.View;
 import android.preference.PreferenceManager;
 import android.view.Display;
 
@@ -1192,15 +1194,26 @@ public class PreferenceConfiguration {
     /**
      * 执行一次按键震动。
      *
-     * <p>{@link #VIBRATE_PRESS_SYSTEM_DEFAULT}（0）表示「系统默认」：不指定时长，
-     * 改用系统预设的点击触感，跟随手机自身的振动强度设置；其它值按毫秒数震动。</p>
+     * <p>{@link #VIBRATE_PRESS_SYSTEM_DEFAULT}（0）表示「系统默认」：走系统的触感反馈通道
+     * （{@link HapticFeedbackConstants#KEYBOARD_TAP}），与系统键盘按键同源——受
+     * 「设置 › 声音和振动 › 系统振动」里的「触摸互动」开关和「系统振动强度」滑块共同控制。
+     * 不能用 {@link Vibrator#vibrate(VibrationEffect)}，那走的是振动服务通道、效果固定，
+     * 手感与系统按键对不上。</p>
+     *
+     * <p>其它值按毫秒数震动（8~100）。</p>
      */
-    public static void vibratePress(Vibrator vibrator, int pressMs) {
-        if (vibrator == null || !vibrator.hasVibrator()) {
+    public static void vibratePress(View view, Vibrator vibrator, int pressMs) {
+        if (pressMs == VIBRATE_PRESS_SYSTEM_DEFAULT) {
+            if (view != null) {
+                // 返回 false 说明系统关掉了触感反馈或视图未挂载，此时就应当没有反馈，不再补偿震动
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            } else if (vibrator != null && vibrator.hasVibrator()) {
+                // 没有可用视图时的兜底
+                vibrateSystemDefault(vibrator);
+            }
             return;
         }
-        if (pressMs == VIBRATE_PRESS_SYSTEM_DEFAULT) {
-            vibrateSystemDefault(vibrator);
+        if (vibrator == null || !vibrator.hasVibrator()) {
             return;
         }
         vibrator.vibrate(Math.max(MIN_VIBRATE_PRESS_MS,

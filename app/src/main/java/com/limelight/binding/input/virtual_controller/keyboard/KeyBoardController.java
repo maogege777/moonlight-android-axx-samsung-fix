@@ -748,7 +748,7 @@ public class KeyBoardController {
         if (!prefConfig.enableKeyboardVibrateOnPressOnly
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()
                 && keyEvent.getSource() != 2) {
-            PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
+            PreferenceConfiguration.vibratePress(frame_layout, vibrator, prefConfig.vibratePressMs);
         }
     }
 
@@ -763,7 +763,7 @@ public class KeyBoardController {
         // 同上：元素按下时已经震过，这里不再重复触发（仅旧模式保留原行为）
         if (!prefConfig.enableKeyboardVibrateOnPressOnly
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
-            PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
+            PreferenceConfiguration.vibratePress(frame_layout, vibrator, prefConfig.vibratePressMs);
         }
         String[] keys=codes.split(",");
         //阿西西快捷键
@@ -859,7 +859,7 @@ public class KeyBoardController {
             }
             pressHapticFired = true;
         }
-        PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
+        PreferenceConfiguration.vibratePress(frame_layout, vibrator, prefConfig.vibratePressMs);
     }
 
     public void resetPressHapticGesture() {
@@ -877,7 +877,7 @@ public class KeyBoardController {
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
             //摇杆不震动
             if(inputContext.inputMap!=0||inputContext.leftTrigger!=0x00||inputContext.rightTrigger!=0x00) {
-                PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
+                PreferenceConfiguration.vibratePress(frame_layout, vibrator, prefConfig.vibratePressMs);
             }
         }
         // HACK: GFE sometimes discards gamepad packets when they are received
