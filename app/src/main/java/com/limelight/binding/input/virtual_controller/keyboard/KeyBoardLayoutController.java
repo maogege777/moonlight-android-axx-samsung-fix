@@ -731,19 +731,19 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         }
 
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
-        // 分离式键盘：左右半区用固定权重（645 / 760）分掉剩余宽度，只有中间操作区需要按像素设置。
-        // 操作区两侧各有 8dp 间隔（XML 里的 margin），这部分宽度是从触摸板列让出来的，
-        // 所以触摸板列基数取 76dp 而不是 92dp，总占用仍是 56 + 76 + 8*2 = 148dp。
-        // 操作区沿用简化键盘那套「屏越宽越宽」的规则，避免平板上触摸板反而比简化键盘小。
+        // 分离式键盘：左右半区用固定权重（645 / 700）分掉剩余宽度，只有中间操作区需要按像素设置。
+        // 操作区两侧各有 8dp 间隔（XML 里的 margin），触摸板列因此从 96dp 起算，
+        // 总占用仍然是 64 + 96 + 8*2 = 176dp（比简化键盘的 148dp 宽，右半区随之右移）。
+        // 沿用简化键盘那套「屏越宽越宽」的规则，避免平板上触摸板反而比简化键盘小。
         View simpleV2 = keyboardView.findViewById(R.id.lv_keyboard_simple_v2);
         if (simpleV2 != null) {
             simpleV2.setLayoutParams(new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, shortH));
         }
         setColumnWidth(keyboardView.findViewById(R.id.ll_v2_mouse),
-                dip2px(context, 56f + excess * 0.10f));
+                dip2px(context, 64f + excess * 0.10f));
         setColumnWidth(keyboardView.findViewById(R.id.ll_v2_pad),
-                dip2px(context, 76f + excess * 0.19f));
+                dip2px(context, 96f + excess * 0.19f));
         // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] END
 
 
