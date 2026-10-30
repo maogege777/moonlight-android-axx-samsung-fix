@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
@@ -240,6 +241,10 @@ public class KeyBoardLayoutController {
                                     if (modView != null) keyUp(modView);
                                     modView = keyboardView.findViewById(R.id.lv_keyboard_simple).findViewWithTag(t);
                                     if (modView != null) keyUp(modView);
+                                    // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
+                                    modView = keyboardView.findViewById(R.id.lv_keyboard_simple_v2).findViewWithTag(t);
+                                    if (modView != null) keyUp(modView);
+                                    // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
                                 }
                                 keyList.clear();
                             }
@@ -303,6 +308,12 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         bindScrollButton(keyboardView.findViewById(R.id.mouse_down), false);
         bindScrollButton(keyboardView.findViewById(R.id.simple_scroll_up), true);
         bindScrollButton(keyboardView.findViewById(R.id.simple_scroll_down), false);
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
+        // 简化v2 的中间操作区：触摸板 + 滚轮上下（id 与另外两套布局不重复）
+        bindTouchPad(keyboardView.findViewById(R.id.fv_keyboard_touch_v2), 1f);
+        bindScrollButton(keyboardView.findViewById(R.id.v2_scroll_up), true);
+        bindScrollButton(keyboardView.findViewById(R.id.v2_scroll_down), false);
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] END
     }
 
     /** 滚轮键：按下连发（100ms 一次），抬手停止，按下时震一次。 */
@@ -401,12 +412,16 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
                 || !"66".equals(v.getTag())) {
             return;
         }
-        View simple = keyboardView.findViewById(R.id.lv_keyboard_simple);
-        if (!(simple instanceof ViewGroup)) {
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
+        // 同步范围只看「v 所在的那套布局」：简化键盘与简化v2 都有 tag 66 的上下两段，
+        // 原来写死 lv_keyboard_simple 会把变色同步到另一套（不可见的）布局上。
+        ViewGroup container = keyboardContainerOf(v);
+        if (container == null) {
             return;
         }
         List<View> parts = new ArrayList<>();
-        collectTagged((ViewGroup) simple, "66", parts);
+        collectTagged(container, "66", parts);
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
         if (parts.size() < 2) {
             return; // 只有一段（例如数字键盘）时不需要同步
         }
@@ -422,6 +437,26 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             }
         }
     }
+
+    // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
+    /**
+     * 从按键往上找它所属的那套键盘布局（lv_keyboard / digitpad / simple / simple_v2）。
+     * 多套布局同时存在于同一棵视图树里（靠 visibility 切换），按 tag 同步状态时必须限定范围。
+     */
+    private ViewGroup keyboardContainerOf(View v) {
+        ViewParent parent = (v == null) ? null : v.getParent();
+        while (parent instanceof View) {
+            View pv = (View) parent;
+            int id = pv.getId();
+            if (id == R.id.lv_keyboard || id == R.id.lv_keyboard_simple
+                    || id == R.id.lv_keyboard_simple_v2 || id == R.id.lv_keyboard_digitpad) {
+                return (ViewGroup) pv;
+            }
+            parent = pv.getParent();
+        }
+        return null;
+    }
+    // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] END
 
     private void collectTagged(ViewGroup group, String tag, List<View> out) {
         for (int i = 0; i < group.getChildCount(); i++) {
@@ -451,6 +486,11 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             if (child.getId() == R.id.mouse_up || child.getId() == R.id.mouse_down) {
                 continue;
             }
+            // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
+            if (child.getId() == R.id.v2_scroll_up || child.getId() == R.id.v2_scroll_down) {
+                continue;
+            }
+            // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
             if (child instanceof ViewGroup) {
                 bindKeys((ViewGroup) child, listener);
             } else if (child.getTag() instanceof String) {
@@ -507,9 +547,11 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
     private static final String[] MODE_VARIANTS = {
             KeyboardVariantStore.VARIANT_FULL,
             KeyboardVariantStore.VARIANT_SIMPLE,
+            KeyboardVariantStore.VARIANT_SIMPLE_V2,
             KeyboardVariantStore.VARIANT_DIGITPAD};
     private static final int[] MODE_VIEW_IDS = {
-            R.id.rbt_keyboard_1, R.id.rbt_keyboard_3, R.id.rbt_keyboard_2};
+            R.id.rbt_keyboard_1, R.id.rbt_keyboard_3,
+            R.id.rbt_keyboard_simple_v2, R.id.rbt_keyboard_2};
 
     /**
      * 顶栏「布局 ▾」：只在「已启用」的布局里循环，顺序 = 菜单里点亮的顺序。
@@ -565,14 +607,21 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         View full = keyboardView.findViewById(R.id.lv_keyboard);
         View digit = keyboardView.findViewById(R.id.lv_keyboard_digitpad);
         View simple = keyboardView.findViewById(R.id.lv_keyboard_simple);
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
+        View simpleV2 = keyboardView.findViewById(R.id.lv_keyboard_simple_v2);
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
 
         boolean isSimple = (checkedId == R.id.rbt_keyboard_3);
 
         full.setVisibility(checkedId == R.id.rbt_keyboard_1 ? View.VISIBLE : View.GONE);
         digit.setVisibility(checkedId == R.id.rbt_keyboard_2 ? View.VISIBLE : View.GONE);
         simple.setVisibility(isSimple ? View.VISIBLE : View.GONE);
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
+        simpleV2.setVisibility(checkedId == R.id.rbt_keyboard_simple_v2
+                ? View.VISIBLE : View.GONE);
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
 
-        // 三种模式共用同一块深色底板：顶栏、触摸板、键块连成一体，不再分区块
+        // 四种模式共用同一块深色底板：顶栏、触摸板、键块连成一体，不再分区块
         keyboardView.setBackgroundColor(0xFF212121);
 
 
@@ -586,6 +635,11 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         if (checkedId == R.id.rbt_keyboard_2) {
             return "数字键盘";
         }
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
+        if (checkedId == R.id.rbt_keyboard_simple_v2) {
+            return "简化v2";
+        }
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
         if (checkedId == R.id.rbt_keyboard_3) {
             return "简化键盘";
         }
@@ -609,6 +663,12 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             if (v != null) {
                 keyUp(v);
             }
+            // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] BEGIN
+            v = keyboardView.findViewById(R.id.lv_keyboard_simple_v2).findViewWithTag(key);
+            if (v != null) {
+                keyUp(v);
+            }
+            // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [MODIFIED] END
         }
     }
 
@@ -647,7 +707,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 //        params.leftMargin = 20 + buttonSize;
 //        params.topMargin = 15;
 
-        // 全键盘保持原高度；简化键盘与数字键盘各矮一个 F 行（约 33dp）
+        // 全键盘保持原高度；简化键盘 / 简化v2 / 数字键盘各矮一个 F 行（约 33dp）
         int fullH = dip2px(context, height);
         int shortH = Math.max(dip2px(context, 110), fullH - dip2px(context, 33));
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, fullH);
@@ -677,11 +737,38 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             simpleMouse.setLayoutParams(mlp);
         }
 
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
+        // 简化v2：左右半区用固定权重（645 / 760）分掉剩余宽度，只有中间操作区需要按像素设置。
+        // 操作区沿用简化键盘那套「屏越宽越宽」的规则：鼠标列 56dp 起、触摸板列 92dp 起，
+        // 大屏上继续变大，避免平板上触摸板反而比简化键盘小。
+        View simpleV2 = keyboardView.findViewById(R.id.lv_keyboard_simple_v2);
+        if (simpleV2 != null) {
+            simpleV2.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, shortH));
+        }
+        setColumnWidth(keyboardView.findViewById(R.id.ll_v2_mouse),
+                dip2px(context, 56f + excess * 0.10f));
+        setColumnWidth(keyboardView.findViewById(R.id.ll_v2_pad),
+                dip2px(context, 92f + excess * 0.19f));
+        // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] END
+
 
         keyboardView.setAlpha(prefConfig.oscKeyboardOpacity/100f);
         frame_layout.addView(keyboardView,params);
 
     }
+
+    // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] BEGIN
+    /** 只改列宽，保留 XML 里的高度与其它布局属性（简化v2 的中间操作区）。 */
+    private void setColumnWidth(View column, int widthPx) {
+        if (column == null || column.getLayoutParams() == null) {
+            return;
+        }
+        ViewGroup.LayoutParams lp = column.getLayoutParams();
+        lp.width = widthPx;
+        column.setLayoutParams(lp);
+    }
+    // EXTENSION DEVELOPMENT [EXT-KB-SPLIT-V2] [ADDED] END
 
     public int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;

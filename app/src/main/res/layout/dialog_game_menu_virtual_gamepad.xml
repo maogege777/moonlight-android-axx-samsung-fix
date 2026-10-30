@@ -524,6 +524,40 @@
                         android:visibility="gone" />
                 </FrameLayout>
 
+                <!-- 简化v2：左右分离 + 中间鼠标/滚轮/触摸板 -->
+                <FrameLayout
+                    android:id="@+id/kb_variant_simplev2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ic_game_menu_btn_selector">
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_simplev2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="简化v2"
+                        android:textColor="#9AA0A6"
+                        android:textSize="10dp" />
+
+                    <TextView
+                        android:id="@+id/tx_kb_variant_simplev2_no"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_gravity="top|right"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginRight="1dp"
+                        android:background="@drawable/bg_kb_variant_badge"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="7dp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+                </FrameLayout>
+
                 <!-- 数字键盘 -->
                 <FrameLayout
                     android:id="@+id/kb_variant_digitpad"

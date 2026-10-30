@@ -82,17 +82,21 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
     private RadioGroup rg_game_virtual_key_color;
 
     // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
-    // 全键盘布局启停：三个 chip 与 KeyboardVariantStore.ALL 一一对应（电脑全键盘 / 简化键盘 / 数字键盘）
+    // 全键盘布局启停：四个 chip 与 KeyboardVariantStore.ALL 一一对应
+    // （电脑全键盘 / 简化键盘 / 简化v2 / 数字键盘），顺序必须与 ALL 保持一致
     private static final int[] KB_VARIANT_CHIP_IDS = {
-            R.id.kb_variant_full, R.id.kb_variant_simple, R.id.kb_variant_digitpad};
+            R.id.kb_variant_full, R.id.kb_variant_simple,
+            R.id.kb_variant_simplev2, R.id.kb_variant_digitpad};
     private static final int[] KB_VARIANT_LABEL_IDS = {
-            R.id.tx_kb_variant_full, R.id.tx_kb_variant_simple, R.id.tx_kb_variant_digitpad};
+            R.id.tx_kb_variant_full, R.id.tx_kb_variant_simple,
+            R.id.tx_kb_variant_simplev2, R.id.tx_kb_variant_digitpad};
     private static final int[] KB_VARIANT_BADGE_IDS = {
-            R.id.tx_kb_variant_full_no, R.id.tx_kb_variant_simple_no, R.id.tx_kb_variant_digitpad_no};
+            R.id.tx_kb_variant_full_no, R.id.tx_kb_variant_simple_no,
+            R.id.tx_kb_variant_simplev2_no, R.id.tx_kb_variant_digitpad_no};
 
-    private final View[] kbVariantChips = new View[3];
-    private final TextView[] kbVariantLabels = new TextView[3];
-    private final TextView[] kbVariantBadges = new TextView[3];
+    private final View[] kbVariantChips = new View[4];
+    private final TextView[] kbVariantLabels = new TextView[4];
+    private final TextView[] kbVariantBadges = new TextView[4];
     // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END
 
     private KeyBoardController.ControllerMode gamePadMode;

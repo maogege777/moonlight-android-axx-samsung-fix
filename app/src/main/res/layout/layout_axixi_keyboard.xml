@@ -43,6 +43,15 @@
                 android:layout_height="1dp"
                 android:button="@null"
                 android:text="数字键盘" />
+
+            <!-- EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN -->
+            <RadioButton
+                android:id="@+id/rbt_keyboard_simple_v2"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:button="@null"
+                android:text="简化v2" />
+            <!-- EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END -->
         </RadioGroup>
 
         <TextView
@@ -130,5 +139,14 @@
         android:layout_height="200dp"
         android:visibility="gone"
         layout="@layout/item_layout_axixi_keyboard_simple"/>
+
+    <!-- EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN -->
+    <include
+        android:id="@+id/lv_keyboard_simple_v2"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:visibility="gone"
+        layout="@layout/item_layout_axixi_keyboard_simple_v2"/>
+    <!-- EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] END -->
 
 </LinearLayout>

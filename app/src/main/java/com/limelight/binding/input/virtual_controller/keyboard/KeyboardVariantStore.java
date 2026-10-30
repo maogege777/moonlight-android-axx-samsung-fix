@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * EXTENSION DEVELOPMENT [EXT-KB-VARIANTS]
  *
- * <p>全键盘三种布局（电脑全键盘 / 简化键盘 / 数字键盘）的启用列表。</p>
+ * <p>全键盘布局（电脑全键盘 / 简化键盘 / 简化v2 / 数字键盘）的启用列表。</p>
  *
  * <p>存储的是一个有序字符串（如 {@code simple,digitpad}）：顺序即「点亮顺序」，
  * 也就是顶栏「布局 ▾」按钮每次点击的切换顺序；列表里没有的布局不参与循环。</p>
@@ -28,10 +28,13 @@ public final class KeyboardVariantStore {
 
     public static final String VARIANT_FULL = "full";
     public static final String VARIANT_SIMPLE = "simple";
+    /** 简化v2：以简化键盘为基础左右分离，鼠标/滚轮/触摸板放到中间（EXT-KB-SPLIT-V2）。 */
+    public static final String VARIANT_SIMPLE_V2 = "simplev2";
     public static final String VARIANT_DIGITPAD = "digitpad";
 
-    /** 界面展示顺序固定：电脑全键盘 / 简化键盘 / 数字键盘。 */
-    public static final String[] ALL = {VARIANT_FULL, VARIANT_SIMPLE, VARIANT_DIGITPAD};
+    /** 界面展示顺序固定：电脑全键盘 / 简化键盘 / 简化v2 / 数字键盘。 */
+    public static final String[] ALL = {
+            VARIANT_FULL, VARIANT_SIMPLE, VARIANT_SIMPLE_V2, VARIANT_DIGITPAD};
 
     /** 覆盖安装（没有记录）时沿用旧版的切换顺序。 */
     private static final List<String> LEGACY_ORDER =
