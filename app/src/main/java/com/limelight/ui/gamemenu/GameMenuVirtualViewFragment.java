@@ -424,7 +424,12 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
                 R.drawable.ic_game_menu_btn_green_selector : R.drawable.ic_game_menu_btn_selector);
 
         //两行显示：标题 + 当前时长，右侧箭头提示可进入
-        btn_vibration_strength.setText("震感强度\n" + prefConfig.vibratePressMs + "ms");
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] BEGIN
+        // 0 = 系统默认，跟随手机自身的振动强度设置
+        btn_vibration_strength.setText("震感强度\n"
+                + (prefConfig.vibratePressMs == PreferenceConfiguration.VIBRATE_PRESS_SYSTEM_DEFAULT
+                ? "系统默认" : prefConfig.vibratePressMs + "ms"));
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
     }
 
     // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN

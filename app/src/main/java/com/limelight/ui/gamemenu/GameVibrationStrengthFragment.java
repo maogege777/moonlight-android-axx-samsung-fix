@@ -12,8 +12,8 @@ import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.ui.BaseFragmentDialog.BaseGameMenuDialog;
 
 /**
- * 震感强度面板：预设 10/15/20/25/30ms，也允许输入 8~100 的自定义值。
- * 结构与“码率”面板保持一致。
+ * 震感强度面板：档位含「系统默认」，以及 10/15/20/25/30ms 预设，
+ * 也允许输入 8~100 的自定义值。结构与“码率”面板保持一致。
  */
 public class GameVibrationStrengthFragment extends BaseGameMenuDialog implements View.OnClickListener {
 
@@ -33,8 +33,18 @@ public class GameVibrationStrengthFragment extends BaseGameMenuDialog implements
         ibtn_back = v.findViewById(R.id.ibtn_back);
         edt_press_ms = v.findViewById(R.id.edt_press_ms);
 
-        edt_press_ms.setText(String.valueOf(value));
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] BEGIN
+        // 0 = 系统默认：输入框留空表示走系统默认，由下方档位或直接留空保存来设置
+        edt_press_ms.setText(value == PreferenceConfiguration.VIBRATE_PRESS_SYSTEM_DEFAULT
+                ? "" : String.valueOf(value));
         edt_press_ms.setSelection(edt_press_ms.getText().length());
+
+        View systemDefault = v.findViewById(R.id.btn_vibration_system_default);
+        if (systemDefault != null) {
+            systemDefault.setOnClickListener(v1 ->
+                    commit(PreferenceConfiguration.VIBRATE_PRESS_SYSTEM_DEFAULT));
+        }
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
 
         ibtn_back.setOnClickListener(this);
         v.findViewById(R.id.btn_right).setOnClickListener(this);
@@ -69,8 +79,11 @@ public class GameVibrationStrengthFragment extends BaseGameMenuDialog implements
         if (v.getId() == R.id.btn_right) {
             String text = edt_press_ms.getText().toString().trim();
             if (TextUtils.isEmpty(text)) {
-                Toast.makeText(getActivity(), "震动时长不能为空！", Toast.LENGTH_SHORT).show();
+                // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] BEGIN
+                // 留空 = 系统默认，不再报“不能为空”
+                commit(PreferenceConfiguration.VIBRATE_PRESS_SYSTEM_DEFAULT);
                 return;
+                // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
             }
             int ms;
             try {
@@ -84,8 +97,11 @@ public class GameVibrationStrengthFragment extends BaseGameMenuDialog implements
     }
 
     private void commit(int ms) {
-        if (ms < PreferenceConfiguration.MIN_VIBRATE_PRESS_MS
-                || ms > PreferenceConfiguration.MAX_VIBRATE_PRESS_MS) {
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] BEGIN
+        // 0 是「系统默认」的合法取值，不参与 8~100 的范围校验
+        if (ms != PreferenceConfiguration.VIBRATE_PRESS_SYSTEM_DEFAULT
+                && (ms < PreferenceConfiguration.MIN_VIBRATE_PRESS_MS
+                || ms > PreferenceConfiguration.MAX_VIBRATE_PRESS_MS)) {
             Toast.makeText(getActivity(),
                     "震动时长需在 " + PreferenceConfiguration.MIN_VIBRATE_PRESS_MS
                             + "~" + PreferenceConfiguration.MAX_VIBRATE_PRESS_MS + "ms 之间",

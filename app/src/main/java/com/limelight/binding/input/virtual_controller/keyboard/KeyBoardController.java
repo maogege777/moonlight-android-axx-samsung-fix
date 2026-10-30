@@ -748,7 +748,7 @@ public class KeyBoardController {
         if (!prefConfig.enableKeyboardVibrateOnPressOnly
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()
                 && keyEvent.getSource() != 2) {
-            vibrator.vibrate(getPressHapticMs());
+            PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
         }
     }
 
@@ -763,7 +763,7 @@ public class KeyBoardController {
         // 同上：元素按下时已经震过，这里不再重复触发（仅旧模式保留原行为）
         if (!prefConfig.enableKeyboardVibrateOnPressOnly
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
-            vibrator.vibrate(getPressHapticMs());
+            PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
         }
         String[] keys=codes.split(",");
         //阿西西快捷键
@@ -849,15 +849,6 @@ public class KeyBoardController {
         notifyPressHaptic();
     }
 
-    /**
-     * 按下震动的时长（毫秒）。读取时已 clamp，这里再兜一次底，
-     * 避免旧配置文件里的脏值把马达震成“长按”或 0ms。
-     */
-    private int getPressHapticMs() {
-        return Math.max(PreferenceConfiguration.MIN_VIBRATE_PRESS_MS,
-                Math.min(PreferenceConfiguration.MAX_VIBRATE_PRESS_MS, prefConfig.vibratePressMs));
-    }
-
     public void notifyPressHaptic() {
         if (vibrator == null || !vibrator.hasVibrator() || !prefConfig.enableKeyboardVibrate) {
             return;
@@ -868,7 +859,7 @@ public class KeyBoardController {
             }
             pressHapticFired = true;
         }
-        vibrator.vibrate(getPressHapticMs());
+        PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
     }
 
     public void resetPressHapticGesture() {
@@ -886,7 +877,7 @@ public class KeyBoardController {
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
             //摇杆不震动
             if(inputContext.inputMap!=0||inputContext.leftTrigger!=0x00||inputContext.rightTrigger!=0x00) {
-                vibrator.vibrate(getPressHapticMs());
+                PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
             }
         }
         // HACK: GFE sometimes discards gamepad packets when they are received

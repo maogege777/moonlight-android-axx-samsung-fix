@@ -503,7 +503,11 @@ public class StreamSettings extends Activity {
                 return;
             }
             int ms = PreferenceConfiguration.readPreferences(activity).vibratePressMs;
-            preference.setSummary("按下时手机马达的震动时长（8~100ms），当前 " + ms + "ms");
+            // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] BEGIN
+            preference.setSummary("按下时手机马达的震动时长（8~100ms），当前 "
+                    + (ms == PreferenceConfiguration.VIBRATE_PRESS_SYSTEM_DEFAULT
+                    ? "系统默认" : ms + "ms"));
+            // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
         }
 
         private void showVibratePressDialog(Preference preference) {

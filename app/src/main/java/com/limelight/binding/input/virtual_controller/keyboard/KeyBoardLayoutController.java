@@ -716,7 +716,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             }
             pressHapticFired = true;
         }
-        vibrator.vibrate(getPressHapticMs());
+        PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
     }
 
     private void resetPressHapticGesture() {
@@ -737,16 +737,11 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         if (!canVibrate()) {
             return;
         }
-        vibrator.vibrate(getPressHapticMs());
+        PreferenceConfiguration.vibratePress(vibrator, prefConfig.vibratePressMs);
     }
 
     private boolean canVibrate() {
         return vibrator != null && vibrator.hasVibrator() && prefConfig.enableKeyboardVibrate;
-    }
-
-    private int getPressHapticMs() {
-        return Math.max(PreferenceConfiguration.MIN_VIBRATE_PRESS_MS,
-                Math.min(PreferenceConfiguration.MAX_VIBRATE_PRESS_MS, prefConfig.vibratePressMs));
     }
 
     /**

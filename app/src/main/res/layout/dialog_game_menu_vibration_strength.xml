@@ -73,7 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:text="输入震动时长 单位ms (范围 8 ~ 100)"
+                    android:text="留空=系统默认，或输入 8 ~ 100ms"
                     android:textStyle="italic"
                     android:textColor="@android:color/white"
                     android:textSize="8dp" />
@@ -99,7 +99,7 @@
                     android:layout_height="30dp"
                     android:layout_marginTop="4dp"
                     android:background="@drawable/ic_game_menu_btn_selector"
-                    android:hint="请输入震动时长，8~100ms"
+                    android:hint="留空=系统默认，或输入 8~100"
                     android:inputType="number"
                     android:maxLength="3"
                     android:paddingLeft="10dp"
@@ -119,6 +119,20 @@
                 <org.apmem.tools.layouts.FlowLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
+                    <!-- EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [ADDED] BEGIN -->
+                    <TextView
+                        android:id="@+id/btn_vibration_system_default"
+                        android:layout_width="60dp"
+                        android:layout_height="28dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/ic_game_menu_btn_selector"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:text="系统默认"
+                        android:textSize="9sp" />
+                    <!-- EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [ADDED] END -->
 
                     <TextView
                         android:layout_width="60dp"

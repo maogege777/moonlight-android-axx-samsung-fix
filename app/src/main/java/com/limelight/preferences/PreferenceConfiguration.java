@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.view.Display;
 
@@ -157,6 +159,14 @@ public class PreferenceConfiguration {
     //按下震动时长允许范围（低于 8ms 多数马达感知不到，高于 100ms 会明显拖长）
     public static final int MIN_VIBRATE_PRESS_MS = 8;
     public static final int MAX_VIBRATE_PRESS_MS = 100;
+
+    // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [ADDED] BEGIN
+    /**
+     * 震感强度取这个值时表示「系统默认」：不指定时长，改用系统预设的点击触感
+     * （VibrationEffect.EFFECT_CLICK），跟随手机自身的振动强度 / 触感反馈设置。
+     */
+    public static final int VIBRATE_PRESS_SYSTEM_DEFAULT = 0;
+    // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [ADDED] END
 
     //自动摇杆
     private static final String CHECKBOX_CHECKBOX_ENABLE_ANALOG_STICK_NEW="checkbox_enable_analog_stick_new";
@@ -1000,8 +1010,13 @@ public class PreferenceConfiguration {
 
         config.enableKeyboardVibrate=prefs.getBoolean(CHECKBOX_ENABLE_KEYBOARD_VIBRATE,false);
         config.enableKeyboardVibrateOnPressOnly=prefs.getBoolean(CHECKBOX_VIBRATE_ON_PRESS_ONLY,DEFAULT_VIBRATE_ON_PRESS_ONLY);
-        config.vibratePressMs=Math.max(MIN_VIBRATE_PRESS_MS,Math.min(MAX_VIBRATE_PRESS_MS,
-                prefs.getInt(EDIT_VIBRATE_PRESS_MS,DEFAULT_VIBRATE_PRESS_MS)));
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] BEGIN
+        // 0 = 系统默认，原样保留；其它值仍然加在 8~100ms 之间
+        int rawVibratePressMs = prefs.getInt(EDIT_VIBRATE_PRESS_MS, DEFAULT_VIBRATE_PRESS_MS);
+        config.vibratePressMs = rawVibratePressMs == VIBRATE_PRESS_SYSTEM_DEFAULT
+                ? VIBRATE_PRESS_SYSTEM_DEFAULT
+                : Math.max(MIN_VIBRATE_PRESS_MS, Math.min(MAX_VIBRATE_PRESS_MS, rawVibratePressMs));
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
         //兼容joycon手柄
         config.enableJoyConFix=prefs.getBoolean("checkbox_enable_joyconfix",false);
         //全键盘透明度
@@ -1172,5 +1187,37 @@ public class PreferenceConfiguration {
 
         return config;
     }
+
+    // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [ADDED] BEGIN
+    /**
+     * 执行一次按键震动。
+     *
+     * <p>{@link #VIBRATE_PRESS_SYSTEM_DEFAULT}（0）表示「系统默认」：不指定时长，
+     * 改用系统预设的点击触感，跟随手机自身的振动强度设置；其它值按毫秒数震动。</p>
+     */
+    public static void vibratePress(Vibrator vibrator, int pressMs) {
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            return;
+        }
+        if (pressMs == VIBRATE_PRESS_SYSTEM_DEFAULT) {
+            vibrateSystemDefault(vibrator);
+            return;
+        }
+        vibrator.vibrate(Math.max(MIN_VIBRATE_PRESS_MS,
+                Math.min(MAX_VIBRATE_PRESS_MS, pressMs)));
+    }
+
+    private static void vibrateSystemDefault(Vibrator vibrator) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // 系统预设的「点击」触感：时长与幅度都交给系统，最接近系统默认按键反馈
+            vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(DEFAULT_VIBRATE_PRESS_MS,
+                    VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            vibrator.vibrate(DEFAULT_VIBRATE_PRESS_MS);
+        }
+    }
+    // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [ADDED] END
 
 }
