@@ -1092,6 +1092,19 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             initKeyboardController();
         }
 
+        // EXTENSION DEVELOPMENT [EXT-KB-WARMUP] [ADDED] BEGIN
+        // 全键盘首次展开要 inflate 三个布局（约 500 个 View），这里在串流起来后空闲时
+        // 先建好并保持隐藏，用户第一次点「键盘」时只做一次 setVisibility。
+        // 延迟执行 + null 判断：用户提前点开则走原有路径，不会重复初始化。
+        if (prefConfig.enableKeyboard && rootView != null) {
+            rootView.postDelayed(() -> {
+                if (keyBoardLayoutController == null) {
+                    initkeyBoardLayoutController(false);
+                }
+            }, 1500);
+        }
+        // EXTENSION DEVELOPMENT [EXT-KB-WARMUP] [ADDED] END
+
         if (prefConfig.usbDriver) {
             // Start the USB driver
             bindService(new Intent(this, UsbDriverService.class),
@@ -1167,11 +1180,27 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     }
 
     private void initkeyBoardLayoutController(){
+        initkeyBoardLayoutController(true);
+    }
+
+    // EXTENSION DEVELOPMENT [EXT-KB-WARMUP] [ADDED] BEGIN
+    /**
+     * 全键盘控制器初始化。
+     *
+     * <p>showNow=false 时只把视图建好并隐藏（预热）：首次点「键盘」只需 setVisibility，
+     * 不再在主线程上现 inflate 三个布局（约 500 个 View）。</p>
+     */
+    private void initkeyBoardLayoutController(boolean showNow){
         keyBoardLayoutController=new KeyBoardLayoutController(controllerHandler,(FrameLayout)rootView, this,prefConfig);
         keyBoardLayoutController.refreshLayout();
-        keyBoardLayoutController.show();
+        if (showNow) {
+            keyBoardLayoutController.show();
+        } else {
+            keyBoardLayoutController.hide();
+        }
         bringDsTouchpadToFront();
     }
+    // EXTENSION DEVELOPMENT [EXT-KB-WARMUP] [ADDED] END
 
     //显示隐藏虚拟特殊按键
     public void showHideKeyboardController(){
