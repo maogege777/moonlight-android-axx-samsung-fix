@@ -3,8 +3,8 @@
     简化键盘：全键盘去掉 F1-F12 那一行，Esc 并入数字行，Del / Ins 接替右侧 Alt / Ctrl。
     左侧 64dp 鼠标三键；右侧上方两格是滚轮，下方是触摸板。
     字母键 100 -> 110（+10%），空间来自左修饰与尾部符号键：
-      Tab 200 -> 130、Caps 230 -> 160、Shift 300 -> 240；
-      [ ] \ ; ' , . / 80 -> 70；↑ 100 -> 120。
+      Tab 200 -> 130、Caps 230 -> 160、Shift 300 -> 260；
+      [ ] \ ; ' , . / 80 -> 70；↑ 保持 100，与下一行 ↓ 同宽且严格对齐。
     各行总权重统一为 1440（数字行由 1530 归一，再把 ⌫ 加长到 150 与下方回车上下对齐：
     Esc 90 -> 75、` 90 -> 70、- 100 -> 70、= 100 -> 75、⌫ 150 -> 120 -> 150），
     键块整体宽度不变，左侧鼠标列与右侧滚轮/触摸板列不受影响。
@@ -952,7 +952,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="240">
+                android:layout_weight="260">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1158,7 +1158,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="120">
+                android:layout_weight="100">
 
                 <TextView
                     android:layout_width="match_parent"
