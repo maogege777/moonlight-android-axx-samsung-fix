@@ -102,6 +102,7 @@ final class SettingsProfileKeys {
         "game_setting_pref_zoom",
         "gameForceGyro",
         "gameForceGyroLeftTrigger",
+        "gameForceGyroActivation",
         "gameForceGyroSensitivity",
         "gameForceGyroXYSwitch",
         "gameTriggerRumbleLink",
