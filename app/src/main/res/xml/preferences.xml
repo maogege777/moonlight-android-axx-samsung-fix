@@ -636,12 +636,14 @@
             android:summary="点按屏幕按键（含全键盘）时，会触发手机马达震动，此选项也可用于虚拟手柄按钮。"
             android:defaultValue="false" />
 
+        <!-- EXT-VIBRATE-DRAG-TOGGLE：旧键 checkbox_vibrate_keyboard_on_press_only（仅按下震动）
+             由新键取代，语义相反（开启 = 拖动手柄按键时持续震动）。旧键仅用于老用户迁移读取。 -->
         <CheckBoxPreference
-            android:key="checkbox_vibrate_keyboard_on_press_only"
+            android:key="checkbox_vibrate_keyboard_on_drag"
             android:dependency="checkbox_vibrate_keyboard"
-            android:title="@string/title_checkbox_vibrate_on_press_only"
-            android:summary="@string/summary_checkbox_vibrate_on_press_only"
-            android:defaultValue="true" />
+            android:title="@string/title_checkbox_vibrate_on_drag"
+            android:summary="@string/summary_checkbox_vibrate_on_drag"
+            android:defaultValue="false" />
 
         <Preference
             android:key="edit_vibrate_press_ms"

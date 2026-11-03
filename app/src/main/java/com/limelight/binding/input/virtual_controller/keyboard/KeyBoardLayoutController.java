@@ -784,7 +784,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
 
     /**
      * 全键盘的按下震动：与虚拟按键、虚拟手柄共用同一组设置
-     * （按键震动开关 / 仅按下震动 / 震感强度），规则保持一致。
+     * （按键震动开关 / 拖动手柄按键震动 / 震感强度），规则保持一致。
      */
     private void notifyPressHapticOnDown() {
         if (!canVibrate()) {
@@ -799,7 +799,7 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
         if (!canVibrate()) {
             return;
         }
-        if (prefConfig.enableKeyboardVibrateOnPressOnly) {
+        if (!prefConfig.enableKeyboardVibrateOnDrag) {
             if (pressHapticFired) {
                 return;
             }

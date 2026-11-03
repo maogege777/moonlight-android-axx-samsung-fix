@@ -959,7 +959,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_ax_key_mod"
+                    android:background="@drawable/bg_ax_key_sym"
                     android:gravity="center"
                     android:tag="59"
                     android:text="Shift"
@@ -1203,7 +1203,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_ax_key_mod"
+                    android:background="@drawable/bg_ax_key_sym"
                     android:gravity="center"
                     android:tag="113"
                     android:text="Ctrl"
@@ -1219,7 +1219,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_ax_key_mod"
+                    android:background="@drawable/bg_ax_key_sym"
                     android:gravity="center"
                     android:tag="117"
                     android:text="Win"
@@ -1235,7 +1235,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_ax_key_mod"
+                    android:background="@drawable/bg_ax_key_sym"
                     android:gravity="center"
                     android:tag="57"
                     android:text="Alt"

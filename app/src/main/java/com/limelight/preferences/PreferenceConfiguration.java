@@ -156,8 +156,14 @@ public class PreferenceConfiguration {
     //屏幕特殊按键 震动
     public static final String CHECKBOX_ENABLE_KEYBOARD_VIBRATE = "checkbox_vibrate_keyboard";
 
-    //屏幕按键/虚拟手柄：仅在按下瞬间震动，拖放与滑过其他按键不再重复震动
+    // EXTENSION DEVELOPMENT [EXT-VIBRATE-DRAG-TOGGLE] [MODIFIED] BEGIN
+    //旧键：仅在按下瞬间震动。已被 CHECKBOX_VIBRATE_ON_DRAG 取代，保留仅用于老用户迁移读取。
     public static final String CHECKBOX_VIBRATE_ON_PRESS_ONLY = "checkbox_vibrate_keyboard_on_press_only";
+
+    //新键：拖动手柄按键震动。开启后按住拖动、滑过其他按键、摇杆画圈都会持续震动；
+    //关闭时只在按下瞬间震一次。与旧键语义相反，老用户由旧键取反推导。
+    public static final String CHECKBOX_VIBRATE_ON_DRAG = "checkbox_vibrate_keyboard_on_drag";
+    // EXTENSION DEVELOPMENT [EXT-VIBRATE-DRAG-TOGGLE] [MODIFIED] END
 
     //屏幕按键/虚拟手柄：按下震动时长（毫秒）
     public static final String EDIT_VIBRATE_PRESS_MS = "edit_vibrate_press_ms";
@@ -207,6 +213,7 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_UNLOCK_FPS = false;
     private static final boolean DEFAULT_VIBRATE_OSC = true;
     private static final boolean DEFAULT_VIBRATE_ON_PRESS_ONLY = true;
+    private static final boolean DEFAULT_VIBRATE_ON_DRAG = false;
     private static final int DEFAULT_VIBRATE_PRESS_MS = 10;
     private static final boolean DEFAULT_VIBRATE_FALLBACK = false;
     private static final int DEFAULT_VIBRATE_FALLBACK_STRENGTH = 100;
@@ -336,8 +343,8 @@ public class PreferenceConfiguration {
 
     public boolean enableKeyboardVibrate;
 
-    //仅按下瞬间震动：开启后拖放、滑过其他按键、摇杆画圈都不再触发震动
-    public boolean enableKeyboardVibrateOnPressOnly;
+    //拖动手柄按键震动：开启后拖放、滑过其他按键、摇杆画圈都会触发震动
+    public boolean enableKeyboardVibrateOnDrag;
 
     //按下震动时长（毫秒），8~100
     public int vibratePressMs;
@@ -1020,7 +1027,12 @@ public class PreferenceConfiguration {
         config.enableKeyboard = prefs.getBoolean(CHECKBOX_ENABLE_KEYBOARD,false);
 
         config.enableKeyboardVibrate=prefs.getBoolean(CHECKBOX_ENABLE_KEYBOARD_VIBRATE,false);
-        config.enableKeyboardVibrateOnPressOnly=prefs.getBoolean(CHECKBOX_VIBRATE_ON_PRESS_ONLY,DEFAULT_VIBRATE_ON_PRESS_ONLY);
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-DRAG-TOGGLE] [MODIFIED] BEGIN
+        // 新键优先；老用户没有新键时用旧键（仅按下震动）取反推导，升级后手感不变。
+        config.enableKeyboardVibrateOnDrag = prefs.contains(CHECKBOX_VIBRATE_ON_DRAG)
+                ? prefs.getBoolean(CHECKBOX_VIBRATE_ON_DRAG, DEFAULT_VIBRATE_ON_DRAG)
+                : !prefs.getBoolean(CHECKBOX_VIBRATE_ON_PRESS_ONLY, DEFAULT_VIBRATE_ON_PRESS_ONLY);
+        // EXTENSION DEVELOPMENT [EXT-VIBRATE-DRAG-TOGGLE] [MODIFIED] END
         // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] BEGIN
         // 0 = 系统默认，原样保留；其它值仍然加在 8~100ms 之间
         int rawVibratePressMs = prefs.getInt(EDIT_VIBRATE_PRESS_MS, DEFAULT_VIBRATE_PRESS_MS);

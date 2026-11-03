@@ -412,11 +412,11 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
     private void initViewData(){
         btn_vibration.setBackgroundResource(prefConfig.enableKeyboardVibrate?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
 
-        //“仅按下震动”是“按键震动”的子选项：主开关关闭时置灰，避免误以为它单独生效
+        //“拖动手柄按键震动”是“按键震动”的子选项：主开关关闭时置灰，避免误以为它单独生效
         btn_vibration_on_press.setEnabled(prefConfig.enableKeyboardVibrate);
         btn_vibration_on_press.setAlpha(prefConfig.enableKeyboardVibrate ? 1f : 0.4f);
         btn_vibration_on_press.setBackgroundResource(
-                prefConfig.enableKeyboardVibrate && prefConfig.enableKeyboardVibrateOnPressOnly
+                prefConfig.enableKeyboardVibrate && prefConfig.enableKeyboardVibrateOnDrag
                         ? R.drawable.ic_game_menu_btn_green_selector
                         : R.drawable.ic_game_menu_btn_selector);
 
@@ -547,11 +547,11 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
                 Toast.makeText(getActivity(), "请先开启按键震动", Toast.LENGTH_SHORT).show();
                 return;
             }
-            prefConfig.enableKeyboardVibrateOnPressOnly=!prefConfig.enableKeyboardVibrateOnPressOnly;
+            prefConfig.enableKeyboardVibrateOnDrag=!prefConfig.enableKeyboardVibrateOnDrag;
             initViewData();
             PreferenceManager.getDefaultSharedPreferences(getActivity())
                     .edit()
-                    .putBoolean(PreferenceConfiguration.CHECKBOX_VIBRATE_ON_PRESS_ONLY,prefConfig.enableKeyboardVibrateOnPressOnly)
+                    .putBoolean(PreferenceConfiguration.CHECKBOX_VIBRATE_ON_DRAG,prefConfig.enableKeyboardVibrateOnDrag)
                     .commit();
             return;
         }

@@ -103,7 +103,7 @@ public class KeyBoardController {
 
     private Vibrator vibrator;
 
-    // 本次触摸手势是否已经触发过按下震动（仅“仅按下震动”模式使用）
+    // 本次触摸手势是否已经触发过按下震动（关闭「拖动手柄按键震动」时用于去重）
     private boolean pressHapticFired;
     private List<keyBoardVirtualControllerElement> elements = new ArrayList<>();
 
@@ -742,10 +742,10 @@ public class KeyBoardController {
             Game.instance.keyboardEvent(keyEvent.getAction() == KeyEvent.ACTION_DOWN,
                     (short) keyEvent.getKeyCode());
         }
-        // “仅按下震动”模式下由触摸元素在 ACTION_DOWN 统一触发震动。
+        // 关闭「拖动手柄按键震动」时，由触摸元素在 ACTION_DOWN 统一触发一次震动。
         // 这里若再震一次，会发现一次按下震两下；且十字键滑动换向时
         // onDirectionChange 会重新生成 ACTION_DOWN，导致拖动又持续震。
-        if (!prefConfig.enableKeyboardVibrateOnPressOnly
+        if (prefConfig.enableKeyboardVibrateOnDrag
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()
                 && keyEvent.getSource() != 2) {
             PreferenceConfiguration.vibratePress(frame_layout, vibrator, prefConfig.vibratePressMs);
@@ -760,8 +760,8 @@ public class KeyBoardController {
     }
 
     public void sendAssembleKey(String codes,int action){
-        // 同上：元素按下时已经震过，这里不再重复触发（仅旧模式保留原行为）
-        if (!prefConfig.enableKeyboardVibrateOnPressOnly
+        // 同上：关闭拖动震动时元素按下已经震过，这里不再重复触发
+        if (prefConfig.enableKeyboardVibrateOnDrag
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
             PreferenceConfiguration.vibratePress(frame_layout, vibrator, prefConfig.vibratePressMs);
         }
@@ -839,8 +839,8 @@ public class KeyBoardController {
      * 按下瞬间的触感反馈。
      *
      * <p>旧逻辑把震动挂在 {@link #sendControllerInputContext()} 上，按住按键拖动或摇杆画圈时
-     * 每个 ACTION_MOVE 都会触发一次 vibrate(10)，体感就是持续震动。开启
-     * enableKeyboardVibrateOnPressOnly 后改由元素在 ACTION_DOWN 调用本方法，同一手势只震一次，
+     * 每个 ACTION_MOVE 都会触发一次 vibrate(10)，体感就是持续震动。关闭
+     * enableKeyboardVibrateOnDrag 后改由元素在 ACTION_DOWN 调用本方法，同一手势只震一次，
      * 移动、滑过其他按键都不再触发。</p>
      */
     public void notifyPressHapticOnDown() {
@@ -853,7 +853,7 @@ public class KeyBoardController {
         if (vibrator == null || !vibrator.hasVibrator() || !prefConfig.enableKeyboardVibrate) {
             return;
         }
-        if (prefConfig.enableKeyboardVibrateOnPressOnly) {
+        if (!prefConfig.enableKeyboardVibrateOnDrag) {
             if (pressHapticFired) {
                 return;
             }
@@ -871,9 +871,9 @@ public class KeyBoardController {
         handler.removeCallbacks(delayedRetransmitRunnable);
 
         sendControllerInputContextInternal();
-        // 仅按下震动模式下，震动由元素在 ACTION_DOWN 时触发；
+        // 关闭拖动震动时，震动由元素在 ACTION_DOWN 时触发；
         // 状态上报（按住按键拖动、摇杆画圈）不再触发，避免持续震动。
-        if (!prefConfig.enableKeyboardVibrateOnPressOnly
+        if (prefConfig.enableKeyboardVibrateOnDrag
                 && prefConfig.enableKeyboardVibrate && vibrator.hasVibrator()) {
             //摇杆不震动
             if(inputContext.inputMap!=0||inputContext.leftTrigger!=0x00||inputContext.rightTrigger!=0x00) {

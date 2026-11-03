@@ -2,7 +2,7 @@
 <!--
     分离式键盘（EXT-KB-SPLIT-V2）：以简化键盘为基础左右分离，中间是导航键 + 鼠标 + 触摸板。
       左半区 645u
-        Esc 75、` 70、1-5 各 100 / Tab 95 + QWERT / Caps 95 + ASDFG / Shift 193 + ZXCV
+        Esc 95（与 Tab 同宽）、` 60（与 \ 同宽）、1-5 各 98 / Tab 95 + QWERT / Caps 95 + ASDFG / Shift 193 + ZXCV
         Ctrl + Win + Alt + 空格 345
       右半区 700u（五行都 700，内缘齐平）
         6-0 各 84、- 65、= 65、退格 150
@@ -20,30 +20,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:padding="3dp">
     <LinearLayout android:id="@+id/ll_v2_left" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="645" android:orientation="vertical">
         <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="75">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="95">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_mod" android:gravity="center" android:tag="111" android:text="Esc" android:textColor="@android:color/white" android:textSize="11sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="70">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="60">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="68" android:text="`" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="~" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="98">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="8" android:text="1" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="!" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="98">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="9" android:text="2" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="@" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="98">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="10" android:text="3" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="#" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="98">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="11" android:text="4" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="$" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
-            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="98">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="12" android:text="5" android:textColor="@android:color/white" android:textSize="13sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|right" android:layout_marginRight="8dp" android:layout_marginTop="4dp" android:text="%" android:textColor="#8CA0BC" android:textSize="9sp" />
             </FrameLayout>
@@ -90,7 +90,7 @@
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
             <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="193">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_mod" android:gravity="center" android:tag="59" android:text="Shift" android:textColor="@android:color/white" android:textSize="11sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="59" android:text="Shift" android:textColor="@android:color/white" android:textSize="11sp" />
             </FrameLayout>
             <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="113">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_alpha" android:gravity="center" android:tag="54" android:text="Z" android:textColor="@android:color/white" android:textSize="13sp" />
@@ -107,13 +107,13 @@
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
             <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_mod" android:gravity="center" android:tag="113" android:text="Ctrl" android:textColor="@android:color/white" android:textSize="11sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="113" android:text="Ctrl" android:textColor="@android:color/white" android:textSize="11sp" />
             </FrameLayout>
             <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_mod" android:gravity="center" android:tag="117" android:text="Win" android:textColor="@android:color/white" android:textSize="11sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="117" android:text="Win" android:textColor="@android:color/white" android:textSize="11sp" />
             </FrameLayout>
             <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_mod" android:gravity="center" android:tag="57" android:text="Alt" android:textColor="@android:color/white" android:textSize="11sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_sym" android:gravity="center" android:tag="57" android:text="Alt" android:textColor="@android:color/white" android:textSize="11sp" />
             </FrameLayout>
             <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="345">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/bg_ax_key_space" android:gravity="center" android:tag="62" android:text="空格" android:textColor="@android:color/white" android:textSize="11sp" />

@@ -747,8 +747,8 @@
                     android:gravity="center"
                     android:padding="4dp"
                     android:id="@+id/btn_vibration_on_press"
-                    android:text="仅按下震动"
-                    android:textSize="11dp" />
+                    android:text="拖动手柄按键震动"
+                    android:textSize="10dp" />
 
                 <Button
                     android:layout_width="match_parent"

@@ -98,7 +98,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
     private static final int SCHEME_LONG_PRESS_DELAY_MS = 200;
     private final Handler schemePressHandler = new Handler(Looper.getMainLooper());
     private Runnable schemeLongPressRunnable;
-    /** 长按已触发时置位，用于吞掉松手后补发的 onClick（避免又切换一次显隐） */
+    /** 长按（弹出布局方案菜单）已触发时置位，用于吞掉松手后补发的 onClick（避免又切换一次显隐） */
     private boolean schemeLongPressFired;
     private PopupWindow schemePopup;
     // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] END
@@ -128,9 +128,9 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             btn_screen_move.setBackgroundResource(game.getScreenMoveZoom()?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
         }
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
-        // 单击弹出布局方案菜单；长按切换显示/隐藏
-        attachToggleLongPress(btn_game_pad, SCHEME_KIND_GAMEPAD);
-        attachToggleLongPress(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
+        // 单击切换显示/隐藏；长按弹出布局方案菜单
+        attachSchemePopupLongPress(btn_game_pad, SCHEME_KIND_GAMEPAD);
+        attachSchemePopupLongPress(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
         // 鼠标与触控：单击、长按都直接弹完整菜单，无需自定义长按监听
         refreshSchemeBadges();
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] END
@@ -320,13 +320,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             return;
         }
         if(v.getId()==R.id.btn_game_pad){
-            // 长按已切换开关时，松手补发的这次 click 直接丢弃，不再弹菜单
+            // 长按已弹出布局方案菜单时，松手补发的这次 click 直接丢弃，不再切换显隐
             if(schemeLongPressFired){
                 schemeLongPressFired=false;
                 return;
             }
-            // 单击：弹出虚拟手柄布局方案菜单
-            showSchemePopup(btn_game_pad, SCHEME_KIND_GAMEPAD);
+            // 单击：切换虚拟手柄显示/隐藏
+            toggleVirtualGamepad();
             return;
         }
 
@@ -339,13 +339,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         }
 
         if(v.getId()==R.id.btn_v_keyboard){
-            // 长按已切换开关时，松手补发的这次 click 直接丢弃，不再弹菜单
+            // 长按已弹出布局方案菜单时，松手补发的这次 click 直接丢弃，不再切换显隐
             if(schemeLongPressFired){
                 schemeLongPressFired=false;
                 return;
             }
-            // 单击：弹出虚拟按键布局方案菜单
-            showSchemePopup(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
+            // 单击：切换虚拟按键显示/隐藏
+            toggleVirtualKeyboard();
             return;
         }
 
@@ -648,9 +648,9 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
     // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
 
     // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
-    // ==================== 长按切换虚拟手柄 / 虚拟按键布局方案 ====================
+    // ========== 单击切换虚拟手柄 / 虚拟按键显隐，长按选择布局方案（EXT-OSC-SCHEME-LONGPRESS-REVERSED） ==========
     // 交互约定：
-    //   短按  → 保持原有「显示/隐藏」行为，按钮绿色高亮同步（行为零改动）
+    //   短按  → 切换「显示/隐藏」，按钮绿色高亮同步
     //   长按  → 200ms 后在按钮正下方（空间不足则正上方）弹出方案列表，就近点选
     //   选中  → 写 pref（gamepad_axi_list / keyboard_axi_list）→ 刷新角标 → 热重载布局
     //           → 关闭全部菜单窗口，回到串流画面
@@ -659,13 +659,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
     /**
      * 给按钮挂上 200ms 长按判定。
      * 用 OnTouchListener + Handler 而不是 setOnLongClickListener，是因为原生长按固定 500ms，
-     * 且这里需要在长按后吞掉补发的 click；返回 false 保证短按仍走原有 OnClickListener。
+     * 且这里需要在长按后吞掉补发的 click；返回 false 保证短按仍走原有 OnClickListener（切换显隐）。
      */
     /**
-     * 长按切换虚拟手柄 / 虚拟按键的显示状态。
-     * 与方案浮层共用同一套触摸骨架：超过阈值触发 toggle，并吞掉松手后补发的 click。
+     * 长按弹出虚拟手柄 / 虚拟按键的布局方案菜单。
+     * 与原来的 toggle 共用同一套触摸骨架：超过阈值弹菜单，并吞掉松手后补发的 click。
      */
-    private void attachToggleLongPress(final Button btn, final int kind) {
+    private void attachSchemePopupLongPress(final Button btn, final int kind) {
         if (btn == null) {
             return;
         }
@@ -674,8 +674,9 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getActionMasked()) {
                     case MotionEvent.ACTION_DOWN:
+                        cancelSchemeLongPress();
                         schemeLongPressFired = false;
-                        scheduleToggleLongPress(kind);
+                        scheduleSchemePopupLongPress(v, kind);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         if (event.getX() < 0 || event.getY() < 0
@@ -706,18 +707,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         });
     }
 
-    private void scheduleToggleLongPress(final int kind) {
+    private void scheduleSchemePopupLongPress(final View anchor, final int kind) {
         schemeLongPressRunnable = new Runnable() {
             @Override
             public void run() {
                 schemeLongPressFired = true;
-                if (!isAdded()) {
-                    return;
-                }
-                if (kind == SCHEME_KIND_GAMEPAD) {
-                    toggleVirtualGamepad();
-                } else if (kind == SCHEME_KIND_KEYBOARD) {
-                    toggleVirtualKeyboard();
+                if (isAdded() && anchor != null) {
+                    showSchemePopup(anchor, kind);
                 }
             }
         };
@@ -748,51 +744,6 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         refreshSchemeBadges();
         Toast.makeText(getActivity(), on ? "虚拟按键已开启" : "虚拟按键已关闭",
                 Toast.LENGTH_SHORT).show();
-    }
-
-    private void attachSchemeLongPress(final Button btn, final int kind) {
-        if (btn == null) {
-            return;
-        }
-        btn.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        cancelSchemeLongPress();
-                        schemeLongPressFired = false;
-                        scheduleSchemeLongPress(v, kind);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        // 手指滑出按钮范围视为放弃长按，避免误弹
-                        if (event.getX() < 0 || event.getY() < 0
-                                || event.getX() > v.getWidth() || event.getY() > v.getHeight()) {
-                            cancelSchemeLongPress();
-                        }
-                        break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        cancelSchemeLongPress();
-                        break;
-                    default:
-                        break;
-                }
-                return false;
-            }
-        });
-    }
-
-    private void scheduleSchemeLongPress(final View anchor, final int kind) {
-        schemeLongPressRunnable = new Runnable() {
-            @Override
-            public void run() {
-                schemeLongPressFired = true;
-                if (isAdded() && anchor != null) {
-                    showSchemePopup(anchor, kind);
-                }
-            }
-        };
-        schemePressHandler.postDelayed(schemeLongPressRunnable, SCHEME_LONG_PRESS_DELAY_MS);
     }
 
     private void cancelSchemeLongPress() {
