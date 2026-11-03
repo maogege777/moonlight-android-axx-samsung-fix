@@ -487,6 +487,12 @@ rg_keyboard.setOnCheckedChangeListener((group, checkedId) -> onModeChanged(check
             if (child instanceof ViewGroup) {
                 bindKeys((ViewGroup) child, listener);
             } else if (child.getTag() instanceof String) {
+                // EXTENSION DEVELOPMENT [EXT-KB-KEY-BG-DEFAULT] [MODIFIED] BEGIN
+                // 绑定时先预存 XML 里的原始背景。否则 resetView() 会对从未按下过的修饰键
+                // 调用 keyUp()，restoreKeyBg() 找不到记录就兜底成 #383838，
+                // 把 Shift/Ctrl/Alt/Win 的配色刷回灰色（看起来像没生效）。
+                rememberKeyBg(child);
+                // EXTENSION DEVELOPMENT [EXT-KB-KEY-BG-DEFAULT] [MODIFIED] END
                 child.setOnTouchListener(listener);
             }
         }

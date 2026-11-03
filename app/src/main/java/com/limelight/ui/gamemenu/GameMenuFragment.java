@@ -131,7 +131,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         // 单击切换显示/隐藏；长按弹出布局方案菜单
         attachSchemePopupLongPress(btn_game_pad, SCHEME_KIND_GAMEPAD);
         attachSchemePopupLongPress(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
-        // 鼠标与触控：单击、长按都直接弹完整菜单，无需自定义长按监听
+        // 鼠标与触控：单击和长按都弹出同一个鼠标菜单
+        attachLongPressAction(btn_mouse, new Runnable() {
+            @Override
+            public void run() {
+                showMouseMenu(btn_mouse);
+            }
+        });
         refreshSchemeBadges();
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] END
         v.findViewById(R.id.btn_unlink).setOnClickListener(this);
@@ -395,7 +401,12 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         // GameFunctionFragment 的「自定义快捷键」分组，「禁用默认的特殊按键指令」开关继续生效。
         // EXTENSION DEVELOPMENT [EXT-QUICK-KEYS-IN-OPERATIONS] [MODIFIED] END
         if(v.getId()==R.id.btn_mouse){
-            // 鼠标与触控不区分长按：任何点击都弹完整菜单
+            // 长按已弹出菜单时，松手补发的 click 直接丢弃，避免菜单重复重建
+            if(schemeLongPressFired){
+                schemeLongPressFired=false;
+                return;
+            }
+            // 单击同样弹出鼠标与触控菜单
             showMouseMenu(btn_mouse);
             return;
         }
@@ -662,10 +673,10 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
      * 且这里需要在长按后吞掉补发的 click；返回 false 保证短按仍走原有 OnClickListener（切换显隐）。
      */
     /**
-     * 长按弹出虚拟手柄 / 虚拟按键的布局方案菜单。
-     * 与原来的 toggle 共用同一套触摸骨架：超过阈值弹菜单，并吞掉松手后补发的 click。
+     * 长按执行 action：虚拟手柄/虚拟按键弹布局方案、鼠标与触控弹鼠标菜单。
+     * 两者共用同一套触摸骨架：超过阈值执行并按需吞掉松手后补发的 click。
      */
-    private void attachSchemePopupLongPress(final Button btn, final int kind) {
+    private void attachLongPressAction(final Button btn, final Runnable action) {
         if (btn == null) {
             return;
         }
@@ -676,7 +687,7 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
                     case MotionEvent.ACTION_DOWN:
                         cancelSchemeLongPress();
                         schemeLongPressFired = false;
-                        scheduleSchemePopupLongPress(v, kind);
+                        scheduleLongPressAction(v, action);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         if (event.getX() < 0 || event.getY() < 0
@@ -707,17 +718,27 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         });
     }
 
-    private void scheduleSchemePopupLongPress(final View anchor, final int kind) {
+    private void scheduleLongPressAction(final View anchor, final Runnable action) {
         schemeLongPressRunnable = new Runnable() {
             @Override
             public void run() {
                 schemeLongPressFired = true;
-                if (isAdded() && anchor != null) {
-                    showSchemePopup(anchor, kind);
+                if (isAdded() && anchor != null && action != null) {
+                    action.run();
                 }
             }
         };
         schemePressHandler.postDelayed(schemeLongPressRunnable, SCHEME_LONG_PRESS_DELAY_MS);
+    }
+
+    /** 虚拟手柄 / 虚拟按键：长按弹出对应的布局方案列表。 */
+    private void attachSchemePopupLongPress(final Button btn, final int kind) {
+        attachLongPressAction(btn, new Runnable() {
+            @Override
+            public void run() {
+                showSchemePopup(btn, kind);
+            }
+        });
     }
 
     private void toggleVirtualGamepad() {
