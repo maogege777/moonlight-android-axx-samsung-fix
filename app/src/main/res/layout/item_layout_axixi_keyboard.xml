@@ -1024,7 +1024,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/bg_ax_key_sym"
+                android:background="@drawable/bg_ax_key_mod"
                 android:gravity="center"
                 android:tag="55"
                 android:text=","
@@ -1050,7 +1050,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/bg_ax_key_sym"
+                android:background="@drawable/bg_ax_key_mod"
                 android:gravity="center"
                 android:tag="56"
                 android:text="."

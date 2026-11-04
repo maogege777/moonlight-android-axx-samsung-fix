@@ -723,7 +723,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
@@ -737,7 +737,7 @@
                     android:textSize="11dp" />
 
                 <Button
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
@@ -751,7 +751,7 @@
                     android:textSize="10dp" />
 
                 <Button
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
@@ -813,17 +813,18 @@
                 android:orientation="horizontal">
 
                 <!-- EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] BEGIN -->
-                <!-- 本行与上一行三键网格严格对齐：根布局宽 300dp（固定），行内宽 270dp，
-                     上一行权重列宽恒为 (270-3*5)/3 = 85dp。权重写法在只有两个子项时列宽会变成
-                     114.67dp（间距段数不同），所以本行直接按网格写死：
-                     震感强度 = 85dp（第一列），「快捷开关设置」= 175dp（= 85+5+85，占第 2~3 列，
-                     右边缘与「模拟手柄震动」齐平）。若将来根布局宽度变化，本行需同步换算。
-                     左右 padding 用 4dp（与上一行一致），保证「系统默认」四字在 85dp 列内不截断。 -->
+                <!-- 本行严格按上一行的 1/3 + 2/3 分列，且子项参数与上一行同构：
+                     上一行 = 3 个「0dp + weight=1 + marginRight=5dp」；
+                     本行   = 1 个「0dp + weight=1 + marginRight=5dp」（震感强度，占 1/3）
+                            + 1 个「0dp + weight=2 + marginRight=5dp」（快捷开关设置，占 2/3）。
+                     两行末尾都带同样的 5dp 右外边距，所以右边缘与上一行「模拟手柄震动」严格齐平；
+                     两个子项都走权重，不再写死 85dp/175dp，避免面板宽度变化后错位。 -->
                 <Button
                     android:id="@+id/btn_vibration_strength"
-                    android:layout_width="85dp"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
+                    android:layout_weight="1"
                     android:background="@drawable/ic_game_menu_btn_selector"
                     android:drawableLeft="@drawable/ic_axi_vibrate"
                     android:drawablePadding="6dp"
@@ -838,8 +839,10 @@
                      与「震感强度」显示当前值同一模式；XML 里只是初始占位。 -->
                 <Button
                     android:id="@+id/btn_osc_menu_tap_swap"
-                    android:layout_width="175dp"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="2"
                     android:background="@drawable/ic_game_menu_btn_selector"
                     android:drawableLeft="@drawable/ic_axi_tap_swap"
                     android:drawablePadding="6dp"
