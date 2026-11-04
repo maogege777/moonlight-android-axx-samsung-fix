@@ -447,7 +447,11 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
 
         // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
-        // 点亮 = 开启互换（点按弹方案、长按切显隐）；熄灭 = 保持默认（点按切显隐、长按弹方案）
+        // 点亮 = 开启互换（点按弹方案、长按切显隐）；熄灭 = 保持默认（点按切显隐、长按弹方案）。
+        // 第二行与「震感强度」一样显示当前生效值：始终描述「点按现在做什么」，
+        // 避免静态说明与灰色状态矛盾（关着却写着「点按弹方案」）。
+        btn_osc_menu_tap_swap.setText("点按互换\n"
+                + (prefConfig.oscMenuTapSwap ? "点按弹方案" : "点按切显隐"));
         btn_osc_menu_tap_swap.setBackgroundResource(prefConfig.oscMenuTapSwap
                 ? R.drawable.ic_game_menu_btn_green_selector : R.drawable.ic_game_menu_btn_selector);
         // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END

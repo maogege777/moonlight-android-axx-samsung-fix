@@ -813,7 +813,9 @@
                 android:orientation="horizontal">
 
                 <!-- EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] BEGIN -->
-                <!-- 震感强度由整行宽改为 1/3 宽，右边两格留给「开关点按互换」与空位。
+                <!-- 震感强度由整行宽改为 1/3 宽，右边两格留给「点按互换」与空位。
+                     前两个按钮各加 marginRight=5dp，与第一行三个震动按钮的间距规则一致
+                     （DS 触控板行没写间距是历史遗留，新行不照抄）。
                      1/3 宽放不下「文字 + 左右两个 drawable」，所以去掉右侧箭头、左右 padding 10dp→6dp；
                      「系统默认」这类四字值靠这个收窄后的余量保证不截断。 -->
                 <Button
@@ -821,6 +823,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginRight="5dp"
                     android:background="@drawable/ic_game_menu_btn_selector"
                     android:drawableLeft="@drawable/ic_axi_vibrate"
                     android:drawablePadding="6dp"
@@ -830,18 +833,21 @@
                     android:text="震感强度\n15ms"
                     android:textSize="10dp" />
 
+                <!-- 「点按互换」按钮：第二行与「震感强度」一样显示当前生效值（点按切显隐/点按弹方案），
+                     由 initViewData() 按开关状态动态设置，XML 里只是初始占位。 -->
                 <Button
                     android:id="@+id/btn_osc_menu_tap_swap"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:layout_marginRight="5dp"
                     android:background="@drawable/ic_game_menu_btn_selector"
                     android:drawableLeft="@drawable/ic_axi_tap_swap"
                     android:drawablePadding="6dp"
                     android:gravity="left|center_vertical"
                     android:paddingLeft="6dp"
                     android:paddingRight="6dp"
-                    android:text="开关点按\n互换"
+                    android:text="点按互换\n点按切显隐"
                     android:textSize="10dp" />
 
                 <View
