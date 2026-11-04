@@ -812,19 +812,43 @@
                 android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
 
+                <!-- EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] BEGIN -->
+                <!-- 震感强度由整行宽改为 1/3 宽，右边两格留给「开关点按互换」与空位。
+                     1/3 宽放不下「文字 + 左右两个 drawable」，所以去掉右侧箭头、左右 padding 10dp→6dp；
+                     「系统默认」这类四字值靠这个收窄后的余量保证不截断。 -->
                 <Button
                     android:id="@+id/btn_vibration_strength"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@drawable/ic_game_menu_btn_selector"
                     android:drawableLeft="@drawable/ic_axi_vibrate"
-                    android:drawableRight="@drawable/ic_axi_arrow"
                     android:drawablePadding="6dp"
                     android:gravity="left|center_vertical"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
                     android:text="震感强度\n15ms"
                     android:textSize="10dp" />
+
+                <Button
+                    android:id="@+id/btn_osc_menu_tap_swap"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/ic_game_menu_btn_selector"
+                    android:drawableLeft="@drawable/ic_axi_tap_swap"
+                    android:drawablePadding="6dp"
+                    android:gravity="left|center_vertical"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:text="开关点按\n互换"
+                    android:textSize="10dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+                <!-- EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] END -->
             </LinearLayout>
 
             <LinearLayout

@@ -128,9 +128,10 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             btn_screen_move.setBackgroundResource(game.getScreenMoveZoom()?R.drawable.ic_game_menu_btn_green_selector:R.drawable.ic_game_menu_btn_selector);
         }
         // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
-        // 单击切换显示/隐藏；长按弹出布局方案菜单
-        attachSchemePopupLongPress(btn_game_pad, SCHEME_KIND_GAMEPAD);
-        attachSchemePopupLongPress(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
+        // 默认：点按切换显示/隐藏，长按弹出布局方案；
+        // 「开关点按互换」开启后两个动作互换，具体挂载见 attachOscMenuActions()
+        attachOscMenuActions(btn_game_pad, SCHEME_KIND_GAMEPAD);
+        attachOscMenuActions(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
         // 鼠标与触控：单击和长按都弹出同一个鼠标菜单
         attachLongPressAction(btn_mouse, new Runnable() {
             @Override
@@ -326,13 +327,19 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
             return;
         }
         if(v.getId()==R.id.btn_game_pad){
-            // 长按已弹出布局方案菜单时，松手补发的这次 click 直接丢弃，不再切换显隐
+            // 长按动作已触发时，松手补发的这次 click 直接丢弃（长按做什么都一样）
             if(schemeLongPressFired){
                 schemeLongPressFired=false;
                 return;
             }
-            // 单击：切换虚拟手柄显示/隐藏
-            toggleVirtualGamepad();
+            // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] BEGIN
+            // 互换开启时点按弹出布局方案，关闭时仍是切换显示/隐藏（长按分支见 attachOscMenuActions）
+            if(isOscMenuTapSwap()){
+                showSchemePopup(btn_game_pad, SCHEME_KIND_GAMEPAD);
+            } else {
+                toggleVirtualGamepad();
+            }
+            // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] END
             return;
         }
 
@@ -345,13 +352,18 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         }
 
         if(v.getId()==R.id.btn_v_keyboard){
-            // 长按已弹出布局方案菜单时，松手补发的这次 click 直接丢弃，不再切换显隐
+            // 长按动作已触发时，松手补发的这次 click 直接丢弃（长按做什么都一样）
             if(schemeLongPressFired){
                 schemeLongPressFired=false;
                 return;
             }
-            // 单击：切换虚拟按键显示/隐藏
-            toggleVirtualKeyboard();
+            // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] BEGIN
+            if(isOscMenuTapSwap()){
+                showSchemePopup(btn_v_keyboard, SCHEME_KIND_KEYBOARD);
+            } else {
+                toggleVirtualKeyboard();
+            }
+            // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] END
             return;
         }
 
@@ -660,11 +672,13 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
 
     // EXTENSION DEVELOPMENT [EXT-OSC-SCHEME-LONGPRESS] [NEW] BEGIN
     // ========== 单击切换虚拟手柄 / 虚拟按键显隐，长按选择布局方案（EXT-OSC-SCHEME-LONGPRESS-REVERSED） ==========
-    // 交互约定：
+    // 交互约定（默认，即「开关点按互换」关闭时）：
     //   短按  → 切换「显示/隐藏」，按钮绿色高亮同步
     //   长按  → 200ms 后在按钮正下方（空间不足则正上方）弹出方案列表，就近点选
     //   选中  → 写 pref（gamepad_axi_list / keyboard_axi_list）→ 刷新角标 → 热重载布局
     //           → 关闭全部菜单窗口，回到串流画面
+    // 「开关点按互换」开启后，上面两行的短按与长按动作互换（见 EXT-OSC-TAP-LONGPRESS-SWAP）：
+    //   短按  → 弹出方案列表；长按 → 切换「显示/隐藏」
     // 与二级面板「虚拟手柄与虚拟按键」里的 RadioGroup 共用同一份 pref，两处始终一致。
 
     /**
@@ -731,15 +745,43 @@ public class GameMenuFragment extends BaseGameMenuDialog implements View.OnClick
         schemePressHandler.postDelayed(schemeLongPressRunnable, SCHEME_LONG_PRESS_DELAY_MS);
     }
 
-    /** 虚拟手柄 / 虚拟按键：长按弹出对应的布局方案列表。 */
-    private void attachSchemePopupLongPress(final Button btn, final int kind) {
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] BEGIN
+    // attachSchemePopupLongPress() 已并入下面的 attachOscMenuActions()：
+    // 长按动作需要在触发时刻按开关状态分派，不能再在挂载时刻固定成「弹方案」。
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [MODIFIED] END
+
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+    /** 读取「开关点按互换」当前值；菜单在没有 Game 实例时按默认（不互换）处理。 */
+    private boolean isOscMenuTapSwap() {
+        return game != null && game.prefConfig.oscMenuTapSwap;
+    }
+
+    /**
+     * 虚拟手柄 / 虚拟按键菜单按钮：长按挂一个「按当前开关状态分派」的动作。
+     * 开关关闭（默认）：长按弹方案，点按走 OnClickListener 切显隐（原行为）。
+     * 开关开启：长按切显隐，点按在 OnClickListener 里弹方案（见 onClick 的 btn_game_pad / btn_v_keyboard 分支）。
+     * 分派放在长按触发时刻而不是挂载时刻：二级面板里改完开关回到仍开着的主菜单时，
+     * 点按分支（onClick 每次实时读 pref）与长按分支会立即一致，不需要重新挂监听。
+     * 两种模式共用同一套 200ms 长按骨架与 schemeLongPressFired 吞点击机制，
+     * 该标记现在表示「长按动作已触发」，与长按具体做什么无关。
+     */
+    private void attachOscMenuActions(final Button btn, final int kind) {
         attachLongPressAction(btn, new Runnable() {
             @Override
             public void run() {
-                showSchemePopup(btn, kind);
+                if (isOscMenuTapSwap()) {
+                    if (kind == SCHEME_KIND_GAMEPAD) {
+                        toggleVirtualGamepad();
+                    } else {
+                        toggleVirtualKeyboard();
+                    }
+                } else {
+                    showSchemePopup(btn, kind);
+                }
             }
         });
     }
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
 
     private void toggleVirtualGamepad() {
         if (game == null) {

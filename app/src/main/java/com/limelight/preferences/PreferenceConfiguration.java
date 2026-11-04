@@ -156,6 +156,13 @@ public class PreferenceConfiguration {
     //屏幕特殊按键 震动
     public static final String CHECKBOX_ENABLE_KEYBOARD_VIBRATE = "checkbox_vibrate_keyboard";
 
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+    // 主菜单「虚拟手柄 / 虚拟按键」两个按钮的点按与长按行为互换：
+    // 关闭（默认）＝点按切换显示/隐藏、长按弹出布局方案；
+    // 开启＝点按弹出布局方案、长按切换显示/隐藏。
+    public static final String CHECKBOX_OSC_MENU_TAP_SWAP = "checkbox_osc_menu_tap_swap";
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
+
     // EXTENSION DEVELOPMENT [EXT-VIBRATE-DRAG-TOGGLE] [MODIFIED] BEGIN
     //旧键：仅在按下瞬间震动。已被 CHECKBOX_VIBRATE_ON_DRAG 取代，保留仅用于老用户迁移读取。
     public static final String CHECKBOX_VIBRATE_ON_PRESS_ONLY = "checkbox_vibrate_keyboard_on_press_only";
@@ -348,6 +355,12 @@ public class PreferenceConfiguration {
 
     //按下震动时长（毫秒），8~100
     public int vibratePressMs;
+
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+    // Whether the tap and long-press actions of the on-screen gamepad / keyboard
+    // menu buttons are swapped (see CHECKBOX_OSC_MENU_TAP_SWAP).
+    public boolean oscMenuTapSwap;
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
 
     public boolean enableKeyboardSquare;
 
@@ -1040,6 +1053,10 @@ public class PreferenceConfiguration {
                 ? VIBRATE_PRESS_SYSTEM_DEFAULT
                 : Math.max(MIN_VIBRATE_PRESS_MS, Math.min(MAX_VIBRATE_PRESS_MS, rawVibratePressMs));
         // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+        // 默认关闭：点按切换显隐、长按弹出布局方案，与旧版行为一致
+        config.oscMenuTapSwap = prefs.getBoolean(CHECKBOX_OSC_MENU_TAP_SWAP, false);
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
         //兼容joycon手柄
         config.enableJoyConFix=prefs.getBoolean("checkbox_enable_joyconfix",false);
         //全键盘透明度

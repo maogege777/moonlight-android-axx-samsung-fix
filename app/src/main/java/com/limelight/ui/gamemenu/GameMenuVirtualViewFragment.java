@@ -49,6 +49,11 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
 
     private Button btn_vibration_strength;
 
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+    // 「开关点按互换」：互换主菜单虚拟手柄/虚拟按键按钮的点按与长按行为
+    private Button btn_osc_menu_tap_swap;
+    // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
+
     private LinearLayout ll_ds_touchpad_row;
 
     private Button btn_vibration_gamepad;
@@ -118,6 +123,9 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         btn_vibration=v.findViewById(R.id.btn_vibration);
         btn_vibration_on_press=v.findViewById(R.id.btn_vibration_on_press);
         btn_vibration_strength=v.findViewById(R.id.btn_vibration_strength);
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+        btn_osc_menu_tap_swap=v.findViewById(R.id.btn_osc_menu_tap_swap);
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
         ll_ds_touchpad_row=v.findViewById(R.id.ll_ds_touchpad_row);
         btn_vibration_gamepad=v.findViewById(R.id.btn_vibration_gamepad);
         btn_ds_touchpad=v.findViewById(R.id.btn_ds_touchpad);
@@ -162,6 +170,9 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
         btn_vibration.setOnClickListener(this);
         btn_vibration_on_press.setOnClickListener(this);
         btn_vibration_strength.setOnClickListener(this);
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+        btn_osc_menu_tap_swap.setOnClickListener(this);
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
         btn_vibration_gamepad.setOnClickListener(this);
         btn_ds_touchpad.setOnClickListener(this);
         v.findViewById(R.id.btn_right).setOnClickListener(this);
@@ -434,6 +445,12 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
                 + (prefConfig.vibratePressMs == PreferenceConfiguration.VIBRATE_PRESS_SYSTEM_DEFAULT
                 ? "系统默认" : prefConfig.vibratePressMs + "ms"));
         // EXTENSION DEVELOPMENT [EXT-VIBRATE-SYSTEM-DEFAULT] [MODIFIED] END
+
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+        // 点亮 = 开启互换（点按弹方案、长按切显隐）；熄灭 = 保持默认（点按切显隐、长按弹方案）
+        btn_osc_menu_tap_swap.setBackgroundResource(prefConfig.oscMenuTapSwap
+                ? R.drawable.ic_game_menu_btn_green_selector : R.drawable.ic_game_menu_btn_selector);
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
     }
 
     // EXTENSION DEVELOPMENT [EXT-KB-VARIANTS] [ADDED] BEGIN
@@ -527,6 +544,18 @@ public class GameMenuVirtualViewFragment extends BaseGameMenuDialog implements V
                     .commit();
             return;
         }
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] BEGIN
+        if(v.getId()==R.id.btn_osc_menu_tap_swap){
+            prefConfig.oscMenuTapSwap=!prefConfig.oscMenuTapSwap;
+            initViewData();
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .edit()
+                    .putBoolean(PreferenceConfiguration.CHECKBOX_OSC_MENU_TAP_SWAP,prefConfig.oscMenuTapSwap)
+                    .commit();
+            return;
+        }
+        // EXTENSION DEVELOPMENT [EXT-OSC-TAP-LONGPRESS-SWAP] [NEW] END
+
         if(v.getId()==R.id.btn_vibration_strength){
             GameVibrationStrengthFragment fragment=new GameVibrationStrengthFragment();
             fragment.setWidth(UiHelper.dpToPx(getActivity(),364));
