@@ -242,7 +242,9 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_GAMEPAD_TOUCHPAD_AS_MOUSE = false;
     private static final boolean DEFAULT_GAMEPAD_MOTION_SENSORS = true;
     private static final boolean DEFAULT_GAMEPAD_MOTION_FALLBACK = false;
-    private static final boolean DEFAULT_KEEP_VIDEO_ZOOM_ON_DISABLE = true;
+    // 与 res/xml/preferences.xml 的同名开关保持一致的默认值：
+    // 默认「关闭缩放后复原」，需要保留画面比例的用户再手动打开。
+    private static final boolean DEFAULT_KEEP_VIDEO_ZOOM_ON_DISABLE = false;
     private static final boolean DEFAULT_KEYBOARD_ESC_OPENS_GAME_MENU = false;
 
     public static final int FRAME_PACING_MIN_LATENCY = 0;

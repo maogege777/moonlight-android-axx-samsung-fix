@@ -1673,7 +1673,17 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             virtualMouseOverlay.cancelActiveInteractions();
         }
         if (videoZoomGestureOverlay != null) {
-            videoZoomGestureOverlay.resetTransform();
+            // EXTENSION DEVELOPMENT [EXT-VIDEO-ZOOM-FIX] [MODIFIED] BEGIN
+            // 旋转 / 弹出软键盘 / 分屏等配置变化不再无条件清空用户画面：
+            // 开了「保留画面缩放」就连同缩放沿用并重新贴合新的视频区域（后续 1770 行
+            // 还会在布局完成后再刷新一次），否则仍按原行为复位。
+            if (prefConfig.keepVideoZoomOnDisable) {
+                videoZoomGestureOverlay.refreshAfterHostSizeChanged();
+            }
+            else {
+                videoZoomGestureOverlay.resetTransform();
+            }
+            // EXTENSION DEVELOPMENT [EXT-VIDEO-ZOOM-FIX] [MODIFIED] END
         }
         super.onConfigurationChanged(newConfig);
 
@@ -5509,6 +5519,22 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         setVirtualMouseInputSuppressed(false);
         if (enabled) {
             refreshVideoZoomOverlayZOrder();
+            // EXTENSION DEVELOPMENT [EXT-VIDEO-ZOOM-FIX] [MODIFIED] BEGIN
+            // 菜单是 DialogFragment，dismiss() 之后窗口焦点要过一帧才回到 Activity，
+            // 这一帧内 hasWindowFocus() 仍为 false。此前图层是否可见完全依赖
+            // onWindowFocusChanged() 兜底，回调一旦不来就永久 GONE
+            // （表现：按钮变绿、Toast 正常，但双指缩放毫无反应）。
+            // 这里在对话框真正消失后再确认一次可见性与层级。
+            videoZoomGestureOverlay.post(new Runnable() {
+                @Override
+                public void run() {
+                    setVideoZoomInputSuppressed(false);
+                    if (getScreenMoveZoom()) {
+                        refreshVideoZoomOverlayZOrder();
+                    }
+                }
+            });
+            // EXTENSION DEVELOPMENT [EXT-VIDEO-ZOOM-FIX] [MODIFIED] END
         }
         Toast.makeText(this, enabled ? R.string.video_zoom_enabled_hint
                 : keepCurrentTransform ? R.string.video_zoom_disabled_retained
@@ -5815,19 +5841,23 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             return;
         }
 
-        boolean gameMenuShowing = dialogGameMenu != null
-                && dialogGameMenu.getDialog() != null
-                && dialogGameMenu.getDialog().isShowing();
         boolean fullKeyboardShowing = keyBoardLayoutController != null
                 && keyBoardLayoutController.isVisible();
+        // EXTENSION DEVELOPMENT [EXT-VIDEO-ZOOM-FIX] [MODIFIED] BEGIN
+        // 只保留“确实会被别的输入层抢走触摸”的抑制条件：
+        //  - 画中画：整屏手势层本来就不该出现；
+        //  - 全键盘：与键盘重叠的区域要让位（关掉键盘时 showHidekeyBoardLayoutController 会立刻重算）；
+        //  - 多手势触控板：缩放由该扩展自己处理，但用户手动开启“画面缩放”时让手势层接管。
+        // 去掉的两项都是“没人再重算就永久失效”的 latch，正是缩放看似开启、实则无反应的原因：
+        //  - gameMenuShowing：菜单是独立窗口，触摸根本到不了 Activity 的 View 上，无需再抑制；
+        //  - !hasWindowFocus()：无焦点时系统不会派发触摸，用它当条件只会把图层永久关死。
         videoZoomGestureOverlay.setInputSuppressed(suppressed
                 // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] BEGIN
-                || multiGestureTouchpadController != null
+                || (multiGestureTouchpadController != null && !getScreenMoveZoom())
                 // EXTENSION DEVELOPMENT [EXT-TOUCHPAD-MULTI-GESTURE] [MODIFIED] END
                 || isHidingOverlays
-                || gameMenuShowing
-                || fullKeyboardShowing
-                || !hasWindowFocus());
+                || fullKeyboardShowing);
+        // EXTENSION DEVELOPMENT [EXT-VIDEO-ZOOM-FIX] [MODIFIED] END
         if (videoZoomGestureOverlay.isModeEnabled()
                 && videoZoomGestureOverlay.getVisibility() == View.VISIBLE) {
             refreshVideoZoomOverlayZOrder();
